@@ -3,11 +3,14 @@ Usage: spooler SPOOLDIR [options]
 
 Options:
 
-  -p --printer=DEVICE   The device of the printer [Default: /dev/usb/lp0]
+  -p --printer=DEVICE   The device of the printer [Default: /dev/usb/lp-thermal]
   --evince              For local development: don't print anything, but
                         show generated pdfs using evince
   -h --help             Show help
 """
+
+# NOTE: by default we print to /dev/usb/lp-thermal: this is a symlink which is
+# created by a custom udev rule: look at etc/udev/*
 
 import sys
 import os
@@ -40,6 +43,8 @@ def main():
     printer = py.path.local(args['--printer'])
     #
     logging.info('Spooler starting')
+    logging.info('spooldir: %s', spooldir)
+    logging.info('printer: %s', printer)
     orders_dir = spooldir.join('orders').ensure(dir=True)
     drinks_dir = spooldir.join('drinks').ensure(dir=True)
     i = 0

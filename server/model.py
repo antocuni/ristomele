@@ -89,6 +89,7 @@ class Order(db.Model):
         w('')
         w('')
         w('')
+        w('')
         if has_drinks:
             return '\n'.join(lines)
         else:
