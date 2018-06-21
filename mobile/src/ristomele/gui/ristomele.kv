@@ -1,0 +1,49 @@
+#:import ListAdapter kivy.adapters.listadapter.ListAdapter
+#:import Factory kivy.factory.Factory
+#:import get_color_from_hex kivy.utils.get_color_from_hex
+#:import icon kivy.garden.iconfonts.icon
+#:import XCamera kivy.garden.xcamera.XCamera
+#:import darker kivy.garden.xcamera.darker
+#:import Theme ristomele.gui.uix.Theme
+
+# =====================================================================
+# common styles
+# =====================================================================
+
+
+<FlatButton>:
+    background_color: (1, 1, 1, 1)
+    _down_color: darker(self.background_color)
+    color: Theme.ICON
+
+    canvas.before:
+        Color:
+            rgba: self.background_color if self.state == 'normal' else self._down_color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+
+<IconButton@FlatButton>:
+    icon: ""
+    markup: True
+    color: Theme.ICON
+    text: icon(self.icon) if self.icon else ""
+    size_hint_x: None
+    width: self.height
+
+
+# =====================================================================
+# containters.py
+# =====================================================================
+
+<Tables>:
+    BoxLayout:
+        orientation: 'vertical'
+
+        Label:
+            text: "Hello World"
+
+        Label:
+            text: "ciao ciao"    
+                

@@ -1,0 +1,18 @@
+[
+	{
+		"type": "title",
+		"title": "Scrolling"
+	},
+	{
+		"type": "numeric",
+		"title": "Scroll timeout",
+		"section": "widgets",
+		"key": "scroll_timeout"
+	},
+	{
+		"type": "numeric",
+		"title": "Scroll distance",
+		"section": "widgets",
+		"key": "scroll_distance"
+	}
+]
