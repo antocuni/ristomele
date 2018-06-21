@@ -1,0 +1,18 @@
+[
+    { "title": "Sync server",
+      "type": "title"
+    },
+
+    { "title": "Indirizzo",
+      "type": "string",
+      "desc": "Indirizzo del server",
+      "section": "server",
+      "key": "host"
+    },
+
+    { "title": "Porta",
+      "type": "string",
+      "section": "server",
+      "key": "port" 
+    }
+]

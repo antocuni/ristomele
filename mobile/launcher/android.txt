@@ -1,0 +1,3 @@
+title=RistoMele
+author=Antonio Cuni
+orientation=portrait
