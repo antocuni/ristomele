@@ -1,6 +1,14 @@
 from kivy.uix.screenmanager import Screen
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
+from kivy.properties import BooleanProperty
+
+class Table(Button):
+    busy = BooleanProperty()
+
+    ## def on_release(self):
+    ##     self.busy = not self.busy
+
 
 class Tables(Screen):
 
@@ -14,4 +22,4 @@ class Tables(Screen):
         for row in range(self.ROWS):
             for col in range(self.COLS):
                 tname = '%s%s' % (row+1, col+1)
-                self.grid.add_widget(Button(text=tname))
+                self.grid.add_widget(Table(text=tname))

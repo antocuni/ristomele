@@ -11,6 +11,7 @@ from ristomele.gui import iconfonts
 from ristomele.gui.manager import Manager
 from ristomele.logger import Logger
 from ristomele.gui.tables import Tables
+from ristomele.gui.menu import Menu
 
 class RistoMeleApp(App):
     from kivy.uix.settings import SettingsWithTabbedPanel as settings_cls
@@ -52,6 +53,10 @@ class RistoMeleApp(App):
 
     ## def on_stop(self):
     ##     self.sync.stop()
+
+    def new_order(self, table):
+        menu = Menu()
+        self.root.open(menu)
 
 
 def main():

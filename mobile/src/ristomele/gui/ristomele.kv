@@ -37,6 +37,10 @@
 # tables.py
 # =====================================================================
 
+<Table@Button>:
+    background_color: (1.0, 0.0, 0.0, 1.0) if self.busy else (0.0, 1.0, 0.0, 1.0)
+    on_release: app.new_order(self)
+
 <Tables>:
     BoxLayout:
         id: layout
@@ -45,3 +49,46 @@
         Label:
             text: "Mappa dei tavoli"
             size_hint_y: None
+
+
+# =====================================================================
+# menu.py
+# =====================================================================
+
+<MenuItem@BoxLayout>:
+    orientation: 'horizontal'
+    size_hint_y: None
+
+    Label:
+        text: self.parent.name
+
+    BoxLayout:
+        orientation: 'horizontal'
+        Button:
+            text: "-"
+            on_release: root.count = max(root.count-1, 0)
+
+        Label:
+            text: str(root.count)
+
+        Button:
+            text: "+"
+            on_release: root.count += 1
+
+<Menu>:
+    BoxLayout:
+        id: layout
+        orientation: 'vertical'
+
+        Label:
+            text: "Nuovo ordine"
+            size_hint_y: None
+
+        MenuItem:
+            name: "Focaccini"
+
+        MenuItem:
+            name: "Ravioli"
+
+        MenuItem:
+            name: "Salsiccia"
