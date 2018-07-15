@@ -57,6 +57,7 @@
 
 <MenuItem@BoxLayout>:
     orientation: 'horizontal'
+    height: '50dp'
     size_hint_y: None
 
     Label:
@@ -84,11 +85,5 @@
             text: "Nuovo ordine"
             size_hint_y: None
 
-        MenuItem:
-            name: "Focaccini"
-
-        MenuItem:
-            name: "Ravioli"
-
-        MenuItem:
-            name: "Salsiccia"
+        ListView:
+            adapter: ListAdapter(data=['Focaccini', 'Ravioli', 'Salsiccia'], cls=Factory.MenuItem, args_converter=lambda i, x: {'name': x})

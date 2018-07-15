@@ -21,5 +21,5 @@ class Tables(Screen):
         self.ids.layout.add_widget(self.grid)
         for row in range(self.ROWS):
             for col in range(self.COLS):
-                tname = '%s%s' % (row+1, col+1)
+                tname = '%s%s' % (col+1, row+1)
                 self.grid.add_widget(Table(text=tname))
