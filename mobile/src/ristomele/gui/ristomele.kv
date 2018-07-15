@@ -92,4 +92,11 @@
             height: '40dp'
 
         ListView:
-            adapter: ListAdapter(data=root.items, cls=Factory.MenuItem, args_converter=lambda i, x: {'name': x})
+            id: item_list
+            adapter: ListAdapter(data=root.items, cls=lambda x, index: x, args_converter=lambda i, x: {'x': x})
+
+        Button:
+            text: "Invia ordine"
+            size_hint_y: None
+            height: '40dp'
+            on_release: app.submit_menu(root)

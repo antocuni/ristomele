@@ -11,7 +11,7 @@ from ristomele.gui import iconfonts
 from ristomele.gui.manager import Manager
 from ristomele.logger import Logger
 from ristomele.gui.tables import Tables
-from ristomele.gui.menu import Menu
+from ristomele.gui.menu import Menu, MenuItem
 
 class RistoMeleApp(App):
     from kivy.uix.settings import SettingsWithTabbedPanel as settings_cls
@@ -55,8 +55,13 @@ class RistoMeleApp(App):
     ##     self.sync.stop()
 
     def new_order(self, table):
-        menu = Menu(table=table, items=['Focaccini', 'Ravioli'])
+        items = [MenuItem(name=x) for x in ['Focaccini', 'Ravioli']]
+        menu = Menu(table=table, items=items)
         self.root.open(menu)
+
+    def submit_menu(self, menu):
+        for item in menu.items:
+            print item.name, item.count
 
 
 def main():
