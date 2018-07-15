@@ -55,7 +55,7 @@ class RistoMeleApp(App):
     ##     self.sync.stop()
 
     def new_order(self, table):
-        menu = Menu(table=table)
+        menu = Menu(table=table, items=['Focaccini', 'Ravioli'])
         self.root.open(menu)
 
 

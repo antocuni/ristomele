@@ -92,4 +92,4 @@
             height: '40dp'
 
         ListView:
-            adapter: ListAdapter(data=['Focaccini', 'Ravioli', 'Salsiccia'], cls=Factory.MenuItem, args_converter=lambda i, x: {'name': x})
+            adapter: ListAdapter(data=root.items, cls=Factory.MenuItem, args_converter=lambda i, x: {'name': x})

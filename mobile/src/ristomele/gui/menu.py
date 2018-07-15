@@ -1,7 +1,7 @@
 from kivy.uix.screenmanager import Screen
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
-from kivy.properties import ObjectProperty, StringProperty, NumericProperty
+from kivy.properties import ObjectProperty, StringProperty, NumericProperty, ListProperty
 from kivy.uix.boxlayout import BoxLayout
 
 class MenuItem(BoxLayout):
@@ -11,3 +11,4 @@ class MenuItem(BoxLayout):
 
 class Menu(Screen):
     table = ObjectProperty()
+    items = ListProperty()
