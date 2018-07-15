@@ -82,8 +82,14 @@
         orientation: 'vertical'
 
         Label:
-            text: "Nuovo ordine"
+            text: "Tavolo: %s" % root.table.text
             size_hint_y: None
+            height: '50dp'
+
+        TextInput:
+            hint_text: 'Nome'
+            size_hint_y: None
+            height: '40dp'
 
         ListView:
             adapter: ListAdapter(data=['Focaccini', 'Ravioli', 'Salsiccia'], cls=Factory.MenuItem, args_converter=lambda i, x: {'name': x})

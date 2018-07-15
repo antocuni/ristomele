@@ -10,4 +10,4 @@ class MenuItem(BoxLayout):
     count = NumericProperty(default=0)
 
 class Menu(Screen):
-    pass
+    table = ObjectProperty()
