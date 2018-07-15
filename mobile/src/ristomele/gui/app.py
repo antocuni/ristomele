@@ -1,5 +1,7 @@
 import os
 import pypath
+from urlparse import urljoin
+import requests
 from kivy.app import App
 from kivy.resources import resource_find
 from kivy.properties import ObjectProperty
@@ -22,6 +24,12 @@ class RistoMeleApp(App):
         ini = root.join('ristomele.ini')
         Logger.info('config file is %s', ini)
         return str(ini)
+
+    def url(self, path):
+        host = self.config.get('server', 'host')
+        port = self.config.get('server', 'port')
+        base = 'http://%s:%s' % (host, port)
+        return urljoin(base, path)
 
     def build_config(self, config):
         config.setdefaults('server', {
@@ -60,8 +68,12 @@ class RistoMeleApp(App):
         self.root.open(menu)
 
     def submit_menu(self, menu):
-        for item in menu.items:
-            print item.name, item.count
+        url = self.url('order/')
+        payload = dict(
+            table=menu.table.text,
+            items=[item.as_dict() for item in menu.items],
+        )
+        requests.post(url, json=payload)
 
 
 def main():

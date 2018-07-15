@@ -44,3 +44,23 @@ def mobile_download():
         SRC_ZIP.reload()
     return flask.send_file(str(SRC_ZIP.zipfile), as_attachment=True,
                            attachment_filename='src.zip')
+
+def error(message, status=403):
+    myjson = flask.jsonify(result='error',
+                           message=message)
+    return myjson, status
+
+
+@app.route('/order/', methods=['GET', 'POST'])
+def order():
+    if flask.request.method == 'POST':
+        data = flask.request.json
+        if data is None:
+            return error('Expected JSON request', 400)
+        #
+        app.logger.info('\norder POST: %s' % data)
+        print data
+        return flask.jsonify(result='OK')
+    else:
+        return error('Only POST allowed', None, 405)
+

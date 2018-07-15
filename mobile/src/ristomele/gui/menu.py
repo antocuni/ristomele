@@ -9,6 +9,9 @@ class MenuItem(BoxLayout):
     name = StringProperty()
     count = NumericProperty(default=0)
 
+    def as_dict(self):
+        return dict(name=self.name, count=self.count)
+
 class Menu(Screen):
     table = ObjectProperty()
     items = ListProperty()
