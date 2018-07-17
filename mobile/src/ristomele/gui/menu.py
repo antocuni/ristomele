@@ -1,4 +1,5 @@
 from kivy.uix.screenmanager import Screen
+from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.properties import ObjectProperty, StringProperty, NumericProperty, ListProperty
@@ -11,6 +12,10 @@ class MenuItem(BoxLayout):
 
     def as_dict(self):
         return dict(name=self.name, count=self.count)
+
+class MenuSeparator(Label):
+    pass
+
 
 class Menu(Screen):
     table = ObjectProperty()

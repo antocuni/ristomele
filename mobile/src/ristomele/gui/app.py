@@ -13,7 +13,7 @@ from ristomele.gui import iconfonts
 from ristomele.gui.manager import Manager
 from ristomele.logger import Logger
 from ristomele.gui.tables import Tables
-from ristomele.gui.menu import Menu, MenuItem
+from ristomele.gui.menu import Menu, MenuItem, MenuSeparator
 
 class RistoMeleApp(App):
     from kivy.uix.settings import SettingsWithTabbedPanel as settings_cls
@@ -63,7 +63,10 @@ class RistoMeleApp(App):
     ##     self.sync.stop()
 
     def new_order(self, table):
-        items = [MenuItem(name=x) for x in ['Focaccini', 'Ravioli']]
+        items = [MenuItem(name='Coperto'),
+                 MenuSeparator(text='Primi'),
+                 MenuItem(name='Ravioli'),
+                 MenuItem(name='Salsiccia alla piastra')]
         menu = Menu(table=table, items=items)
         self.root.open(menu)
 

@@ -62,6 +62,8 @@
 
     Label:
         text: self.parent.name
+        text_size: self.size
+        padding_x: 20
 
     BoxLayout:
         orientation: 'horizontal'
@@ -75,6 +77,12 @@
         Button:
             text: "+"
             on_release: root.count += 1
+
+<MenuSeparator@Label>:
+    height: '50dp'
+    text_size: self.size
+    valign: "bottom"
+    padding_x: 10
 
 <Menu>:
     BoxLayout:
