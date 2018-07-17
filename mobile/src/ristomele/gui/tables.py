@@ -1,9 +1,8 @@
 import random
-from kivy.uix.screenmanager import Screen
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.properties import BooleanProperty
-from ristomele.gui.uix import FlatButton
+from ristomele.gui.uix import FlatButton, MyScreen
 
 class Table(FlatButton):
     busy = BooleanProperty()
@@ -12,7 +11,7 @@ class Table(FlatButton):
     ##     self.busy = not self.busy
 
 
-class Tables(Screen):
+class Tables(MyScreen):
 
     ROWS = 7
     COLS = 3

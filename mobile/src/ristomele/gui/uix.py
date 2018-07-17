@@ -1,8 +1,10 @@
 from kivy.lang import Builder
 from kivy.animation import Animation
 from kivy.uix.label import Label
+from kivy.uix.screenmanager import Screen
 from kivy.uix.behaviors.button import ButtonBehavior
 from kivy.utils import get_color_from_hex
+
 
 class AbstractTheme(object):
 
@@ -66,6 +68,16 @@ Builder.load_string("""
     bgcolor: Theme.BG
     color: Theme.PRIMARY
 
+<MyScreen>:
+    canvas.before:
+        Color:
+            rgba: self.bgcolor or Theme.TRANSPARENT
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    bgcolor: Theme.BG
+
 <Paragraph>:
     # maximize the width of the label, but let the height growing
     # automatically; scale is used to animate: set it to 0 to hide the label,
@@ -87,6 +99,8 @@ class FlatButton(ButtonBehavior, Label):
 class MyLabel(Label):
     pass
 
+class MyScreen(Screen):
+    pass
 
 class Paragraph(MyLabel):
 
