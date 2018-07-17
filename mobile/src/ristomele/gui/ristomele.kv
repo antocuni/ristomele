@@ -64,18 +64,22 @@
         text: self.parent.name
         text_size: self.size
         padding_x: 20
+        size_hint_x: 0.75
 
     BoxLayout:
         orientation: 'horizontal'
-        Button:
-            text: "-"
+        size_hint_x: 0.25
+        IconButton:
+            icon: 'fa-minus-square'
+            color: Theme.DANGER
             on_release: root.count = max(root.count-1, 0)
 
         MyLabel:
             text: str(root.count)
 
-        Button:
-            text: "+"
+        IconButton:
+            icon: 'fa-plus-square'
+            color: Theme.DANGER
             on_release: root.count += 1
 
 <MenuSeparator>:
@@ -83,6 +87,7 @@
     text_size: self.size
     valign: "bottom"
     padding_x: 10
+    color: Theme.MUTED
 
 <Menu>:
     BoxLayout:
