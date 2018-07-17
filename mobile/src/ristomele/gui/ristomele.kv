@@ -37,8 +37,8 @@
 # tables.py
 # =====================================================================
 
-<Table@Button>:
-    background_color: (1.0, 0.0, 0.0, 1.0) if self.busy else (0.0, 1.0, 0.0, 1.0)
+<Table>:
+    background_color: Theme.DANGER if self.busy else Theme.SUCCESS
     on_release: app.new_order(self)
 
 <Tables>:
@@ -46,7 +46,7 @@
         id: layout
         orientation: 'vertical'
 
-        Label:
+        MyLabel:
             text: "Mappa dei tavoli"
             size_hint_y: None
 
@@ -55,12 +55,12 @@
 # menu.py
 # =====================================================================
 
-<MenuItem@BoxLayout>:
+<MenuItem>:
     orientation: 'horizontal'
-    height: '50dp'
+    height: '30dp'
     size_hint_y: None
 
-    Label:
+    MyLabel:
         text: self.parent.name
         text_size: self.size
         padding_x: 20
@@ -71,15 +71,15 @@
             text: "-"
             on_release: root.count = max(root.count-1, 0)
 
-        Label:
+        MyLabel:
             text: str(root.count)
 
         Button:
             text: "+"
             on_release: root.count += 1
 
-<MenuSeparator@Label>:
-    height: '50dp'
+<MenuSeparator>:
+    height: '30dp'
     text_size: self.size
     valign: "bottom"
     padding_x: 10
@@ -89,7 +89,7 @@
         id: layout
         orientation: 'vertical'
 
-        Label:
+        MyLabel:
             text: "Tavolo: %s" % root.table.text
             size_hint_y: None
             height: '50dp'
