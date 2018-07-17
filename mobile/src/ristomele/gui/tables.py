@@ -1,3 +1,4 @@
+import random
 from kivy.uix.screenmanager import Screen
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
@@ -23,4 +24,6 @@ class Tables(Screen):
         for row in range(self.ROWS):
             for col in range(self.COLS):
                 tname = '%s%s' % (col+1, row+1)
-                self.grid.add_widget(Table(text=tname))
+                self.grid.add_widget(Table(text=tname,
+                                           busy=random.choice([0, 0, 0, 1]),
+                                           ))
