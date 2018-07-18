@@ -84,7 +84,7 @@ class RistoMeleApp(App):
                  MenuItem(name='Birra alla spina', price=3.5),
                  MenuItem(name='Lattine - Bottiglietta The', price=1.5),
                  MenuItem(name='Acqua minerale piccola', price=1),
-                 MenuItem(name='Caffè', price=1),
+                 MenuItem(name='Caffe', price=1),
                  ]
         menu = Menu(table=table, items=items)
         self.root.open(menu)
@@ -93,11 +93,20 @@ class RistoMeleApp(App):
         url = self.url('order/')
         payload = dict(
             table=menu.table.text,
-            customer=menu.ids.customer_name.text,
+            customer=menu.customer,
             menuitems=[item.as_dict() for item in menu.items],
         )
         requests.post(url, json=payload)
 
+    def print_menu(self, menu):
+        s = menu.as_textual_receipt()
+        if platform == 'android':
+            from ristomele.gui.printer import print_string
+            print_string(s)
+        else:
+            print
+            print s
+            print
 
 def main():
     iconfonts.init()
