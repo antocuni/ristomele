@@ -14,10 +14,11 @@ class MenuItem(BoxLayout):
     def as_dict(self):
         return dict(kind='item', name=self.name, count=self.count)
 
-class MenuSeparator(MyLabel):
+class MenuSeparator(BoxLayout):
+    name = StringProperty()
 
     def as_dict(self):
-        return dict(kind='separator', name=self.text)
+        return dict(kind='separator', name=self.name)
 
 
 class Menu(MyScreen):

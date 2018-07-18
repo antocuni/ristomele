@@ -92,11 +92,14 @@
             on_release: root.count += 1
 
 <MenuSeparator>:
+    orientation: 'horizontal'
     height: '30dp'
-    text_size: self.size
-    valign: "bottom"
-    padding_x: 10
-    color: Theme.MUTED
+    size_hint_y: None
+    MyLabel:
+        text: root.name
+        text_size: self.size
+        padding_x: 10
+        color: Theme.MUTED
 
 <Menu>:
     BoxLayout:
