@@ -17,14 +17,14 @@
         <div class="col-xs-3">
           <b>Tavolo</b>
         </div>
-        <div class="col-xs-1">32</div>
+        <div class="col-xs-1">{{data.table}}</div>
       </div>
 
       <div class="row">
         <div class="col-xs-3">
           <b>Cliente</b>
         </div>
-        <div class="col-xs-1">Pippo</div>
+        <div class="col-xs-1">{{data.customer}}</div>
       </div>
 
       <br>
@@ -37,37 +37,19 @@
             <th></th>
             <th>Quantità</th>
           </tr>
-          <tr>
-            <td>Coperto</td>
-            <td>3</td>
-          </tr>
-          <tr>
-          </tr>
 
-          <tr>
-            <th style="padding-top: 2em" colspan="2">Primi</th>
-          </tr>
-          <tr>
-            <td>Ravioli</td>
-            <td>3</td>
-          </tr>
-
-          <tr>
-            <th style="padding-top: 2em" colspan="2">Secondi</th>
-          </tr>
-          
-          <tr>
-            <td>Salssicia alla piastra</td>
-            <td>1</td>
-          </tr>      
-          <tr>
-            <td>Salssicia alla piatra + Contorno</td>
-            <td>2</td>
-          </tr>      
-          <tr>
-            <td>Arrosto di manzo</td>
-            <td>0</td>
-          </tr>
+          {% for item in data.menuitems %}
+            {% if item.kind == 'separator' %}
+              <tr>
+                <th style="padding-top: 2em" colspan="2">{{item.name}}</th>
+              </tr>
+            {% else %}
+              <tr>
+                <td>{{item.name}}</td>
+                <td>{{item.count}}</td>
+              </tr>
+            {% endif %}
+          {% endfor %}
         </table>
       </div>
       </div>

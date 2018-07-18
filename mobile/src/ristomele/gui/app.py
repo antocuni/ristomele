@@ -74,7 +74,8 @@ class RistoMeleApp(App):
         url = self.url('order/')
         payload = dict(
             table=menu.table.text,
-            items=[item.as_dict() for item in menu.items],
+            customer=menu.ids.customer_name.text,
+            menuitems=[item.as_dict() for item in menu.items],
         )
         requests.post(url, json=payload)
 
