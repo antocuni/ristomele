@@ -29,6 +29,7 @@ BUILDFLAGS += --name $(NAME)
 BUILDFLAGS += --version $(VERSION)
 #BUILDFLAGS += --icon $(ROOT)/play/icon.png
 BUILDFLAGS += --permission INTERNET
+BUILDFLAGS += --permission BLUETOOTH
 #BUILDFLAGS += --permission CAMERA
 BUILDFLAGS += --orientation portrait
 #BUILDFLAGS += --minsdk 13
