@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="{{static}}/bootstrap.min.css">
   </head>
 
-  <body style="font-size: 18pt">
+  <body style="font-size: 16pt">
     <div class="container">
       <div class="row">
         <div class="col-xs-3">
@@ -32,21 +32,21 @@
       
       <div class="row">
         <div class="col-xs-9">
-        <table class="table" style="font-size: 15pt">
-          <tr>
-            <th></th>
-            <th>Quantità</th>
-          </tr>
-
+        <table class="table" style="font-size: 14pt">
           {% for item in data.menuitems %}
             {% if item.kind == 'separator' %}
               <tr>
-                <th style="padding-top: 2em" colspan="2">{{item.name}}</th>
+                <th colspan="2">{{item.name}}</th>
+              </tr>
+            {% elif item.count == 0 %}
+              <tr style="padding-left: 1em" class="text-muted">
+                <td></td>
+                <td>{{item.name}}</td>
               </tr>
             {% else %}
               <tr>
+                <td class="text-right">{{item.count}}</td>
                 <td>{{item.name}}</td>
-                <td>{{item.count}}</td>
               </tr>
             {% endif %}
           {% endfor %}
