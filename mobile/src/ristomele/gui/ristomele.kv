@@ -38,6 +38,15 @@
 # =====================================================================
 
 <Table>:
+    canvas.after:
+        Color:
+            rgba: Theme.MUTED
+
+        Line:
+            rectangle: self.x,self.y,self.width,self.height
+            # dash_offset: 5
+            # dash_length: 3
+
     background_color: Theme.DANGER if self.busy else Theme.SUCCESS
     on_release: app.new_order(self)
 
