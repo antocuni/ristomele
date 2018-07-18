@@ -91,11 +91,7 @@ class RistoMeleApp(App):
 
     def submit_menu(self, menu):
         url = self.url('order/')
-        payload = dict(
-            table=menu.table.text,
-            customer=menu.customer,
-            menuitems=[item.as_dict() for item in menu.items],
-        )
+        payload = menu.as_dict()
         requests.post(url, json=payload)
 
     def print_menu(self, menu):

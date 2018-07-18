@@ -29,6 +29,18 @@ class Menu(MyScreen):
     def customer(self):
         return self.ids.customer_name.text
 
+    @property
+    def notes(self):
+        return self.ids.notes.text
+
+    def as_dict(self):
+        return dict(
+            table=self.table.text,
+            customer=self.customer,
+            notes=self.notes,
+            menuitems=[item.as_dict() for item in self.items],
+        )
+
     def as_textual_receipt(self):
         WIDTH = 32
         lines = []

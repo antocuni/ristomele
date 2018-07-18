@@ -80,7 +80,7 @@
         size_hint_x: 0.25
         IconButton:
             icon: 'fa-minus-square'
-            color: Theme.DANGER
+            color: Theme.MUTED
             on_release: root.count = max(root.count-1, 0)
 
         MyLabel:
@@ -88,7 +88,7 @@
 
         IconButton:
             icon: 'fa-plus-square'
-            color: Theme.DANGER
+            color: Theme.MUTED
             on_release: root.count += 1
 
 <MenuSeparator>:
@@ -99,7 +99,7 @@
         text: root.name
         text_size: self.size
         padding_x: 10
-        color: Theme.MUTED
+        color: (0, 0, 0, 1)
 
 <Menu>:
     BoxLayout:
@@ -115,7 +115,13 @@
             id: customer_name
             hint_text: 'Nome'
             size_hint_y: None
-            height: '40dp'
+            height: '30dp'
+
+        TextInput:
+            id: notes
+            hint_text: 'Note'
+            size_hint_y: None
+            height: '30dp'
 
         ListView:
             id: item_list
@@ -132,3 +138,4 @@
             size_hint_y: None
             height: '40dp'
             on_release: app.print_menu(root)
+
