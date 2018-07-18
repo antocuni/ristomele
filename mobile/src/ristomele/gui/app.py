@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 import os
 import pypath
 from urlparse import urljoin
@@ -63,10 +64,28 @@ class RistoMeleApp(App):
     ##     self.sync.stop()
 
     def new_order(self, table):
-        items = [MenuItem(name='Coperto'),
+        items = [MenuItem(name='Coperto', price=1),
                  MenuSeparator(text='Primi'),
-                 MenuItem(name='Ravioli'),
-                 MenuItem(name='Salsiccia alla piastra')]
+                 MenuItem(name='Ravioli', price=7),
+                 MenuSeparator(text='Secondi'),
+                 MenuItem(name='Salsiccia alla piastra', price=4),
+                 MenuItem(name='Salsiccia alla piastra + contorno', price=5),
+                 MenuItem(name='Arrosto di manzo', price=5),
+                 MenuItem(name='Arrosto di manzo + contorno', price=6),
+                 MenuSeparator(text='Contorni'),
+                 MenuItem(name='Patatine fritte', price=2),
+                 MenuItem(name='Pomodori', price=2),
+                 MenuSeparator(text='Dolci'),
+                 MenuItem(name='Dolci misti', price=3),
+                 MenuItem(name='Semifreddo alla nutella', price=3.5),
+                 MenuSeparator(text='Bevande'),
+                 MenuItem(name='Bottiglia vino rosso', price=5),
+                 MenuItem(name='Bottiglia vino bianco', price=5),
+                 MenuItem(name='Birra alla spina', price=3.5),
+                 MenuItem(name='Lattine - Bottiglietta The', price=1.5),
+                 MenuItem(name='Acqua minerale piccola', price=1),
+                 MenuItem(name='Caffè', price=1),
+                 ]
         menu = Menu(table=table, items=items)
         self.root.open(menu)
 

@@ -9,6 +9,7 @@ class MenuItem(BoxLayout):
     root = ObjectProperty()
     name = StringProperty()
     count = NumericProperty(default=0)
+    price = NumericProperty(default=0)
 
     def as_dict(self):
         return dict(kind='item', name=self.name, count=self.count)
