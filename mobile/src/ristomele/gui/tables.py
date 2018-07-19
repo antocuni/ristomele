@@ -13,7 +13,7 @@ class Table(FlatButton):
 
 class Tables(MyScreen):
 
-    ROWS = 7
+    ROWS = 5
     COLS = 3
 
     def __init__(self, **kwds):
@@ -24,5 +24,6 @@ class Tables(MyScreen):
             for col in range(self.COLS):
                 tname = '%s%s' % (col+1, row+1)
                 self.grid.add_widget(Table(text=tname,
-                                           busy=random.choice([0, 0, 0, 1]),
+                                           busy=False,
+                                           #busy=random.choice([0, 0, 0, 1]),
                                            ))
