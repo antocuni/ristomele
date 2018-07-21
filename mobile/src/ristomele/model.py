@@ -50,7 +50,7 @@ class Menu(EventDispatcher):
             table=self.table.as_dict(),
             customer=self.customer,
             notes=self.notes,
-            menuitems=[item.as_dict() for item in self.items],
+            items=[item.as_dict() for item in self.items],
         )
 
     def as_textual_receipt(self):

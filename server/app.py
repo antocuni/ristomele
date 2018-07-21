@@ -75,7 +75,7 @@ def order():
         app.logger.info('\norder POST: %s' % data)
         html = flask.render_template('order.html',
                                      static=str(STATIC),
-                                     data=data)
+                                     menu=data)
         pdf = topdf(html, 'order')
         # XXX: eventually, we should print it and/or move it to a spool dir
         os.system('evince "%s" &' % pdf)

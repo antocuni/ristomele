@@ -26,7 +26,7 @@ def test_Menu_as_dict():
             busy=False),
         customer='pippo',
         notes='my notes',
-        menuitems=[
+        items=[
             dict(kind='item', name='item1', count=1, price=10),
             dict(kind='separator', name='---', count=0, price=0),
             dict(kind='item', name='item2', count=2, price=20),
