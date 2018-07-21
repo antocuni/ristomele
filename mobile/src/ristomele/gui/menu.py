@@ -6,40 +6,20 @@ from kivy.uix.boxlayout import BoxLayout
 from ristomele.gui.uix import MyLabel, MyScreen
 
 class MenuItem(BoxLayout):
-    root = ObjectProperty()
-    name = StringProperty()
-    count = NumericProperty(default=0)
-    price = NumericProperty(default=0)
-
-    def as_dict(self):
-        return dict(kind='item', name=self.name, count=self.count)
+    item = ObjectProperty()
 
 class MenuSeparator(BoxLayout):
-    name = StringProperty()
-
-    def as_dict(self):
-        return dict(kind='separator', name=self.name)
+    item = ObjectProperty()
 
 
-class Menu(MyScreen):
-    table = ObjectProperty()
-    items = ListProperty()
+class MenuScreen(MyScreen):
+    menu = ObjectProperty()
 
-    @property
-    def customer(self):
-        return self.ids.customer_name.text
-
-    @property
-    def notes(self):
-        return self.ids.notes.text
-
-    def as_dict(self):
-        return dict(
-            table=self.table.text,
-            customer=self.customer,
-            notes=self.notes,
-            menuitems=[item.as_dict() for item in self.items],
-        )
+    def item_class(self, x, index):
+        if x.kind == 'item':
+            return MenuItem(item=x)
+        else:
+            return MenuSeparator(item=x)
 
     def as_textual_receipt(self):
         WIDTH = 32

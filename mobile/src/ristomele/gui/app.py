@@ -15,7 +15,7 @@ from ristomele.gui import iconfonts
 from ristomele.gui.manager import Manager
 from ristomele.logger import Logger
 from ristomele.gui.tables import TablesScreen
-from ristomele.gui.menu import Menu, MenuItem, MenuSeparator
+from ristomele.gui.menu import MenuScreen
 
 class RistoMeleApp(App):
     from kivy.uix.settings import SettingsWithTabbedPanel as settings_cls
@@ -66,36 +66,39 @@ class RistoMeleApp(App):
     ##     self.sync.stop()
 
     def new_order(self, table):
-        items = [MenuItem(name='Coperto', price=1),
-                 MenuSeparator(name='Primi'),
-                 MenuItem(name='Ravioli', price=7),
-                 MenuSeparator(name='Secondi'),
-                 MenuItem(name='Salsiccia alla piastra', price=4),
-                 MenuItem(name='Salsiccia alla piastra + contorno', price=5),
-                 MenuItem(name='Arrosto di manzo', price=5),
-                 MenuItem(name='Arrosto di manzo + contorno', price=6),
-                 MenuSeparator(name='Contorni'),
-                 MenuItem(name='Patatine fritte', price=2),
-                 MenuItem(name='Pomodori', price=2),
-                 MenuSeparator(name='Dolci'),
-                 MenuItem(name='Dolci misti', price=3),
-                 MenuItem(name='Semifreddo alla nutella', price=3.5),
-                 MenuSeparator(name='Bevande'),
-                 MenuItem(name='Bottiglia vino rosso', price=5),
-                 MenuItem(name='Bottiglia vino bianco', price=5),
-                 MenuItem(name='Birra alla spina', price=3.5),
-                 MenuItem(name='Lattine - Bottiglietta The', price=1.5),
-                 MenuItem(name='Acqua minerale piccola', price=1),
-                 MenuItem(name='Caffe', price=1),
+        Item = model.MenuItem
+        Sep = lambda name: model.MenuItem(kind='separator', name=name)
+        items = [Item(name='Coperto', price=1),
+                 Sep(name='Primi'),
+                 Item(name='Ravioli', price=7),
+                 Sep(name='Secondi'),
+                 Item(name='Salsiccia alla piastra', price=4),
+                 Item(name='Salsiccia alla piastra + contorno', price=5),
+                 Item(name='Arrosto di manzo', price=5),
+                 Item(name='Arrosto di manzo + contorno', price=6),
+                 Sep(name='Contorni'),
+                 Item(name='Patatine fritte', price=2),
+                 Item(name='Pomodori', price=2),
+                 Sep(name='Dolci'),
+                 Item(name='Dolci misti', price=3),
+                 Item(name='Semifreddo alla nutella', price=3.5),
+                 Sep(name='Bevande'),
+                 Item(name='Bottiglia vino rosso', price=5),
+                 Item(name='Bottiglia vino bianco', price=5),
+                 Item(name='Birra alla spina', price=3.5),
+                 Item(name='Lattine - Bottiglietta The', price=1.5),
+                 Item(name='Acqua minerale piccola', price=1),
+                 Item(name='Caffe', price=1),
                  ]
-        menu = Menu(table=table, items=items)
-        self.root.open(menu)
+        menu = model.Menu(table=table, items=items)
+        screen = MenuScreen(name='menu', menu=menu)
+        self.root.open(screen)
 
     def submit_menu(self, menu):
         url = self.url('order/')
         payload = menu.as_dict()
         requests.post(url, json=payload)
-        self.print_menu(menu)
+        #self.print_menu(menu)
 
     def print_menu(self, menu):
         s = menu.as_textual_receipt()

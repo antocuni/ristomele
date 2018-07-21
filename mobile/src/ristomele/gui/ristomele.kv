@@ -49,7 +49,7 @@
 
     background_color: Theme.DANGER if self.table.busy else Theme.SUCCESS
     text: self.table.name
-    on_release: app.new_order(self)
+    on_release: app.new_order(self.table)
 
 
 <TablesScreen>:
@@ -72,7 +72,7 @@
     size_hint_y: None
 
     MyLabel:
-        text: self.parent.name
+        text: root.item.name
         text_size: self.size
         padding_x: 20
         size_hint_x: 0.75
@@ -83,33 +83,33 @@
         IconButton:
             icon: 'fa-minus-square'
             color: Theme.MUTED
-            on_release: root.count = max(root.count-1, 0)
+            on_release: root.item.count = max(root.item.count-1, 0)
 
         MyLabel:
-            text: str(root.count)
+            text: str(root.item.count)
 
         IconButton:
             icon: 'fa-plus-square'
             color: Theme.MUTED
-            on_release: root.count += 1
+            on_release: root.item.count += 1
 
 <MenuSeparator>:
     orientation: 'horizontal'
     height: '30dp'
     size_hint_y: None
     MyLabel:
-        text: root.name
+        text: root.item.name
         text_size: self.size
         padding_x: 10
         color: (0, 0, 0, 1)
 
-<Menu>:
+<MenuScreen>:
     BoxLayout:
         id: layout
         orientation: 'vertical'
 
         MyLabel:
-            text: "Tavolo: %s" % root.table.text
+            text: "Tavolo: %s" % root.menu.table.name
             size_hint_y: None
             height: '50dp'
 
@@ -129,13 +129,13 @@
 
         ListView:
             id: item_list
-            adapter: ListAdapter(data=root.items, cls=lambda x, index: x, args_converter=lambda i, x: {'x': x})
+            adapter: ListAdapter(data=root.menu.items, cls=root.item_class, args_converter=lambda i, x: {'x': x})
 
         Button:
             text: "Invia ordine"
             size_hint_y: None
             height: '40dp'
-            on_release: app.submit_menu(root)
+            on_release: app.submit_menu(root.menu)
 
         # Button:
         #     text: "Stampa"
