@@ -98,7 +98,7 @@ class RistoMeleApp(App):
         url = self.url('order/')
         payload = menu.as_dict()
         requests.post(url, json=payload)
-        #self.print_menu(menu)
+        self.print_menu(menu)
 
     def print_menu(self, menu):
         s = menu.as_textual_receipt()

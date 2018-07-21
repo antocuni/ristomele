@@ -25,37 +25,3 @@ class MenuScreen(MyScreen):
         self.menu.customer = self.ids.customer_name.text
         self.menu.notes = self.ids.notes.text
         app.submit_menu(self.menu)
-
-    def as_textual_receipt(self):
-        WIDTH = 32
-        lines = []
-        w = lines.append
-        w('RICEVUTA')
-        w('Numero ordine: xxx')
-        w('Tavolo: %s' % self.table.text)
-        w('Cliente: %s' % self.customer)
-        w('')
-        total = 0
-        for item in self.items:
-            if not isinstance(item, MenuItem):
-                continue
-            if item.count == 0:
-                continue
-            subtot = item.count * item.price
-            descr = item.name
-            price = '%s %5.2f' % (('x%d' % item.count).ljust(3), subtot)
-            total += subtot
-            #
-            descr = (descr + ' ')[:WIDTH]
-            if len(descr) + len(price) > WIDTH:
-                # print on two separate lines
-                w(descr)
-                w(price.rjust(WIDTH))
-            else:
-                # print on a single line
-                line = '%s%s' % (descr, price.rjust(WIDTH-len(descr)))
-                w(line)
-        w('')
-        line = 'TOTALE: %.2f' % total
-        w(line.rjust(WIDTH))
-        return '\n'.join(lines)
