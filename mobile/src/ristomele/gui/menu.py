@@ -21,6 +21,11 @@ class MenuScreen(MyScreen):
         else:
             return MenuSeparator(item=x)
 
+    def submit(self, app):
+        self.menu.customer = self.ids.customer_name.text
+        self.menu.notes = self.ids.notes.text
+        app.submit_menu(self.menu)
+
     def as_textual_receipt(self):
         WIDTH = 32
         lines = []
