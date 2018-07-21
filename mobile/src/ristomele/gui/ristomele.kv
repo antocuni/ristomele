@@ -37,7 +37,7 @@
 # tables.py
 # =====================================================================
 
-<Table>:
+<TableButton>:
     canvas.after:
         Color:
             rgba: Theme.MUTED
@@ -47,10 +47,12 @@
             # dash_offset: 5
             # dash_length: 3
 
-    background_color: Theme.DANGER if self.busy else Theme.SUCCESS
+    background_color: Theme.DANGER if self.table.busy else Theme.SUCCESS
+    text: self.table.name
     on_release: app.new_order(self)
 
-<Tables>:
+
+<TablesScreen>:
     BoxLayout:
         id: layout
         orientation: 'vertical'

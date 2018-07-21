@@ -9,11 +9,12 @@ from kivy.properties import ObjectProperty
 from kivy.utils import platform
 from kivy.core.window import Window
 import ristomele
+from ristomele import model
 import ristomele.gui.uix # side effects
 from ristomele.gui import iconfonts
 from ristomele.gui.manager import Manager
 from ristomele.logger import Logger
-from ristomele.gui.tables import Tables
+from ristomele.gui.tables import TablesScreen
 from ristomele.gui.menu import Menu, MenuItem, MenuSeparator
 
 class RistoMeleApp(App):
@@ -48,7 +49,8 @@ class RistoMeleApp(App):
     def build(self):
         Window.bind(on_keyboard=self.on_keyboard)
         manager = Manager()
-        main = Tables(name='main')
+        restaurant = model.Restaurant()
+        main = TablesScreen(name='main', restaurant=restaurant)
         manager.open(main)
         return manager
 
