@@ -44,8 +44,9 @@ def order():
                                      order=myorder,
                                      menu=menu)
         pdf = topdf(html, 'order')
-        # XXX: eventually, we should print it and/or move it to a spool dir
-        os.system('evince "%s" &' % pdf)
+        if not current_app.config['TESTING']:
+            # XXX: eventually, we should print it and/or move it to a spool dir
+            os.system('evince "%s" &' % pdf)
         return flask.jsonify(result='OK')
     else:
         return error('Only POST allowed', None, 405)
