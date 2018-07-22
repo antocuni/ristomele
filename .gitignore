@@ -1,3 +1,9 @@
+db.sqlite
+mobile/play
+mobile/ristomele.ini
+mobile/src.zip
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
