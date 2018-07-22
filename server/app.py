@@ -1,13 +1,20 @@
 import os
 import py
 import zipfile
+import json
 import flask
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug import secure_filename
 from server import config
 
 app = flask.Flask('risto_server')
 STATIC = config.ROOT.join('server', 'static')
 MOBILE = config.ROOT.join('mobile')
+DB = config.ROOT.join('db.sqlite')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s' % DB
+db = SQLAlchemy(app)
+from server import model
+db.create_all()
 
 class SrcZip(object):
 
@@ -68,14 +75,19 @@ def topdf(html, basename):
 @app.route('/order/', methods=['GET', 'POST'])
 def order():
     if flask.request.method == 'POST':
-        data = flask.request.json
-        if data is None:
+        menu = flask.request.json
+        if menu is None:
             return error('Expected JSON request', 400)
         #
-        app.logger.info('\norder POST: %s' % data)
+        app.logger.info('\norder POST: %s' % menu)
+        #
+        myorder = model.Order(menu=json.dumps(menu))
+        db.session.add(myorder)
+        db.session.commit()
         html = flask.render_template('order.html',
                                      static=str(STATIC),
-                                     menu=data)
+                                     order=myorder,
+                                     menu=menu)
         pdf = topdf(html, 'order')
         # XXX: eventually, we should print it and/or move it to a spool dir
         os.system('evince "%s" &' % pdf)
