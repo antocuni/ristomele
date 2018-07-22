@@ -53,11 +53,10 @@ class Menu(EventDispatcher):
             items=[item.as_dict() for item in self.items],
         )
 
-    def as_textual_receipt(self):
-        WIDTH = 32
+    def as_textual_receipt(self, width=32):
         lines = []
         w = lines.append
-        w('RICEVUTA')
+        w('RICEVUTA NON FISCALE')
         w('Numero ordine: xxx')
         w('Tavolo: %s' % self.table.name)
         w('Cliente: %s' % self.customer)
@@ -73,16 +72,16 @@ class Menu(EventDispatcher):
             price = '%s %5.2f' % (('x%d' % item.count).ljust(3), subtot)
             total += subtot
             #
-            descr = (descr + ' ')[:WIDTH]
-            if len(descr) + len(price) > WIDTH:
+            descr = (descr + ' ')[:width]
+            if len(descr) + len(price) > width:
                 # print on two separate lines
                 w(descr)
-                w(price.rjust(WIDTH))
+                w(price.rjust(width))
             else:
                 # print on a single line
-                line = '%s%s' % (descr, price.rjust(WIDTH-len(descr)))
+                line = '%s%s' % (descr, price.rjust(width-len(descr)))
                 w(line)
         w('')
         line = 'TOTALE: %.2f' % total
-        w(line.rjust(WIDTH))
+        w(line.rjust(width))
         return '\n'.join(lines)
