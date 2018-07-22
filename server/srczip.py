@@ -3,6 +3,7 @@ import zipfile
 from server import config
 
 MOBILE = config.ROOT.join('mobile')
+srczip = flask.Blueprint('srczip', __name__)
 
 class SrcZip(object):
 
@@ -29,18 +30,15 @@ class SrcZip(object):
 
 SRC_ZIP = SrcZip(MOBILE)
 
+@srczip.route('/mobile/md5')
 def mobile_md5():
     if config.DEBUG:
         SRC_ZIP.reload()
     return flask.jsonify(md5=SRC_ZIP.md5)
 
+@srczip.route('/mobile/download')
 def mobile_download():
     if config.DEBUG:
         SRC_ZIP.reload()
     return flask.send_file(str(SRC_ZIP.zipfile), as_attachment=True,
                            attachment_filename='src.zip')
-
-
-def add_routes(app):
-    app.route('/mobile/md5')(mobile_md5)
-    app.route('/mobile/download')(mobile_download)

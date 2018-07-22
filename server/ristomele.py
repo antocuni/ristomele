@@ -6,6 +6,7 @@ from flask import current_app
 from server import config
 
 STATIC = config.ROOT.join('server', 'static')
+ristomele = flask.Blueprint('ristomele', __name__)
 
 def error(message, status=403):
     myjson = flask.jsonify(result='error',
@@ -25,7 +26,7 @@ def topdf(html, basename):
         raise ValueError('Error when executing wkhtmltopdf')
     return pdfname
 
-
+@ristomele.route('/order/', methods=['GET', 'POST'])
 def order():
     from server import model
     if flask.request.method == 'POST':
@@ -48,7 +49,3 @@ def order():
         return flask.jsonify(result='OK')
     else:
         return error('Only POST allowed', None, 405)
-
-
-def add_routes(app):
-    app.route('/order/', methods=['GET', 'POST'])(order)
