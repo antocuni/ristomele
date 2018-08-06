@@ -47,6 +47,6 @@ def order():
         if not current_app.config['TESTING']:
             # XXX: eventually, we should print it and/or move it to a spool dir
             os.system('evince "%s" &' % pdf)
-        return flask.jsonify(result='OK')
+        return flask.jsonify(result='OK', order=myorder.as_dict())
     else:
         return error('Only POST allowed', None, 405)
