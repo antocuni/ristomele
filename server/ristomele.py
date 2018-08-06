@@ -26,31 +26,28 @@ def topdf(html, basename, htmldir, pdfdir):
         raise ValueError('Error when executing wkhtmltopdf')
     return pdfname
 
-@ristomele.route('/order/', methods=['GET', 'POST'])
-def order():
+@ristomele.route('/order/', methods=['POST'])
+def new_order():
     from server import model
-    if flask.request.method == 'POST':
-        menu = flask.request.json
-        if menu is None:
-            return error('Expected JSON request', 400)
-        #
-        current_app.logger.info('\norder POST: %s' % menu)
-        #
-        myorder = model.Order(menu=json.dumps(menu))
-        model.db.session.add(myorder)
-        model.db.session.commit()
-        html = flask.render_template('order.html',
-                                     static=str(STATIC),
-                                     order=myorder,
-                                     menu=menu)
-        #
-        # we generate the HTML in a temporary dir, but the PDF into a
-        # spooldir: the idea is that we will have a deamon which prints all
-        # the PDFs which are copied there
-        pdf = topdf(html, 'order_%06d' % myorder.id, TMPDIR,
-                    current_app.config['SPOOLDIR'])
-        if not current_app.config['TESTING']:
-            os.system('evince "%s" &' % pdf)
-        return flask.jsonify(result='OK', order=myorder.as_dict())
-    else:
-        return error('Only POST allowed', None, 405)
+    menu = flask.request.json
+    if menu is None:
+        return error('Expected JSON request', 400)
+    #
+    current_app.logger.info('\norder POST: %s' % menu)
+    #
+    myorder = model.Order(menu=json.dumps(menu))
+    model.db.session.add(myorder)
+    model.db.session.commit()
+    html = flask.render_template('order.html',
+                                 static=str(STATIC),
+                                 order=myorder,
+                                 menu=menu)
+    #
+    # we generate the HTML in a temporary dir, but the PDF into a
+    # spooldir: the idea is that we will have a deamon which prints all
+    # the PDFs which are copied there
+    pdf = topdf(html, 'order_%06d' % myorder.id, TMPDIR,
+                current_app.config['SPOOLDIR'])
+    if not current_app.config['TESTING']:
+        os.system('evince "%s" &' % pdf)
+    return flask.jsonify(result='OK', order=myorder.as_dict())
