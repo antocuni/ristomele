@@ -5,10 +5,15 @@ from server.app import create_app
 from server import model
 
 @pytest.fixture
-def client(tmpdir):
+def spooldir(tmpdir):
+    return tmpdir.join('spooldir').ensure(dir=True)
+
+@pytest.fixture
+def client(tmpdir, spooldir):
     dbfile = tmpdir.join('db-test.sqlite')
     app = create_app(dbfile)
     app.config['TESTING'] = True
+    app.config['SPOOLDIR'] = spooldir
     client = app.test_client()
     with app.app_context():
         yield client
@@ -51,3 +56,12 @@ class TestServer(object):
                 'menu': menu
                 }
             }
+
+    def test_new_order_spooldir(self, client, spooldir):
+        menu = dict(table=dict(),
+                    items=[])
+        assert spooldir.listdir() == []
+        resp = client.post('/order/', json=menu)
+        assert spooldir.listdir() == [
+            spooldir.join('order_000001.pdf')
+            ]

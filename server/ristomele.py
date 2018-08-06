@@ -5,6 +5,7 @@ import flask
 from flask import current_app
 from server import config
 
+TMPDIR = py.path.local.mkdtemp()
 STATIC = config.ROOT.join('server', 'static')
 ristomele = flask.Blueprint('ristomele', __name__)
 
@@ -13,12 +14,11 @@ def error(message, status=403):
                            message=message)
     return myjson, status
 
-def topdf(html, basename):
-    tmpdir = py.path.local.mkdtemp()
-    htmlname = tmpdir.join(basename + '.html')
+def topdf(html, basename, htmldir, pdfdir):
+    htmlname = htmldir.join(basename + '.html')
+    pdfname = pdfdir.join(basename + '.pdf')
     with htmlname.open('w') as f:
         f.write(html.encode('utf8'))
-    pdfname = htmlname.new(ext='pdf')
     cmdline = 'wkhtmltopdf "%s" "%s"' % (htmlname, pdfname)
     print cmdline
     ret = os.system(cmdline)
@@ -43,9 +43,13 @@ def order():
                                      static=str(STATIC),
                                      order=myorder,
                                      menu=menu)
-        pdf = topdf(html, 'order')
+        #
+        # we generate the HTML in a temporary dir, but the PDF into a
+        # spooldir: the idea is that we will have a deamon which prints all
+        # the PDFs which are copied there
+        pdf = topdf(html, 'order_%06d' % myorder.id, TMPDIR,
+                    current_app.config['SPOOLDIR'])
         if not current_app.config['TESTING']:
-            # XXX: eventually, we should print it and/or move it to a spool dir
             os.system('evince "%s" &' % pdf)
         return flask.jsonify(result='OK', order=myorder.as_dict())
     else:
