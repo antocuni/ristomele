@@ -3,6 +3,8 @@
 import time
 from jnius import autoclass
 
+# https://www.slideshare.net/AdaiseNascimento/58-mm-mini-portable-thermal-printer-instruction-manual
+
 BluetoothAdapter = autoclass('android.bluetooth.BluetoothAdapter')
 BluetoothDevice = autoclass('android.bluetooth.BluetoothDevice')
 BluetoothSocket = autoclass('android.bluetooth.BluetoothSocket')
