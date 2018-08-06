@@ -65,3 +65,16 @@ class TestServer(object):
         assert spooldir.listdir() == [
             spooldir.join('order_000001.pdf')
             ]
+
+    def test_all_orders(self, client):
+        o1 = model.Order(menu='101')
+        o2 = model.Order(menu='102')
+        o3 = model.Order(menu='103')
+        model.db.session.add_all([o1, o2, o3])
+        model.db.session.commit()
+        resp = client.get('/order/')
+        assert resp.json == [
+            {'id': 3, 'menu': 103},
+            {'id': 2, 'menu': 102},
+            {'id': 1, 'menu': 101},
+            ]

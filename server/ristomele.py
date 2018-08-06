@@ -51,3 +51,11 @@ def new_order():
     if not current_app.config['TESTING']:
         os.system('evince "%s" &' % pdf)
     return flask.jsonify(result='OK', order=myorder.as_dict())
+
+
+@ristomele.route('/order/', methods=['GET'])
+def all_orders():
+    from server import model
+    orders = model.Order.query.order_by('id DESC').all()
+    orders = [order.as_dict() for order in orders]
+    return flask.jsonify(orders)
