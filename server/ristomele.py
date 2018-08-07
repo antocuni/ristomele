@@ -56,6 +56,6 @@ def new_order():
 @ristomele.route('/order/', methods=['GET'])
 def all_orders():
     from server import model
-    orders = model.Order.query.order_by('id DESC').all()
+    orders = model.Order.query.order_by(model.Order.id.desc()).all()
     orders = [order.as_dict() for order in orders]
     return flask.jsonify(orders)
