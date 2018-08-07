@@ -68,28 +68,96 @@ class RistoMeleApp(App):
     def new_order(self, table):
         Item = model.MenuItem
         Sep = lambda name: model.MenuItem(kind='separator', name=name)
-        items = [Item(name='Coperto', price=1),
-                 Sep(name='Primi'),
-                 Item(name='Ravioli', price=7),
-                 Sep(name='Secondi'),
-                 Item(name='Salsiccia alla piastra', price=4),
-                 Item(name='Salsiccia alla piastra + contorno', price=5),
-                 Item(name='Arrosto di manzo', price=5),
-                 Item(name='Arrosto di manzo + contorno', price=6),
-                 Sep(name='Contorni'),
-                 Item(name='Patatine fritte', price=2),
-                 Item(name='Pomodori', price=2),
-                 Sep(name='Dolci'),
-                 Item(name='Dolci misti', price=3),
-                 Item(name='Semifreddo alla nutella', price=3.5),
-                 Sep(name='Bevande'),
-                 Item(name='Bottiglia vino rosso', price=5),
-                 Item(name='Bottiglia vino bianco', price=5),
-                 Item(name='Birra alla spina', price=3.5),
-                 Item(name='Lattine - Bottiglietta The', price=1.5),
-                 Item(name='Acqua minerale piccola', price=1),
-                 Item(name='Caffe', price=1),
-                 ]
+
+        fugassin1 = [
+            Sep(name='Focaccini'),
+            Item(name='Zeneize de Me', price=1.5),
+            Item(name='Stracchino', price=3),
+            Item(name='Salame', price=3),
+            Item(name='Salame + stracchino', price=4),
+            Item(name='Prosciutto cotto', price=3),
+            Item(name='Prosciutto cotto + stracchino', price=4.5),
+            Item(name='Speck', price=3.5),
+            Item(name='Boscaiolo + cotto', price=5),
+            Item(name='Boscaiolo + mortadella', price=5),
+            Item(name='Boscaiolo + speck', price=5.5),
+            Item(name='Wurstel', price=4),
+            Item(name='Salsiccia', price=4.5),
+            Item(name='Porchetta', price=5),
+            Item(name='Mortadella', price=3),
+            Item(name='Mortadella + stracchino', price=4),
+            Item(name='Nutella', price=3.5),
+        ]
+
+        fugassin2 = [
+            Sep(name='Focaccini'),
+            Item(name='Zeneize de Me', price=1.5),
+            Item(name='Salame', price=3),
+            Item(name='Salsiccia', price=4.5),
+            Item(name='Nutella', price=3.5),
+            Item(name='Prosciutto Cotto', price=3),
+            Item(name='Porchetta', price=5),
+        ]
+
+        fugassin = fugassin1
+
+        items = [
+            Item(name='Coperto', price=1),
+            Sep(name='Primi'),
+            Item(name='Ravioli', price=7),
+
+            Sep(name='Secondi'),
+
+            Item(name='Salsiccia', price=4),
+            Item(name='Salsiccia + patatine', price=5),
+            Item(name='Salsiccia + pomodori', price=5),
+
+            Item(name='Porchetta', price=4.5),
+            Item(name='Porchetta + patatine', price=5.5),
+            Item(name='Porchetta + pomodori', price=5.5),
+
+            Item(name='Arrosto', price=5),
+            Item(name='Arrosto + patatine', price=6),
+            Item(name='Arrosto + pomodori', price=6),
+
+            Sep(name='Contorni'),
+
+            Item(name='Patatine fritte', price=2),
+            Item(name='Pomodori', price=2),
+
+        ] + fugassin + [
+
+            Sep(name='Dolci'),
+            Item(name='Dolci misti', price=3),
+            Item(name='Semifreddo alla nutella', price=3.5),
+
+            Sep(name='Vino'),
+            Item(name='Sangria', price=3.5),
+            Item(name='Bottiglia rosso', price=5),
+            Item(name='Bottiglia bianco', price=5),
+
+            Item(name='Bicchiere grande rosso ', price=2.5),
+            Item(name='Bicchiere grande bianco ', price=2.5),
+
+            Item(name='Bicchiere piccolo rosso ', price=1),
+            Item(name='Bicchiere piccolo bianco ', price=1),
+
+            Sep(name='Altre bevande'),
+
+            Item(name='Birra alla spina Weiss', price=4),
+            Item(name='Birra alla spina Pils', price=3.5),
+
+            Item(name='Coca Cola', price=1.5),
+            Item(name='Fanta', price=1.5),
+            Item(name='Gazzosa', price=1.5),
+            Item(name='The Limone', price=1.5),
+            Item(name='The Pesca', price=1.5),
+
+            Item(name='Acqua naturale 0.5L', price=1),
+            Item(name='Acqua frizzante 0.5L', price=1),
+
+            Item(name='Caffe', price=1),
+        ]
         menu = model.Menu(table=table, items=items)
         screen = MenuScreen(name='menu', menu=menu)
         self.root.open(screen)
