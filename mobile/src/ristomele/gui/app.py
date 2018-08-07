@@ -83,6 +83,8 @@ class RistoMeleApp(App):
             Item(name='Boscaiolo + speck', price=5.5),
             Item(name='Wurstel', price=4),
             Item(name='Salsiccia', price=4.5),
+            Item(name='Salsiccia + stracchino', price=5.5),
+
             Item(name='Porchetta', price=5),
             Item(name='Mortadella', price=3),
             Item(name='Mortadella + stracchino', price=4),
