@@ -1,6 +1,8 @@
 import os
+from datetime import datetime
 import pytest
 import json
+from freezegun import freeze_time
 from server.app import create_app
 from server import model
 
@@ -46,16 +48,22 @@ class TestModel(object):
 class TestServer(object):
 
     def test_new_order(self, client):
-        menu = dict(table=dict(),
-                    items=[])
-        resp = client.post('/orders/', json=menu)
-        assert resp.json == {
-            'result': 'OK',
-            'order': {
-                'id': 1,
-                'menu': menu
+        with freeze_time('2018-08-15 20:00'):
+            menu = dict(table=dict(),
+                        items=[])
+            resp = client.post('/orders/', json=menu)
+            assert resp.json == {
+                'result': 'OK',
+                'order': {
+                    'id': 1,
+                    'menu': menu
+                    }
                 }
-            }
+            #
+            myorder = model.Order.query.get(1)
+            assert myorder.menu == json.dumps(menu)
+            assert myorder.date == datetime(2018, 8, 15, 20, 0, 0)
+            assert myorder.textual_id() == '1 [15/08 20:00]'
 
     def test_new_order_spooldir(self, client, spooldir):
         menu = dict(table=dict(),

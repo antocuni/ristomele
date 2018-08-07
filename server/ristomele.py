@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 import py
 import json
 import flask
@@ -45,7 +46,7 @@ def new_order():
     #
     current_app.logger.info('\norder POST: %s' % menu)
     #
-    myorder = model.Order(menu=json.dumps(menu))
+    myorder = model.Order(date=datetime.now(), menu=json.dumps(menu))
     model.db.session.add(myorder)
     model.db.session.commit()
     html = flask.render_template('order.html',

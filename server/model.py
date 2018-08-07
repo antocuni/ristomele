@@ -4,6 +4,7 @@ db = SQLAlchemy()
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    date = db.Column(db.DATETIME)
     menu = db.Column(db.TEXT)
 
     def as_dict(self):
@@ -15,3 +16,8 @@ class Order(db.Model):
             menu = None
         return dict(id=self.id, menu=menu)
 
+    def textual_id(self):
+        date = ''
+        if self.date is not None:
+            date = self.date.strftime('%d/%m %H:%M')
+        return '%d [%s]' % (self.id, date)
