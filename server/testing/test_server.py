@@ -29,6 +29,7 @@ class TestModel(object):
         order_dict = order.as_dict()
         assert order_dict == {
             'id': None,
+            'date': None,
             'menu': {
                 'a': 1,
                 'b': 2,
@@ -41,6 +42,7 @@ class TestModel(object):
         order_dict = order.as_dict()
         assert order_dict == {
             'id': None,
+            'date': None,
             'menu': None,
             }
 
@@ -56,6 +58,7 @@ class TestServer(object):
                 'result': 'OK',
                 'order': {
                     'id': 1,
+                    'date': '2018-08-15T20:00:00',
                     'menu': menu
                     }
                 }
@@ -82,7 +85,7 @@ class TestServer(object):
         model.db.session.commit()
         resp = client.get('/orders/')
         assert resp.json == [
-            {'id': 3, 'menu': 103},
-            {'id': 2, 'menu': 102},
-            {'id': 1, 'menu': 101},
+            {'id': 3, 'menu': 103, 'date': None},
+            {'id': 2, 'menu': 102, 'date': None},
+            {'id': 1, 'menu': 101, 'date': None},
             ]

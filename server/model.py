@@ -14,7 +14,9 @@ class Order(db.Model):
         except ValueError:
             # json decoding error
             menu = None
-        return dict(id=self.id, menu=menu)
+        return dict(id=self.id,
+                    date=self.date and self.date.isoformat() or None,
+                    menu=menu)
 
     def textual_id(self):
         date = ''
