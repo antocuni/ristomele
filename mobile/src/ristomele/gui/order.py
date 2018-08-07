@@ -12,7 +12,7 @@ class MenuSeparator(BoxLayout):
     item = ObjectProperty()
 
 
-class MenuScreen(MyScreen):
+class NewOrderScreen(MyScreen):
     menu = ObjectProperty()
 
     def item_class(self, x, index):
