@@ -26,6 +26,16 @@ def topdf(html, basename, htmldir, pdfdir):
         raise ValueError('Error when executing wkhtmltopdf')
     return pdfname
 
+def split_columns(menu):
+    items = menu['items']
+    n = len(items)/2
+    columns = [
+        items[:n],
+        items[n:],
+    ]
+    return columns
+
+
 @ristomele.route('/orders/', methods=['POST'])
 def new_order():
     from server import model
@@ -41,7 +51,8 @@ def new_order():
     html = flask.render_template('order.html',
                                  static=str(STATIC),
                                  order=myorder,
-                                 menu=menu)
+                                 menu=menu,
+                                 columns=split_columns(menu))
     #
     # we generate the HTML in a temporary dir, but the PDF into a
     # spooldir: the idea is that we will have a deamon which prints all

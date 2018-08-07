@@ -38,17 +38,19 @@
       <br>
       
       <div class="row">
-        <div class="col-xs-9">
-        <table class="table" style="font-size: 14pt">
-          {% for item in menu['items'] %}
+        {% for column_content in columns %}
+        <div class="col-xs-6">
+        <table class="table table-condensed" style="font-size: 13pt">
+          {% for item in column_content %}
             {% if item.kind == 'separator' %}
               <tr>
-                <th colspan="2">{{item.name}}</th>
+                <th colspan="3">{{item.name}}</th>
               </tr>
             {% elif item.count == 0 %}
               <tr style="padding-left: 1em" class="text-muted">
                 <td></td>
                 <td>{{item.name}}</td>
+                <td>{{'%.2f' % item.price}} €</td>
               </tr>
             {% else %}
               <tr>
@@ -58,7 +60,8 @@
             {% endif %}
           {% endfor %}
         </table>
-      </div>
+        </div>
+        {% endfor %}
       </div>
     </div>
   </body>
