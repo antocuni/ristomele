@@ -13,6 +13,7 @@ def create_app(dbpath=DB):
     from server import model
     app = flask.Flask('risto_server', root_path='server')
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s' % dbpath
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.register_blueprint(srczip)
     app.register_blueprint(ristomele)
     model.db.init_app(app)
