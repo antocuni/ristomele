@@ -26,7 +26,7 @@ def topdf(html, basename, htmldir, pdfdir):
         raise ValueError('Error when executing wkhtmltopdf')
     return pdfname
 
-@ristomele.route('/order/', methods=['POST'])
+@ristomele.route('/orders/', methods=['POST'])
 def new_order():
     from server import model
     menu = flask.request.json
@@ -53,7 +53,7 @@ def new_order():
     return flask.jsonify(result='OK', order=myorder.as_dict())
 
 
-@ristomele.route('/order/', methods=['GET'])
+@ristomele.route('/orders/', methods=['GET'])
 def all_orders():
     from server import model
     orders = model.Order.query.order_by(model.Order.id.desc()).all()

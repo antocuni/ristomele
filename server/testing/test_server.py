@@ -48,7 +48,7 @@ class TestServer(object):
     def test_new_order(self, client):
         menu = dict(table=dict(),
                     items=[])
-        resp = client.post('/order/', json=menu)
+        resp = client.post('/orders/', json=menu)
         assert resp.json == {
             'result': 'OK',
             'order': {
@@ -61,7 +61,7 @@ class TestServer(object):
         menu = dict(table=dict(),
                     items=[])
         assert spooldir.listdir() == []
-        resp = client.post('/order/', json=menu)
+        resp = client.post('/orders/', json=menu)
         assert spooldir.listdir() == [
             spooldir.join('order_000001.pdf')
             ]
@@ -72,7 +72,7 @@ class TestServer(object):
         o3 = model.Order(menu='103')
         model.db.session.add_all([o1, o2, o3])
         model.db.session.commit()
-        resp = client.get('/order/')
+        resp = client.get('/orders/')
         assert resp.json == [
             {'id': 3, 'menu': 103},
             {'id': 2, 'menu': 102},
