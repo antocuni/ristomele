@@ -95,9 +95,10 @@ class RistoMeleApp(App):
         self.root.open(screen)
 
     def submit_menu(self, menu):
-        url = self.url('order/')
+        url = self.url('orders/')
         payload = menu.as_dict()
         requests.post(url, json=payload)
+        # XXX check the response
         self.print_menu(menu)
 
     def print_menu(self, menu):
