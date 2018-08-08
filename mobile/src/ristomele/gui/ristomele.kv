@@ -91,10 +91,6 @@
     on_release: app.new_order(self.table)
 
 
-<MySpinnerOption>:
-    size_hint_y: None
-    height: '48dp'
-
 <TablesScreen>:
     BoxLayout:
         id: layout
@@ -106,6 +102,10 @@
             height: '50dp'
 
 
+<EditableTable>:
+    text: '%s\n%s' % (self.table.name, self.table.waiter)
+
+            
 <EditTablesScreen>:
     BoxLayout:
         id: layout
@@ -115,6 +115,14 @@
             text: "Modifica tavoli"
             size_hint_y: None
             height: '50dp'
+
+        TextInput: 
+            id: waiter_name
+            hint_text: 'Nome cameriere'
+            size_hint_y: None
+            height: '30dp'
+            multiline: False
+
 
 
 # =====================================================================
