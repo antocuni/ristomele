@@ -111,3 +111,26 @@ class TestServer(object):
             (2, 102),
             (1, 101)
             ]
+
+    def test_tables(self, client):
+        resp = client.put('/tables/11/', json=dict(waiter='anto'))
+        assert resp.status_code == 200
+        client.put('/tables/12/', json=dict(waiter='pippo'))
+        assert resp.status_code == 200
+        #
+        resp = client.get('/tables/')
+        assert resp.status_code == 200
+        assert resp.json == [
+            dict(name='11', waiter='anto'),
+            dict(name='12', waiter='pippo')
+            ]
+        #
+        # now, try to update one table
+        resp = client.put('/tables/11/', json=dict(waiter='pluto'))
+        assert resp.status_code == 200
+        resp = client.get('/tables/')
+        assert resp.status_code == 200
+        assert resp.json == [
+            dict(name='11', waiter='pluto'),
+            dict(name='12', waiter='pippo')
+            ]

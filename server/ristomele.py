@@ -70,3 +70,25 @@ def all_orders():
     orders = model.Order.query.order_by(model.Order.id.desc()).all()
     orders = [order.as_dict() for order in orders]
     return flask.jsonify(orders)
+
+
+@ristomele.route('/tables/<name>/', methods=['PUT'])
+def update_table(name):
+    from server import model
+    waiter = flask.request.json['waiter']
+    table = model.Table.query.get(name)
+    if table is None:
+        # no table with this name, create one from scratch
+        table = model.Table(name=name, waiter=waiter)
+    else:
+        table.waiter = waiter
+    model.db.session.add(table)
+    model.db.session.commit()
+    return flask.jsonify(table.as_dict())
+
+@ristomele.route('/tables/', methods=['GET'])
+def all_tables():
+    from server import model
+    tables = model.Table.query.all()
+    tables = [t.as_dict() for t in tables]
+    return flask.jsonify(tables)

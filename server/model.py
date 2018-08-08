@@ -3,6 +3,16 @@ import json
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
+class Table(db.Model):
+    name = db.Column(db.TEXT, primary_key=True)
+    waiter = db.Column(db.TEXT)
+
+    def as_dict(self):
+        return dict(
+            name=self.name,
+            waiter=self.waiter
+            )
+
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DATETIME)
