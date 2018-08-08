@@ -33,7 +33,7 @@ class Order(db.Model):
     def as_dict(self):
         return dict(
             id = self.id,
-            date = self.date.isoformat() if self.date else None,
+            date = self.date.strftime('%Y-%m-%d %H:%M:%S') if self.date else None,
             table = self.table,
             waiter = self.waiter,
             customer = self.customer,

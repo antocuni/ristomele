@@ -58,7 +58,7 @@ class TestModel(object):
             id = mydict.pop('id')
             date = mydict.pop('date')
             assert id is None
-            assert date == '2018-08-15T20:00:00'
+            assert date == '2018-08-15 20:00:00'
             assert mydict == example_order_data
 
     def test_Order_as_dict_error(self, example_order_data):
@@ -78,7 +78,7 @@ class TestServer(object):
                 'result': 'OK',
                 'order': {
                     'id': 1,
-                    'date': '2018-08-15T20:00:00',
+                    'date': '2018-08-15 20:00:00',
                     'table': ex['table'],
                     'waiter': ex['waiter'],
                     'customer': ex['customer'],

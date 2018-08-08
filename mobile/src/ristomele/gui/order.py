@@ -31,4 +31,7 @@ class ShowOrderScreen(MyScreen):
     order = ObjectProperty()
 
     def submit(self, app):
-        app.submit_order(self.order)
+        new_order = app.submit_order(self.order)
+        self.order = new_order
+        self.ids.content.text = new_order.as_textual_receipt()
+        app.print_order(new_order)

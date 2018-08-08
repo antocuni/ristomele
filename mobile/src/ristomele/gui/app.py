@@ -171,9 +171,11 @@ class RistoMeleApp(App):
     def submit_order(self, order):
         url = self.url('orders/')
         payload = order.as_dict()
-        requests.post(url, json=payload)
-        # XXX check the response
-        self.print_order(order)
+        resp = requests.post(url, json=payload)
+        # XXX: check the return state
+        order_data = resp.json()['order']
+        new_order = model.Order.from_dict(order_data)
+        return new_order
 
     def print_order(self, order):
         s = order.as_textual_receipt()

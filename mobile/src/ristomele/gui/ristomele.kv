@@ -132,7 +132,7 @@
             adapter: ListAdapter(data=root.order.menu, cls=root.item_class, args_converter=lambda i, x: {'x': x})
 
         Button:
-            text: "Invia ordine"
+            text: "OK"
             size_hint_y: None
             height: '40dp'
             on_release: root.submit(app)
@@ -151,6 +151,7 @@
         ScrollView:
             size_hint_y: 1
             Label:
+                id: content
                 text: root.order.as_textual_receipt()
                 height: self.texture_size[1]
                 size_hint_y: None

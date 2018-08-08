@@ -1,3 +1,4 @@
+from datetime import datetime
 from kivy.event import EventDispatcher
 from kivy.properties import (StringProperty, ObjectProperty, ListProperty,
                              BooleanProperty, NumericProperty, OptionProperty)
@@ -51,7 +52,7 @@ class Order(EventDispatcher):
     def from_dict(cls, data):
         date = data.get('date')
         if date is not None:
-            date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S")
+            date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
         table = Table(name=data['table'], waiter=data['waiter'])
         return cls(
             id = data.get('id'),
