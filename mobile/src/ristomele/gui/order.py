@@ -35,3 +35,7 @@ class ShowOrderScreen(MyScreen):
         self.order = new_order
         self.ids.content.text = new_order.as_textual_receipt()
         app.print_order(new_order)
+        # go back to the table selection screen
+        app.root.go_back()
+        app.root.go_back()
+

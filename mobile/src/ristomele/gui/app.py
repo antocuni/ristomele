@@ -11,11 +11,15 @@ from kivy.core.window import Window
 import ristomele
 from ristomele import model
 import ristomele.gui.uix # side effects
+from ristomele.gui.uix import MyScreen
 from ristomele.gui import iconfonts
 from ristomele.gui.manager import Manager
 from ristomele.logger import Logger
 from ristomele.gui.tables import TablesScreen
 from ristomele.gui.order import NewOrderScreen, ShowOrderScreen
+
+class MainScreen(MyScreen):
+    pass
 
 class RistoMeleApp(App):
     from kivy.uix.settings import SettingsWithTabbedPanel as settings_cls
@@ -47,11 +51,10 @@ class RistoMeleApp(App):
                                 filename=resource_find('data/scrolling.json'))
 
     def build(self):
+        self.restaurant = model.Restaurant()
         Window.bind(on_keyboard=self.on_keyboard)
         manager = Manager()
-        restaurant = model.Restaurant()
-        main = TablesScreen(name='main', restaurant=restaurant)
-        manager.open(main)
+        manager.open(MainScreen())
         return manager
 
     def on_keyboard(self, window, key, scancode, codepoint, modifier):
@@ -64,6 +67,10 @@ class RistoMeleApp(App):
 
     ## def on_stop(self):
     ##     self.sync.stop()
+
+    def show_tables(self):
+        tables = TablesScreen(name='tables', restaurant=self.restaurant)
+        self.root.open(tables)
 
     def new_order(self, table):
         Item = model.MenuItem

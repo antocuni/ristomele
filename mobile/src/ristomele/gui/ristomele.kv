@@ -15,13 +15,21 @@
     background_color: (1, 1, 1, 1)
     _down_color: darker(self.background_color)
     color: Theme.ICON
+    show_border: False
 
     canvas.before:
         Color:
             rgba: self.background_color if self.state == 'normal' else self._down_color
+
         Rectangle:
             pos: self.pos
             size: self.size
+
+        Color:
+            rgba: Theme.SEPARATOR if self.show_border else Theme.TRANSPARENT
+
+        Line:
+            rectangle: self.x+1,self.y+1,self.width-1,self.height-1
 
 
 <IconButton@FlatButton>:
@@ -31,6 +39,36 @@
     text: icon(self.icon) if self.icon else ""
     size_hint_x: None
     width: self.height
+
+# ==========
+# main menu
+# ==========
+
+<MainScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+
+        MyLabel:
+            text: "Menu Principale"
+            size_hint_y: None
+            height: "50dp"
+
+        FlatButton:
+            text: "Mappa tavoli"
+            show_border: True
+            on_release: app.show_tables()
+
+        FlatButton:
+            text: "Lista ordini"
+            show_border: True
+
+        FlatButton:
+            text: "Configura tavoli"
+            show_border: True
+
+        FlatButton:
+            text: "Opzioni"
+            show_border: True
 
 
 # =====================================================================
@@ -60,6 +98,7 @@
         MyLabel:
             text: "Mappa dei tavoli"
             size_hint_y: None
+            height: '50dp'
 
 
 # =====================================================================
@@ -131,11 +170,24 @@
             id: item_list
             adapter: ListAdapter(data=root.order.menu, cls=root.item_class, args_converter=lambda i, x: {'x': x})
 
-        Button:
-            text: "OK"
-            size_hint_y: None
+        BoxLayout:
+            id: layout
+            orientation: 'horizontal'
             height: '40dp'
-            on_release: root.submit(app)
+            size_hint_y: None
+
+            Button:
+                text: "OK"
+                size_hint_y: None
+                height: '40dp'
+                on_release: root.submit(app)
+
+            Button:
+                text: "Indietro"
+                size_hint_y: None
+                height: '40dp'
+                on_release: app.root.go_back()
+
 
 
 <ShowOrderScreen>:
