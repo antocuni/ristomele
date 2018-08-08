@@ -25,10 +25,8 @@ def test_Restaurant():
 def test_Order_as_dict(example_order):
     d = example_order.as_dict()
     assert d == dict(
-        table=dict(
-            name='11',
-            waiter='anto',
-            busy=False),
+        table='11',
+        waiter='anto',
         customer='pippo',
         notes='my notes',
         menu=[

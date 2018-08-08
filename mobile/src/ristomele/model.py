@@ -7,10 +7,6 @@ class Table(EventDispatcher):
     waiter = StringProperty()
     busy = BooleanProperty(False)
 
-    def as_dict(self):
-        return dict(name=self.name,
-                    waiter=self.waiter,
-                    busy=self.busy)
 
 class Restaurant(EventDispatcher):
     tables = ListProperty()
@@ -47,7 +43,8 @@ class Order(EventDispatcher):
 
     def as_dict(self):
         return dict(
-            table=self.table.as_dict(),
+            table=self.table.name,
+            waiter=self.table.waiter,
             customer=self.customer,
             notes=self.notes,
             menu=[item.as_dict() for item in self.menu],
