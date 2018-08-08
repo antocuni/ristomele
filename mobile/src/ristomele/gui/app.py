@@ -15,7 +15,7 @@ from ristomele.gui.uix import MyScreen
 from ristomele.gui import iconfonts
 from ristomele.gui.manager import Manager
 from ristomele.logger import Logger
-from ristomele.gui.tables import TablesScreen
+from ristomele.gui.tables import TablesScreen, EditTablesScreen
 from ristomele.gui.order import NewOrderScreen, ShowOrderScreen
 
 class MainScreen(MyScreen):
@@ -23,7 +23,6 @@ class MainScreen(MyScreen):
 
 class RistoMeleApp(App):
     from kivy.uix.settings import SettingsWithTabbedPanel as settings_cls
-    sync = ObjectProperty()
 
     def get_application_config(self):
         root = pypath.local(ristomele.__file__).dirpath().dirpath().dirpath()
@@ -51,10 +50,10 @@ class RistoMeleApp(App):
                                 filename=resource_find('data/scrolling.json'))
 
     def build(self):
-        self.restaurant = model.Restaurant()
         Window.bind(on_keyboard=self.on_keyboard)
         manager = Manager()
-        manager.open(MainScreen())
+        #manager.open(MainScreen())
+        manager.open(EditTablesScreen(restaurant=model.Restaurant()))
         return manager
 
     def on_keyboard(self, window, key, scancode, codepoint, modifier):
@@ -65,12 +64,14 @@ class RistoMeleApp(App):
     def on_pause(self):
         return True
 
-    ## def on_stop(self):
-    ##     self.sync.stop()
-
     def show_tables(self):
-        tables = TablesScreen(name='tables', restaurant=self.restaurant)
+        tables = TablesScreen(name='tables', restaurant=model.Restaurant())
         self.root.open(tables)
+
+    def edit_tables(self):
+        screen = EditTablesScreen(name='edit_tables',
+                                  restaurant=model.Restaurant())
+        self.root.open(screen)
 
     def new_order(self, table):
         Item = model.MenuItem

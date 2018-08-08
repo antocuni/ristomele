@@ -65,6 +65,7 @@
         FlatButton:
             text: "Configura tavoli"
             show_border: True
+            on_release: app.edit_tables()
 
         FlatButton:
             text: "Opzioni"
@@ -90,6 +91,10 @@
     on_release: app.new_order(self.table)
 
 
+<MySpinnerOption>:
+    size_hint_y: None
+    height: '48dp'
+
 <TablesScreen>:
     BoxLayout:
         id: layout
@@ -97,6 +102,17 @@
 
         MyLabel:
             text: "Mappa dei tavoli"
+            size_hint_y: None
+            height: '50dp'
+
+
+<EditTablesScreen>:
+    BoxLayout:
+        id: layout
+        orientation: 'vertical'
+
+        MyLabel:
+            text: "Modifica tavoli"
             size_hint_y: None
             height: '50dp'
 
