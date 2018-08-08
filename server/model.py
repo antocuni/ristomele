@@ -41,7 +41,10 @@ class Order(db.Model):
             menu = self._load_menu())
 
     def textual_id(self):
+        id = ''
         date = ''
+        if self.id is not None:
+            id = str(self.id)
         if self.date is not None:
             date = self.date.strftime('%d/%m %H:%M')
-        return '%d [%s]' % (self.id, date)
+        return '%s [%s]' % (id, date)
