@@ -28,6 +28,10 @@ class MenuItem(EventDispatcher):
     count = NumericProperty(default=0)
     price = NumericProperty(default=0)
 
+    @classmethod
+    def from_dict(cls, data):
+        return cls(**data)
+
     def as_dict(self):
         return dict(kind=self.kind,
                     name=self.name,
@@ -42,6 +46,21 @@ class Order(EventDispatcher):
     customer = StringProperty()
     notes = StringProperty()
     menu = ListProperty() # list of MenuItem
+
+    @classmethod
+    def from_dict(cls, data):
+        date = data.get('date')
+        if date is not None:
+            date = datetime.strptime(date, "%Y-%m-%dT%H:%M:%S")
+        table = Table(name=data['table'], waiter=data['waiter'])
+        return cls(
+            id = data.get('id'),
+            date = date,
+            table = table,
+            customer = data['customer'],
+            notes = data['notes'],
+            menu = [MenuItem.from_dict(d) for d in data['menu']]
+            )
 
     def as_dict(self):
         return dict(

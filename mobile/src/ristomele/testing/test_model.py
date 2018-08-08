@@ -2,19 +2,11 @@ import pytest
 import textwrap
 from datetime import datetime
 from ristomele import model
+from server.testing.test_server import example_order_data
 
 @pytest.fixture
-def example_order():
-    return model.Order(
-        table=model.Table(name='11', waiter='anto'),
-        customer='pippo',
-        notes='my notes',
-        menu=[
-            model.MenuItem(kind='separator', name='First Dishes'),
-            model.MenuItem(name='Pasta', count=1, price=10),
-            model.MenuItem(kind='separator', name='Desserts'),
-            model.MenuItem(name='Tiramisu', count=2, price=15),
-            ])
+def example_order(example_order_data):
+    return model.Order.from_dict(example_order_data)
 
 def test_Restaurant():
     r = model.Restaurant(2, 3)
@@ -22,6 +14,21 @@ def test_Restaurant():
     names = [t.name for t in r.tables]
     assert names == ['11', '21', '31',
                      '12', '22', '32']
+
+def test_Order_from_dict(example_order, example_order_data):
+    o = example_order
+    data = example_order_data
+    assert o.id is None
+    assert o.date is None
+    assert o.table.name == data['table']
+    assert o.table.waiter == data['waiter']
+    assert o.customer == data['customer']
+    assert o.notes == data['notes']
+    for o_item, d_item in zip(o.menu, data['menu']):
+        assert o_item.kind == d_item['kind']
+        assert o_item.name == d_item['name']
+        assert o_item.count == d_item['count']
+        assert o_item.price == d_item['price']
 
 def test_Order_as_dict(example_order):
     d = example_order.as_dict()
