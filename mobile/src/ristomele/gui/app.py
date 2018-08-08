@@ -160,23 +160,23 @@ class RistoMeleApp(App):
 
             Item(name='Caffe', price=1),
         ]
-        menu = model.Menu(table=table, items=items)
-        screen = NewOrderScreen(name='menu', menu=menu)
+        order = model.Order(table=table, menu=items)
+        screen = NewOrderScreen(name='menu', order=order)
         self.root.open(screen)
 
-    def show_menu(self, menu):
-        screen = ShowOrderScreen(menu=menu)
+    def show_order(self, order):
+        screen = ShowOrderScreen(order=order)
         self.root.open(screen)
 
-    def submit_menu(self, menu):
+    def submit_order(self, order):
         url = self.url('orders/')
-        payload = menu.as_dict()
+        payload = order.as_dict()
         requests.post(url, json=payload)
         # XXX check the response
-        self.print_menu(menu)
+        self.print_order(order)
 
-    def print_menu(self, menu):
-        s = menu.as_textual_receipt()
+    def print_order(self, order):
+        s = order.as_textual_receipt()
         if platform == 'android':
             from ristomele.gui.printer import print_string
             print_string(s)

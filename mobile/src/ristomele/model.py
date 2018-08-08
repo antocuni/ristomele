@@ -39,18 +39,18 @@ class MenuItem(EventDispatcher):
                     price=self.price)
 
 
-class Menu(EventDispatcher):
+class Order(EventDispatcher):
     table = ObjectProperty()
     customer = StringProperty()
     notes = StringProperty()
-    items = ListProperty()
+    menu = ListProperty() # list of MenuItem
 
     def as_dict(self):
         return dict(
             table=self.table.as_dict(),
             customer=self.customer,
             notes=self.notes,
-            items=[item.as_dict() for item in self.items],
+            menu=[item.as_dict() for item in self.menu],
         )
 
     def as_textual_receipt(self, width=32):
@@ -62,7 +62,7 @@ class Menu(EventDispatcher):
         w('Cliente: %s' % self.customer)
         w('')
         total = 0
-        for item in self.items:
+        for item in self.menu:
             if item.kind != 'item':
                 continue
             if item.count == 0:

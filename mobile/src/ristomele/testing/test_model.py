@@ -3,12 +3,12 @@ import textwrap
 from ristomele import model
 
 @pytest.fixture
-def example_menu():
-    return model.Menu(
+def example_order():
+    return model.Order(
         table=model.Table(name='11', waiter='anto'),
         customer='pippo',
         notes='my notes',
-        items=[
+        menu=[
             model.MenuItem(kind='separator', name='First Dishes'),
             model.MenuItem(name='Pasta', count=1, price=10),
             model.MenuItem(kind='separator', name='Desserts'),
@@ -22,8 +22,8 @@ def test_Restaurant():
     assert names == ['11', '21', '31',
                      '12', '22', '32']
 
-def test_Menu_as_dict(example_menu):
-    d = example_menu.as_dict()
+def test_Order_as_dict(example_order):
+    d = example_order.as_dict()
     assert d == dict(
         table=dict(
             name='11',
@@ -31,20 +31,20 @@ def test_Menu_as_dict(example_menu):
             busy=False),
         customer='pippo',
         notes='my notes',
-        items=[
+        menu=[
             dict(kind='separator', name='First Dishes', count=0, price=0),
             dict(kind='item',      name='Pasta', count=1, price=10),
             dict(kind='separator', name='Desserts', count=0, price=0),
             dict(kind='item',      name='Tiramisu', count=2, price=15),
             ])
 
-def test_Menu_as_textural_recepit(example_menu):
-    example_menu.items.extend([
+def test_Menu_as_textural_recepit(example_order):
+    example_order.menu.extend([
         model.MenuItem(name='Gelato', count=0, price=1),
         model.MenuItem(name='Very long item description', count=1, price=1),
         model.MenuItem(name='Even longer and longer item description', count=1, price=1)
     ])
-    txt = example_menu.as_textual_receipt(width=32)
+    txt = example_order.as_textual_receipt(width=32)
     assert txt == textwrap.dedent("""
         RICEVUTA NON FISCALE
         Numero ordine: xxx

@@ -13,7 +13,7 @@ class MenuSeparator(BoxLayout):
 
 
 class NewOrderScreen(MyScreen):
-    menu = ObjectProperty()
+    order = ObjectProperty()
 
     def item_class(self, x, index):
         if x.kind == 'item':
@@ -22,13 +22,13 @@ class NewOrderScreen(MyScreen):
             return MenuSeparator(item=x)
 
     def submit(self, app):
-        self.menu.customer = self.ids.customer_name.text
-        self.menu.notes = self.ids.notes.text
-        app.show_menu(self.menu)
+        self.order.customer = self.ids.customer_name.text
+        self.order.notes = self.ids.notes.text
+        app.show_order(self.order)
 
 
 class ShowOrderScreen(MyScreen):
-    menu = ObjectProperty()
+    order = ObjectProperty()
 
     def submit(self, app):
-        app.submit_menu(self.menu)
+        app.submit_order(self.order)
