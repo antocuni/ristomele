@@ -15,7 +15,7 @@ from ristomele.gui import iconfonts
 from ristomele.gui.manager import Manager
 from ristomele.logger import Logger
 from ristomele.gui.tables import TablesScreen
-from ristomele.gui.order import NewOrderScreen
+from ristomele.gui.order import NewOrderScreen, ShowOrderScreen
 
 class RistoMeleApp(App):
     from kivy.uix.settings import SettingsWithTabbedPanel as settings_cls
@@ -162,6 +162,10 @@ class RistoMeleApp(App):
         ]
         menu = model.Menu(table=table, items=items)
         screen = NewOrderScreen(name='menu', menu=menu)
+        self.root.open(screen)
+
+    def show_menu(self, menu):
+        screen = ShowOrderScreen(menu=menu)
         self.root.open(screen)
 
     def submit_menu(self, menu):

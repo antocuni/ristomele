@@ -1,6 +1,8 @@
 from kivy.lang import Builder
+from kivy.properties import StringProperty
 from kivy.animation import Animation
 from kivy.uix.label import Label
+from kivy.uix.scrollview import ScrollView
 from kivy.uix.screenmanager import Screen
 from kivy.uix.behaviors.button import ButtonBehavior
 from kivy.utils import get_color_from_hex
@@ -146,3 +148,16 @@ class Paragraph(MyLabel):
         anim.bind(on_complete=cleartext)
         anim.name = 'hide'
         self._start(anim)
+
+
+Builder.load_string('''
+<ScrollableLabel>:
+    Label:
+        size_hint_y: None
+        height: self.texture_size[1]
+        text_size: self.width, None
+        text: root.text
+''')
+
+class ScrollableLabel(ScrollView):
+    text = StringProperty('')

@@ -136,3 +136,53 @@
             size_hint_y: None
             height: '40dp'
             on_release: root.submit(app)
+
+
+<ShowOrderScreen>:
+    BoxLayout:
+        id: layout
+        orientation: 'vertical'
+
+        MyLabel:
+            text: "Riepilogo ordine"
+            size_hint_y: None
+            height: '50dp'
+
+        ScrollView:
+            size_hint_y: 1
+            Label:
+                text: root.menu.as_textual_receipt()
+                height: self.texture_size[1]
+                size_hint_y: None
+                color: (0, 0, 0, 1)
+                font_name: 'RobotoMono-Regular'
+
+        BoxLayout:
+            id: layout
+            orientation: 'horizontal'
+            height: '40dp'
+            size_hint_y: None
+
+            Button:
+                text: "Invia"
+                size_hint_y: None
+                height: '40dp'
+                on_release: root.submit(app)
+
+            Button:
+                text: "Scontrino"
+                size_hint_y: None
+                height: '40dp'
+                #on_release: root.submit(app)
+
+            Button:
+                text: "Bar"
+                size_hint_y: None
+                height: '40dp'
+                #on_release: root.submit(app)
+
+            Button:
+                text: "Cucina"
+                size_hint_y: None
+                height: '40dp'
+                #on_release: root.submit(app)

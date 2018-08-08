@@ -24,4 +24,11 @@ class NewOrderScreen(MyScreen):
     def submit(self, app):
         self.menu.customer = self.ids.customer_name.text
         self.menu.notes = self.ids.notes.text
+        app.show_menu(self.menu)
+
+
+class ShowOrderScreen(MyScreen):
+    menu = ObjectProperty()
+
+    def submit(self, app):
         app.submit_menu(self.menu)
