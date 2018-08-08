@@ -1,5 +1,6 @@
 import pytest
 import textwrap
+from datetime import datetime
 from ristomele import model
 
 @pytest.fixture
@@ -44,8 +45,7 @@ def test_Menu_as_textural_recepit(example_order):
     ])
     txt = example_order.as_textual_receipt(width=32)
     assert txt == textwrap.dedent("""
-        RICEVUTA NON FISCALE
-        Numero ordine: xxx
+        Numero ordine:  
         Tavolo: 11
         Cliente: pippo
 
@@ -57,7 +57,19 @@ def test_Menu_as_textural_recepit(example_order):
                                x1   1.00
 
                            TOTALE: 42.00
+
+        RICEVUTA NON FISCALE
         """).strip()
     lines = txt.splitlines()
     for line in lines:
         assert len(line) <= 32
+    #
+    example_order.id = 1
+    example_order.date = datetime(2015, 8, 15, 20, 0, 0)
+    txt = example_order.as_textual_receipt(width=32)
+    exp = textwrap.dedent("""
+        Numero ordine: 1 [15/08 20:00]
+        Tavolo: 11
+        Cliente: pippo
+        """).strip()
+    assert txt.startswith(exp)

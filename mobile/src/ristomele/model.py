@@ -36,6 +36,8 @@ class MenuItem(EventDispatcher):
 
 
 class Order(EventDispatcher):
+    id = ObjectProperty()
+    date = ObjectProperty()
     table = ObjectProperty()
     customer = StringProperty()
     notes = StringProperty()
@@ -53,8 +55,12 @@ class Order(EventDispatcher):
     def as_textual_receipt(self, width=32):
         lines = []
         w = lines.append
-        w('RICEVUTA NON FISCALE')
-        w('Numero ordine: xxx')
+        num = self.id or ''
+        if self.date:
+            date = '[%s]' % self.date.strftime('%d/%m %H:%M')
+        else:
+            date = ''
+        w('Numero ordine: %s %s' % (num, date))
         w('Tavolo: %s' % self.table.name)
         w('Cliente: %s' % self.customer)
         w('')
@@ -81,4 +87,6 @@ class Order(EventDispatcher):
         w('')
         line = 'TOTALE: %.2f' % total
         w(line.rjust(width))
+        w('')
+        w('RICEVUTA NON FISCALE')
         return '\n'.join(lines)
