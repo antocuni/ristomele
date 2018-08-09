@@ -16,6 +16,7 @@
     background_color: (1, 1, 1, 1)
     _down_color: darker(self.background_color)
     color: Theme.PRIMARY
+    disabled_color: Theme.MUTED
     show_border: True
 
     canvas.before:
@@ -336,9 +337,17 @@
             size_hint_y: None
 
             FlatButton:
-                text: "Salva"
-                on_release: root.submit(app)
+                text: "Ristampa" if root.order.is_saved else "Salva"
+                on_release: root.save_or_reprint(app)
+
+            FlatButton:
+                text: "Ricevuta"
+                disabled: not root.order.is_saved
+
+            FlatButton:
+                text: "Stampa Bar"
+                disabled: not root.order.is_saved
 
             FlatButton:
                 text: "Indietro"
-                on_release: app.root.go_back()
+                on_release: root.go_back_dwim(app)

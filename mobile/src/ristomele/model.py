@@ -1,7 +1,8 @@
 from datetime import datetime
 from kivy.event import EventDispatcher
 from kivy.properties import (StringProperty, ObjectProperty, ListProperty,
-                             BooleanProperty, NumericProperty, OptionProperty)
+                             BooleanProperty, NumericProperty, OptionProperty,
+                             AliasProperty)
 
 class Table(EventDispatcher):
     name = StringProperty()
@@ -55,6 +56,10 @@ class Order(EventDispatcher):
     customer = StringProperty()
     notes = StringProperty()
     menu = ListProperty() # list of MenuItem
+
+    def is_saved(self):
+        return self.id is not None
+    is_saved = AliasProperty(is_saved, bind=['id'])
 
     @classmethod
     def from_dict(cls, data):

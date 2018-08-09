@@ -4,6 +4,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.properties import ObjectProperty, StringProperty, NumericProperty, ListProperty
 from kivy.uix.boxlayout import BoxLayout
 from ristomele.gui.uix import MyLabel, MyScreen
+from ristomele import model
 
 class OrderItem(BoxLayout):
     order = ObjectProperty()
@@ -38,16 +39,24 @@ class NewOrderScreen(MyScreen):
 
 
 class ShowOrderScreen(MyScreen):
-    order = ObjectProperty()
+    order = ObjectProperty(rebind=True)
 
-    def submit(self, app):
-        new_order = app.submit_order(self.order)
-        self.order = new_order
-        self.ids.content.text = new_order.as_textual_receipt()
-        app.print_order(new_order)
-        # go back to the table selection screen
-        ## app.root.go_back()
-        ## app.root.go_back()
+    def save_or_reprint(self, app):
+        if self.order.is_saved:
+            # reprint
+            print 'TODO reprint'
+        else:
+            # save
+            new_order = app.submit_order(self.order)
+            self.order = new_order
+            self.ids.content.text = new_order.as_textual_receipt()
+            app.print_order(new_order)
+
+    def go_back_dwim(self, app):
+        if self.order.is_saved:
+            print 'TODO'
+        else:
+            app.root.go_back()
 
     def update_rest(self):
         try:
