@@ -5,6 +5,16 @@ from kivy.properties import ObjectProperty, StringProperty, NumericProperty, Lis
 from kivy.uix.boxlayout import BoxLayout
 from ristomele.gui.uix import MyLabel, MyScreen
 
+class OrderItem(BoxLayout):
+    order = ObjectProperty()
+
+class OrderListScreen(MyScreen):
+    orders = ListProperty()
+
+
+
+
+
 class MenuItem(BoxLayout):
     item = ObjectProperty()
 

@@ -1,4 +1,5 @@
 #:import ListAdapter kivy.adapters.listadapter.ListAdapter
+#:import SimpleListAdapter kivy.adapters.simplelistadapter.SimpleListAdapter
 #:import Factory kivy.factory.Factory
 #:import get_color_from_hex kivy.utils.get_color_from_hex
 #:import icon kivy.garden.iconfonts.icon
@@ -56,21 +57,18 @@
 
         FlatButton:
             text: "Mappa tavoli"
-            show_border: True
             on_release: app.show_tables()
 
         FlatButton:
             text: "Lista ordini"
-            show_border: True
+            on_release: app.show_orders()
 
         FlatButton:
             text: "Configura tavoli"
-            show_border: True
             on_release: app.edit_tables()
 
         FlatButton:
             text: "Opzioni"
-            show_border: True
             on_release: app.open_settings()
 
 
@@ -156,6 +154,58 @@
 # =====================================================================
 # order.py
 # =====================================================================
+
+<OrderItem>:
+    layout: 'horizontal'
+    height: '40dp'
+    size_hint_y: None
+    current_cashier: app.get_cashier()
+    fgcolor: Theme.PRIMARY if root.order.cashier == root.current_cashier else Theme.MUTED
+
+    canvas.after:
+        Color:
+            rgba: Theme.SEPARATOR
+        Rectangle:
+            pos: self.pos
+            size: self.width, dp(1)
+
+    FlatButton:
+        text: root.order.textual_id()
+        show_border: False
+        on_release: app.show_order(root.order)
+        color: root.fgcolor
+
+    FlatButton:
+        text: root.order.table.name
+        show_border: False
+        color: root.fgcolor
+        on_release: app.show_order(root.order)
+
+    FlatButton:
+        text: root.order.cashier
+        show_border: False
+        color: root.fgcolor
+        on_release: app.show_order(root.order)
+
+<OrderListScreen>:
+    BoxLayout:
+        id: layout
+        orientation: 'vertical'
+
+        MyLabel:
+            text: "Lista ordini"
+            size_hint_y: None
+            height: '50dp'
+
+        ListView:
+            adapter: SimpleListAdapter(data=root.orders, cls=Factory.OrderItem, args_converter=lambda i, x: {'order': x})
+
+        FlatButton:
+            text: "Indietro"
+            size_hint_y: None
+            height: '40dp'
+            on_release: app.root.go_back()
+
 
 <MenuItem>:
     orientation: 'horizontal'

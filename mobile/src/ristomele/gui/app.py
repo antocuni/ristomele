@@ -16,7 +16,7 @@ from ristomele.gui import iconfonts
 from ristomele.gui.manager import Manager
 from ristomele.logger import Logger
 from ristomele.gui.tables import TablesScreen, EditTablesScreen
-from ristomele.gui.order import NewOrderScreen, ShowOrderScreen
+from ristomele.gui.order import OrderListScreen, NewOrderScreen, ShowOrderScreen
 
 class MainScreen(MyScreen):
     pass
@@ -48,6 +48,9 @@ class RistoMeleApp(App):
             'cashier': ''
         })
 
+    def get_cashier(self):
+        return self.config.get('ristomele', 'cashier')
+
     def build_settings(self, settings):
         from kivy.config import Config
         settings.add_json_panel('App', self.config,
@@ -68,6 +71,15 @@ class RistoMeleApp(App):
 
     def on_pause(self):
         return True
+
+    def show_orders(self):
+        url = self.url('orders/')
+        resp = requests.get(url)
+        # XXX: check the return state
+        order_data = resp.json()
+        orders = [model.Order.from_dict(d) for d in order_data]
+        screen = OrderListScreen(name='ordini', orders=orders)
+        self.root.open(screen)
 
     def show_tables(self):
         tables = TablesScreen(name='tables', restaurant=self.load_restaurant())
@@ -174,7 +186,7 @@ class RistoMeleApp(App):
             Item(name='Caffe', price=1),
         ]
         order = model.Order(table=table, menu=items,
-                            cashier=self.config.get('ristomele', 'cashier'))
+                            cashier=self.get_cashier())
         screen = NewOrderScreen(name='menu', order=order)
         self.root.open(screen)
 

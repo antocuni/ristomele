@@ -72,6 +72,15 @@ class Order(EventDispatcher):
             menu = [MenuItem.from_dict(d) for d in data['menu']]
             )
 
+    def textual_id(self):
+        id = ''
+        date = ''
+        if self.id is not None:
+            id = str(self.id)
+        if self.date is not None:
+            date = self.date.strftime('%d/%m %H:%M')
+        return '%s [%s]' % (id, date)
+
     def as_dict(self):
         return dict(
             cashier=self.cashier,
