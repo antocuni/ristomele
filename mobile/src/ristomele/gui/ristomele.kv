@@ -141,14 +141,10 @@
 
             FlatButton:
                 text: "Salva"
-                size_hint_y: None
-                height: '40dp'
                 on_release: root.save(app)
 
             FlatButton:
                 text: "Annulla"
-                size_hint_y: None
-                height: '40dp'
                 on_release: app.root.go_back()
 
 # =====================================================================
@@ -280,14 +276,10 @@
 
             FlatButton:
                 text: "OK"
-                size_hint_y: None
-                height: '40dp'
                 on_release: root.submit(app)
 
             FlatButton:
                 text: "Indietro"
-                size_hint_y: None
-                height: '40dp'
                 on_release: app.root.go_back()
 
 
@@ -344,13 +336,9 @@
             size_hint_y: None
 
             FlatButton:
-                text: "Invia"
-                size_hint_y: None
-                height: '40dp'
+                text: "Salva"
                 on_release: root.submit(app)
 
             FlatButton:
                 text: "Indietro"
-                size_hint_y: None
-                height: '40dp'
                 on_release: app.root.go_back()
