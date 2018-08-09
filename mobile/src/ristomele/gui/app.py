@@ -78,7 +78,7 @@ class RistoMeleApp(App):
         # XXX: check the return state
         order_data = resp.json()
         orders = [model.Order.from_dict(d) for d in order_data]
-        screen = OrderListScreen(name='ordini', orders=orders)
+        screen = OrderListScreen(name='list_orders', orders=orders)
         self.root.open(screen)
 
     def show_tables(self):
@@ -190,7 +190,7 @@ class RistoMeleApp(App):
         ]
         order = model.Order(table=table, menu=items,
                             cashier=self.get_cashier())
-        screen = NewOrderScreen(name='menu', order=order)
+        screen = NewOrderScreen(name='new_order', order=order)
         self.root.open(screen)
 
     def show_order(self, order):
