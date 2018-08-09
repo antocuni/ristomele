@@ -61,7 +61,7 @@ class RistoMeleApp(App):
     def build(self):
         Window.bind(on_keyboard=self.on_keyboard)
         manager = Manager()
-        manager.open(MainScreen())
+        manager.open(MainScreen(name='main'))
         return manager
 
     def on_keyboard(self, window, key, scancode, codepoint, modifier):
@@ -191,7 +191,7 @@ class RistoMeleApp(App):
         self.root.open(screen)
 
     def show_order(self, order):
-        screen = ShowOrderScreen(order=order)
+        screen = ShowOrderScreen(title='order', order=order)
         self.root.open(screen)
 
     def submit_order(self, order):
