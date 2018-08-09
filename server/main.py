@@ -10,6 +10,7 @@ def run_flask(app):
     Run the app using the builtin flask webserver, for development
     """
     import logging
+    logging.basicConfig()
     logging.getLogger('werkzeug').setLevel(logging.INFO)
     app.run(host='0.0.0.0', debug=True)
 

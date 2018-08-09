@@ -50,3 +50,8 @@ class EditTablesScreen(BaseTablesScreen):
         w.ids.main_button.on_release = save_waiter
         w.ids.load_button.on_release = load_waiter
         return w
+
+    def save(self, app):
+        app.update_tables(self.restaurant.tables)
+        app.root.go_back()
+

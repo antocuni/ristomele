@@ -164,13 +164,13 @@
                 text: "Salva"
                 size_hint_y: None
                 height: '40dp'
-                #on_release: root.submit(app)
+                on_release: root.save(app)
 
             FlatButton:
                 text: "Annulla"
                 size_hint_y: None
                 height: '40dp'
-                #on_release: app.root.go_back()
+                on_release: app.root.go_back()
 
 # =====================================================================
 # order.py

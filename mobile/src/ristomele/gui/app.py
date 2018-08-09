@@ -52,8 +52,8 @@ class RistoMeleApp(App):
     def build(self):
         Window.bind(on_keyboard=self.on_keyboard)
         manager = Manager()
-        #manager.open(MainScreen())
-        manager.open(EditTablesScreen(restaurant=model.Restaurant()))
+        manager.open(MainScreen())
+        #manager.open(EditTablesScreen(restaurant=model.Restaurant()))
         return manager
 
     def on_keyboard(self, window, key, scancode, codepoint, modifier):
@@ -184,6 +184,12 @@ class RistoMeleApp(App):
         order_data = resp.json()['order']
         new_order = model.Order.from_dict(order_data)
         return new_order
+
+    def update_tables(self, tables):
+        url = self.url('tables/')
+        payload = [t.as_dict() for t in tables]
+        resp = requests.put(url, json=payload)
+        # XXX: check the return state
 
     def print_order(self, order):
         s = order.as_textual_receipt()
