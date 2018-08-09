@@ -20,11 +20,11 @@ class BaseTablesScreen(MyScreen):
 
     def __init__(self, **kwds):
         super(BaseTablesScreen, self).__init__(**kwds)
-        self.grid = GridLayout(rows=self.restaurant.rows,
-                               cols=self.restaurant.cols)
-        self.ids.layout.add_widget(self.grid)
+        grid = self.ids.grid
+        grid.rows = self.restaurant.rows
+        grid.cols = self.restaurant.cols
         for t in self.restaurant.tables:
-            self.grid.add_widget(self.make_widget(t))
+            grid.add_widget(self.make_widget(t))
 
 
 class TablesScreen(BaseTablesScreen):
