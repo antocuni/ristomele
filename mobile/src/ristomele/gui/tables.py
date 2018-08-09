@@ -4,15 +4,13 @@ from kivy.uix.spinner import Spinner
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import ObjectProperty
-from ristomele.gui.uix import FlatButton, MyScreen
+from kivy.app import App
+from ristomele.gui.uix import FlatButton, MyScreen, Theme
 from ristomele import model
 
-
-class TableButton(FlatButton):
-    table = ObjectProperty()
-
-    ## def on_release(self):
-    ##     self.table.busy = not self.table.busy
+class TableWidget(BoxLayout):
+    bgcolor = ObjectProperty()
+    table = ObjectProperty(default=model.Table())
 
 
 class BaseTablesScreen(MyScreen):
@@ -30,12 +28,17 @@ class BaseTablesScreen(MyScreen):
 class TablesScreen(BaseTablesScreen):
 
     def make_widget(self, table):
-        return TableButton(table=table)
+        app = App.get_running_app()
+        def new_order():
+            app.new_order(table)
 
-
-
-class EditableTable(BoxLayout):
-    table = ObjectProperty(default=model.Table())
+        w = TableWidget(table=table)
+        w.ids.main_button.on_release = new_order
+        w.ids.name_button.on_release = new_order
+        w.ids.main_button.background_color = Theme.SUCCESS
+        w.ids.main_button.color = Theme.ICON
+        w.ids.name_button.background_color = Theme.SUCCESS
+        return w
 
 
 class EditTablesScreen(BaseTablesScreen):
@@ -46,9 +49,9 @@ class EditTablesScreen(BaseTablesScreen):
         def load_waiter():
             self.ids.waiter_name.text = table.waiter
 
-        w = EditableTable(table=table)
+        w = TableWidget(table=table)
         w.ids.main_button.on_release = save_waiter
-        w.ids.load_button.on_release = load_waiter
+        w.ids.name_button.on_release = load_waiter
         return w
 
     def save(self, app):

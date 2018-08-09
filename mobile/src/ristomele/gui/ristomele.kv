@@ -77,19 +77,6 @@
 # tables.py
 # =====================================================================
 
-<TableButton>:
-    canvas.after:
-        Color:
-            rgba: Theme.MUTED
-
-        Line:
-            rectangle: self.x,self.y,self.width,self.height
-
-    background_color: Theme.DANGER if self.table.busy else Theme.SUCCESS
-    text: self.table.name
-    on_release: app.new_order(self.table)
-
-
 <TablesScreen>:
     BoxLayout:
         id: layout
@@ -104,10 +91,10 @@
             id: grid
 
 
-<EditableTable>:
+<TableWidget>:
     canvas.after:
         Color:
-            rgba: Theme.SEPARATOR
+            rgba: Theme.MUTED
 
         Line:
             rectangle: self.x+1,self.y+1,self.width-1,self.height-1
@@ -119,20 +106,13 @@
         text: root.table.name
         show_border: False
 
-    BoxLayout:
-        orientation: 'horizontal'
+    FlatButton:
+        id: name_button
+        text: root.table.waiter
+        color: Theme.ICON
+        show_border: False
         size_hint_y: None
-        height: '40dp'
-
-        MyLabel:
-            text: root.table.waiter
-
-        IconButton:
-            id: load_button
-            icon: 'fa-upload'
-            size_hint_y: None
-            height: '40dp'
-
+        height: '25dp'
 
 <EditTablesScreen>:
     BoxLayout:

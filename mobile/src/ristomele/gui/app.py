@@ -56,7 +56,6 @@ class RistoMeleApp(App):
         Window.bind(on_keyboard=self.on_keyboard)
         manager = Manager()
         manager.open(MainScreen())
-        #manager.open(EditTablesScreen(restaurant=model.Restaurant()))
         return manager
 
     def on_keyboard(self, window, key, scancode, codepoint, modifier):
@@ -68,14 +67,13 @@ class RistoMeleApp(App):
         return True
 
     def show_tables(self):
-        tables = TablesScreen(name='tables', restaurant=model.Restaurant())
+        tables = TablesScreen(name='tables', restaurant=self.load_restaurant())
         self.root.open(tables)
 
     def edit_tables(self):
         screen = EditTablesScreen(name='edit_tables',
                                   restaurant=self.load_restaurant())
         self.root.open(screen)
-
 
     def new_order(self, table):
         Item = model.MenuItem
