@@ -24,6 +24,9 @@ class MainScreen(MyScreen):
 class RistoMeleApp(App):
     from kivy.uix.settings import SettingsWithTabbedPanel as settings_cls
 
+    ROWS = 9
+    COLS = 3
+
     def get_application_config(self):
         root = pypath.local(ristomele.__file__).dirpath().dirpath().dirpath()
         ini = root.join('ristomele.ini')
@@ -70,8 +73,9 @@ class RistoMeleApp(App):
 
     def edit_tables(self):
         screen = EditTablesScreen(name='edit_tables',
-                                  restaurant=model.Restaurant())
+                                  restaurant=self.load_restaurant())
         self.root.open(screen)
+
 
     def new_order(self, table):
         Item = model.MenuItem
@@ -190,6 +194,13 @@ class RistoMeleApp(App):
         payload = [t.as_dict() for t in tables]
         resp = requests.put(url, json=payload)
         # XXX: check the return state
+
+    def load_restaurant(self):
+        url = self.url('tables/')
+        resp = requests.get(url)
+        # XXX: check the return state
+        table_data = resp.json()
+        return model.Restaurant(self.ROWS, self.COLS, table_data)
 
     def print_order(self, order):
         s = order.as_textual_receipt()

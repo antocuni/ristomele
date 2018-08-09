@@ -9,11 +9,19 @@ def example_order(example_order_data):
     return model.Order.from_dict(example_order_data)
 
 def test_Restaurant():
-    r = model.Restaurant(2, 3)
+    tables = [
+        dict(name='11', waiter='pippo'),
+        dict(name='12', waiter='pluto')
+    ]
+    r = model.Restaurant(2, 3, tables)
     assert len(r.tables) == 6
     names = [t.name for t in r.tables]
     assert names == ['11', '21', '31',
                      '12', '22', '32']
+    t11 = r.tables[0]
+    t12 = r.tables[3]
+    assert t11.waiter == 'pippo'
+    assert t12.waiter == 'pluto'
 
 def test_Order_from_dict(example_order, example_order_data):
     o = example_order

@@ -14,14 +14,19 @@ class Table(EventDispatcher):
 class Restaurant(EventDispatcher):
     tables = ListProperty()
 
-    def __init__(self, rows=5, cols=3):
+    def __init__(self, rows=5, cols=3, table_data=()):
+        name2waiter = {}
+        for d in table_data:
+            name2waiter[d['name']] = d['waiter']
+        #
         self.rows = rows
         self.cols = cols
         tables = []
         for row in range(self.rows):
             for col in range(self.cols):
                 tname = '%s%s' % (col+1, row+1)
-                tables.append(Table(name=tname))
+                waiter = name2waiter.get(tname, '')
+                tables.append(Table(name=tname, waiter=waiter))
         super(Restaurant, self).__init__(tables=tables)
 
 
