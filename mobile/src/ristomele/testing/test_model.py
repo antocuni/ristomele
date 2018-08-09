@@ -38,6 +38,9 @@ def test_Order_from_dict(example_order, example_order_data):
         assert o_item.count == d_item['count']
         assert o_item.price == d_item['price']
 
+def test_Order_get_total(example_order):
+    assert example_order.get_total() == 10 + 2*15
+
 def test_Order_as_dict(example_order):
     d = example_order.as_dict()
     assert d == dict(

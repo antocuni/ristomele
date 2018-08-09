@@ -262,6 +262,31 @@
                 color: (0, 0, 0, 1)
                 font_name: 'RobotoMono-Regular'
 
+        MyLabel:
+            text: "Totale: %.2f" % root.order.get_total()
+            size_hint_y: None
+            height: '30dp'
+            halign: 'right'
+            text_size: self.size
+            padding: '5dp', '5dp'
+
+        BoxLayout:
+            orientation: 'horizontal'
+            height: '30dp'
+            size_hint_y: None
+
+            TextInput:
+                id: money
+                hint_text: "Denaro ricevuto"
+                on_text: root.update_rest()
+
+            MyLabel:
+                id: rest
+                text: "Resto:"
+                halign: 'right'
+                text_size: self.size
+                padding: '5dp', '5dp'
+
         BoxLayout:
             id: layout
             orientation: 'horizontal'

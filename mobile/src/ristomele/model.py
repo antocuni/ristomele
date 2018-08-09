@@ -82,6 +82,14 @@ class Order(EventDispatcher):
             menu=[item.as_dict() for item in self.menu],
         )
 
+    def get_total(self):
+        total = 0
+        for item in self.menu:
+            if item.kind != 'item':
+                continue
+            total += item.count * item.price
+        return total
+
     def as_textual_receipt(self, width=32):
         lines = []
         w = lines.append
@@ -95,7 +103,6 @@ class Order(EventDispatcher):
         w('Cassiere: %s' % (self.cashier))
         w('Cliente: %s' % self.customer)
         w('')
-        total = 0
         for item in self.menu:
             if item.kind != 'item':
                 continue
@@ -104,7 +111,6 @@ class Order(EventDispatcher):
             subtot = item.count * item.price
             descr = item.name
             price = '%s %5.2f' % (('x%d' % item.count).ljust(3), subtot)
-            total += subtot
             #
             descr = (descr + ' ')[:width]
             if len(descr) + len(price) > width:
@@ -116,7 +122,7 @@ class Order(EventDispatcher):
                 line = '%s%s' % (descr, price.rjust(width-len(descr)))
                 w(line)
         w('')
-        line = 'TOTALE: %.2f' % total
+        line = 'TOTALE: %.2f' % self.get_total()
         w(line.rjust(width))
         w('')
         w('RICEVUTA NON FISCALE')

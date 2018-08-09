@@ -36,6 +36,14 @@ class ShowOrderScreen(MyScreen):
         self.ids.content.text = new_order.as_textual_receipt()
         app.print_order(new_order)
         # go back to the table selection screen
-        app.root.go_back()
-        app.root.go_back()
+        ## app.root.go_back()
+        ## app.root.go_back()
 
+    def update_rest(self):
+        try:
+            got = float(self.ids.money.text)
+        except ValueError:
+            rest = 0
+        else:
+            rest = got - self.order.get_total()
+        self.ids.rest.text = 'Resto: %.2f' % rest
