@@ -2,6 +2,7 @@ import random
 from kivy.uix.button import Button
 from kivy.uix.spinner import Spinner
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import ObjectProperty
 from ristomele.gui.uix import FlatButton, MyScreen
 from ristomele import model
@@ -33,16 +34,19 @@ class TablesScreen(BaseTablesScreen):
 
 
 
-class EditableTable(FlatButton):
+class EditableTable(BoxLayout):
     table = ObjectProperty(default=model.Table())
 
 
 class EditTablesScreen(BaseTablesScreen):
 
     def make_widget(self, table):
-        w = EditableTable(table=table,
-                          on_release=self.update_waiter)
-        return w
+        def save_waiter():
+            table.waiter = self.ids.waiter_name.text
+        def load_waiter():
+            self.ids.waiter_name.text = table.waiter
 
-    def update_waiter(self, editable_table):
-        editable_table.table.waiter = self.ids.waiter_name.text
+        w = EditableTable(table=table)
+        w.ids.main_button.on_release = save_waiter
+        w.ids.load_button.on_release = load_waiter
+        return w

@@ -103,9 +103,24 @@
 
 
 <EditableTable>:
-    text: '%s\n%s' % (self.table.name, self.table.waiter)
+    canvas.after:
+        Color:
+            rgba: Theme.SEPARATOR
 
-            
+        Line:
+            rectangle: self.x+1,self.y+1,self.width-1,self.height-1
+
+    FlatButton:
+        id: main_button
+        text: '%s\n%s' % (root.table.name, root.table.waiter)
+
+    IconButton:
+        id: load_button
+        icon: 'fa-upload'
+        size_hint_y: None
+        height: '30dp'
+
+
 <EditTablesScreen>:
     BoxLayout:
         id: layout
@@ -122,7 +137,6 @@
             size_hint_y: None
             height: '30dp'
             multiline: False
-
 
 
 # =====================================================================
