@@ -88,7 +88,7 @@ class Order(EventDispatcher):
         else:
             date = ''
         w('Numero ordine: %s %s' % (num, date))
-        w('Tavolo: %s' % self.table.name)
+        w('Tavolo: %s [%s]' % (self.table.name, self.table.waiter))
         w('Cliente: %s' % self.customer)
         w('')
         total = 0

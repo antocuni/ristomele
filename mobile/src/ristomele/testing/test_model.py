@@ -61,7 +61,7 @@ def test_Menu_as_textural_recepit(example_order):
     txt = example_order.as_textual_receipt(width=32)
     assert txt == textwrap.dedent("""
         Numero ordine:  
-        Tavolo: 11
+        Tavolo: 11 [anto]
         Cliente: pippo
 
         Pasta                  x1  10.00
@@ -84,7 +84,7 @@ def test_Menu_as_textural_recepit(example_order):
     txt = example_order.as_textual_receipt(width=32)
     exp = textwrap.dedent("""
         Numero ordine: 1 [15/08 20:00]
-        Tavolo: 11
+        Tavolo: 11 [anto]
         Cliente: pippo
         """).strip()
     assert txt.startswith(exp)
