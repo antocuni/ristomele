@@ -68,7 +68,7 @@ Builder.load_string("""
             size: self.size
 
     bgcolor: Theme.BG
-    color: Theme.PRIMARY
+    color: Theme.ICON
 
 <MyScreen>:
     canvas.before:

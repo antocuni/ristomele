@@ -14,8 +14,8 @@
 <FlatButton>:
     background_color: (1, 1, 1, 1)
     _down_color: darker(self.background_color)
-    color: Theme.ICON
-    show_border: False
+    color: Theme.PRIMARY
+    show_border: True
 
     canvas.before:
         Color:
@@ -35,6 +35,7 @@
 <IconButton@FlatButton>:
     icon: ""
     markup: True
+    show_border: False
     color: Theme.ICON
     text: icon(self.icon) if self.icon else ""
     size_hint_x: None
@@ -111,15 +112,26 @@
         Line:
             rectangle: self.x+1,self.y+1,self.width-1,self.height-1
 
+    orientation: 'vertical'
+
     FlatButton:
         id: main_button
-        text: '%s\n%s' % (root.table.name, root.table.waiter)
+        text: root.table.name
+        show_border: False
 
-    IconButton:
-        id: load_button
-        icon: 'fa-upload'
+    BoxLayout:
+        orientation: 'horizontal'
         size_hint_y: None
-        height: '30dp'
+        height: '40dp'
+
+        MyLabel:
+            text: root.table.waiter
+
+        IconButton:
+            id: load_button
+            icon: 'fa-upload'
+            size_hint_y: None
+            height: '40dp'
 
 
 <EditTablesScreen>:
