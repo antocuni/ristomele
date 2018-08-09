@@ -50,6 +50,7 @@ class MenuItem(EventDispatcher):
 class Order(EventDispatcher):
     id = ObjectProperty()
     date = ObjectProperty()
+    cashier = StringProperty()
     table = ObjectProperty()
     customer = StringProperty()
     notes = StringProperty()
@@ -64,6 +65,7 @@ class Order(EventDispatcher):
         return cls(
             id = data.get('id'),
             date = date,
+            cashier = data['cashier'],
             table = table,
             customer = data['customer'],
             notes = data['notes'],
@@ -72,6 +74,7 @@ class Order(EventDispatcher):
 
     def as_dict(self):
         return dict(
+            cashier=self.cashier,
             table=self.table.name,
             waiter=self.table.waiter,
             customer=self.customer,
@@ -89,6 +92,7 @@ class Order(EventDispatcher):
             date = ''
         w('Numero ordine: %s %s' % (num, date))
         w('Tavolo: %s [%s]' % (self.table.name, self.table.waiter))
+        w('Cassiere: %s' % (self.cashier))
         w('Cliente: %s' % self.customer)
         w('')
         total = 0

@@ -24,6 +24,7 @@ def client(tmpdir, spooldir):
 def example_order_data():
     return dict(
         table='11',
+        cashier='gian',
         waiter='anto',
         customer='pippo',
         notes='my notes',
@@ -79,6 +80,7 @@ class TestServer(object):
                 'order': {
                     'id': 1,
                     'date': '2018-08-15 20:00:00',
+                    'cashier': ex['cashier'],
                     'table': ex['table'],
                     'waiter': ex['waiter'],
                     'customer': ex['customer'],

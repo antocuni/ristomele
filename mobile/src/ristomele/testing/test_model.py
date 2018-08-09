@@ -42,6 +42,7 @@ def test_Order_as_dict(example_order):
     d = example_order.as_dict()
     assert d == dict(
         table='11',
+        cashier='gian',
         waiter='anto',
         customer='pippo',
         notes='my notes',
@@ -62,6 +63,7 @@ def test_Menu_as_textural_recepit(example_order):
     assert txt == textwrap.dedent("""
         Numero ordine:  
         Tavolo: 11 [anto]
+        Cassiere: gian
         Cliente: pippo
 
         Pasta                  x1  10.00
@@ -85,6 +87,7 @@ def test_Menu_as_textural_recepit(example_order):
     exp = textwrap.dedent("""
         Numero ordine: 1 [15/08 20:00]
         Tavolo: 11 [anto]
+        Cassiere: gian
         Cliente: pippo
         """).strip()
     assert txt.startswith(exp)

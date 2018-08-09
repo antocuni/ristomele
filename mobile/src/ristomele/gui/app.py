@@ -44,6 +44,9 @@ class RistoMeleApp(App):
             'host': '192.168.1.3',
             'port': '5000'
         })
+        config.setdefaults('ristomele', {
+            'cashier': ''
+        })
 
     def build_settings(self, settings):
         from kivy.config import Config
@@ -170,7 +173,8 @@ class RistoMeleApp(App):
 
             Item(name='Caffe', price=1),
         ]
-        order = model.Order(table=table, menu=items)
+        order = model.Order(table=table, menu=items,
+                            cashier=self.config.get('ristomele', 'cashier'))
         screen = NewOrderScreen(name='menu', order=order)
         self.root.open(screen)
 

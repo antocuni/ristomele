@@ -16,6 +16,7 @@ class Table(db.Model):
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DATETIME)
+    cashier = db.Column(db.TEXT)
     table = db.Column(db.TEXT)
     waiter = db.Column(db.TEXT)
     customer = db.Column(db.TEXT)
@@ -26,6 +27,7 @@ class Order(db.Model):
     def from_dict(cls, data):
         return cls(
             date = datetime.now(),
+            cashier = data['cashier'],
             table = data['table'],
             waiter = data['waiter'],
             customer = data['customer'],
@@ -44,6 +46,7 @@ class Order(db.Model):
         return dict(
             id = self.id,
             date = self.date.strftime('%Y-%m-%d %H:%M:%S') if self.date else None,
+            cashier = self.cashier,
             table = self.table,
             waiter = self.waiter,
             customer = self.customer,

@@ -1,4 +1,10 @@
 [
+    { "title": "Cassiere",
+      "type": "string",
+      "desc": "Nome Cassiere",
+      "section": "ristomele",
+      "key": "cashier"
+    },
     { "title": "Sync server", "type": "title"},
     { "title": "Indirizzo",
       "type": "string",
@@ -10,5 +16,5 @@
       "type": "string",
       "section": "server",
       "key": "port" 
-    },
+    }
 ]

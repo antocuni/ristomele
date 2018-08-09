@@ -7,26 +7,20 @@
   <body style="font-size: 16pt">
     <div class="container">
       <div class="row">
-        <div class="col-xs-3">
-          <b>Numero ordine</b>
-        </div>
-        <div class="col-xs-9">{{order.textual_id()}}</div>
+        <div class="col-xs-3"><b>Ordine</b></div>
+        <div class="col-xs-3"><b>Tavolo</b></div>
+        <div class="col-xs-3"><b>Cliente</b></div>
+        <div class="col-xs-3"><b>Cassiere</b></div>
       </div>
 
       <div class="row">
-        <div class="col-xs-3">
-          <b>Tavolo</b>
-        </div>
-        <div class="col-xs-9">{{order.table}} [{{order.waiter}}]</div>
+        <div class="col-xs-3">{{order.textual_id()}}</div>
+        <div class="col-xs-3">{{order.table}} [{{order.waiter}}]</div>
+        <div class="col-xs-3">{{order.customer}}</div>
+        <div class="col-xs-3">{{order.cashier}}</div>
       </div>
 
-      <div class="row">
-        <div class="col-xs-3">
-          <b>Cliente</b>
-        </div>
-        <div class="col-xs-9">{{order.customer}}</div>
-      </div>
-
+      <br>
       <div class="row">
         <div class="col-xs-3">
           <b>Note</b>
