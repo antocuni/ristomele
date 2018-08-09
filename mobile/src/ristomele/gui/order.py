@@ -54,7 +54,10 @@ class ShowOrderScreen(MyScreen):
 
     def go_back_dwim(self, app):
         if self.order.is_saved:
-            print 'TODO'
+            # go back to the tables screen. Actually, this opens a NEW screen,
+            # which is good because it means that the names of waiters are
+            # reloaded
+            app.show_tables()
         else:
             app.root.go_back()
 

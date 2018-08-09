@@ -90,6 +90,12 @@
         GridLayout:
             id: grid
 
+        FlatButton:
+            size_hint_y: None
+            height: '40dp'
+            text: "Indietro"
+            on_release: app.root.go_back()
+
 
 <TableWidget>:
     canvas.after:

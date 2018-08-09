@@ -18,6 +18,14 @@ class Manager(ScreenManager):
         self.current = name
         self.history.append(view)
 
+    def unwind(self, name):
+        while self.current_view.name != name:
+            res = self.go_back()
+            if not res:
+                # we reached the bottom without finding the target screen,
+                # bail out
+                break
+
     def go_back(self):
         if len(self.history) < 2:
             return False

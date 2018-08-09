@@ -82,6 +82,9 @@ class RistoMeleApp(App):
         self.root.open(screen)
 
     def show_tables(self):
+        # this is a bit magic: it always "unwind" the screenmanager stack to
+        # make sure that the tables screen is immediately above the main.
+        self.root.unwind('main')
         tables = TablesScreen(name='tables', restaurant=self.load_restaurant())
         self.root.open(tables)
 
