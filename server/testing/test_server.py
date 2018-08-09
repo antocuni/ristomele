@@ -134,3 +134,19 @@ class TestServer(object):
             dict(name='11', waiter='pluto'),
             dict(name='12', waiter='pippo')
             ]
+
+    def test_update_many_tables(self, client):
+        client.put('/tables/11/', json=dict(waiter='anto'))
+        new_tables = [
+            dict(name='12', waiter='pippo'),
+            dict(name='13', waiter='pluto')
+            ]
+        resp = client.put('/tables/', json=new_tables)
+        assert resp.status_code == 200
+        all_tables = model.Table.query.all()
+        items = [(t.name, t.waiter) for t in all_tables]
+        assert items == [
+            ('11', 'anto'),
+            ('12', 'pippo'),
+            ('13', 'pluto'),
+            ]

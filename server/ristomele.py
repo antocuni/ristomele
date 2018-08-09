@@ -71,11 +71,8 @@ def all_orders():
     orders = [order.as_dict() for order in orders]
     return flask.jsonify(orders)
 
-
-@ristomele.route('/tables/<name>/', methods=['PUT'])
-def update_table(name):
+def _update_one_table(name, waiter):
     from server import model
-    waiter = flask.request.json['waiter']
     table = model.Table.query.get(name)
     if table is None:
         # no table with this name, create one from scratch
@@ -83,6 +80,13 @@ def update_table(name):
     else:
         table.waiter = waiter
     model.db.session.add(table)
+    return table
+
+@ristomele.route('/tables/<name>/', methods=['PUT'])
+def update_table(name):
+    from server import model
+    waiter = flask.request.json['waiter']
+    table = _update_one_table(name, waiter)
     model.db.session.commit()
     return flask.jsonify(table.as_dict())
 
@@ -90,5 +94,18 @@ def update_table(name):
 def all_tables():
     from server import model
     tables = model.Table.query.all()
+    tables = [t.as_dict() for t in tables]
+    return flask.jsonify(tables)
+
+@ristomele.route('/tables/', methods=['PUT'])
+def update_many_tables():
+    from server import model
+    tables = []
+    for tdict in flask.request.json:
+        name = tdict['name']
+        waiter = tdict['waiter']
+        tables.append(_update_one_table(name, waiter))
+    #
+    model.db.session.commit()
     tables = [t.as_dict() for t in tables]
     return flask.jsonify(tables)
