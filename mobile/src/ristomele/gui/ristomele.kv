@@ -90,11 +90,19 @@
         GridLayout:
             id: grid
 
-        FlatButton:
-            size_hint_y: None
+        BoxLayout:
+            id: layout
+            orientation: 'horizontal'
             height: '40dp'
-            text: "Indietro"
-            on_release: app.root.go_back()
+            size_hint_y: None
+
+            FlatButton:
+                text: "Lista ordini"
+                on_release: app.show_orders()
+
+            FlatButton:
+                text: "Indietro"
+                on_release: app.root.go_back()
 
 
 <TableWidget>:

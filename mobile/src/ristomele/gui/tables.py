@@ -35,9 +35,9 @@ class TablesScreen(BaseTablesScreen):
         w = TableWidget(table=table)
         w.ids.main_button.on_release = new_order
         w.ids.name_button.on_release = new_order
-        w.ids.main_button.background_color = Theme.SUCCESS
+        w.ids.main_button.background_color = Theme.BGSUCCESS
         w.ids.main_button.color = Theme.ICON
-        w.ids.name_button.background_color = Theme.SUCCESS
+        w.ids.name_button.background_color = Theme.BGSUCCESS
         return w
 
 
