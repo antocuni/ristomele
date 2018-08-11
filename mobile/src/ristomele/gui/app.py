@@ -32,7 +32,7 @@ class RistoMeleApp(App):
     # these are needed so that we can change to font size in the options
     font_size = ConfigParserProperty(15.0, 'ristomele', 'font_size', 'app',
                                      val_type=float)
-    std_height = AliasProperty(lambda self: self.font_size + dp(15),
+    std_height = AliasProperty(lambda self: self.font_size * 2,
                                bind=['font_size'])
 
 
