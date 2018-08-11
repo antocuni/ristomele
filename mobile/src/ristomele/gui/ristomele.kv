@@ -305,7 +305,7 @@
             id: notes
             hint_text: 'Note'
             size_hint_y: None
-            height: app.std_height * 2
+            height: app.std_height*2 if self.text else app.std_height
             multiline: True
 
         ListView:
