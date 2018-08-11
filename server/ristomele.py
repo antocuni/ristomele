@@ -49,10 +49,27 @@ def new_order():
     myorder = model.Order.from_dict(order_dict)
     model.db.session.add(myorder)
     model.db.session.commit()
+    print_order(myorder)
+    return flask.jsonify(result='OK', order=myorder.as_dict())
+
+
+@ristomele.route('/orders/<int:order_id>/print/', methods=['POST'])
+def reprint_order(order_id):
+    from server import model
+    myorder = model.Order.query.get(order_id)
+    if myorder is None:
+        return error("Cannot find the requested order")
+    print_order(myorder, reprint=True)
+    return flask.jsonify(result='OK')
+
+
+def print_order(myorder, reprint=False):
+    menu = json.loads(myorder.menu)
     html = flask.render_template('order.html',
                                  static=str(STATIC),
+                                 reprint=reprint,
                                  order=myorder,
-                                 columns=split_columns(order_dict['menu']))
+                                 columns=split_columns(menu))
     #
     # we generate the HTML in a temporary dir, but the PDF into a
     # spooldir: the idea is that we will have a deamon which prints all
@@ -61,7 +78,7 @@ def new_order():
                 current_app.config['SPOOLDIR'])
     if not current_app.config['TESTING']:
         os.system('evince "%s" &' % pdf)
-    return flask.jsonify(result='OK', order=myorder.as_dict())
+
 
 
 @ristomele.route('/orders/', methods=['GET'])
@@ -70,6 +87,8 @@ def all_orders():
     orders = model.Order.query.order_by(model.Order.id.desc()).all()
     orders = [order.as_dict() for order in orders]
     return flask.jsonify(orders)
+
+
 
 def _update_one_table(name, waiter):
     from server import model

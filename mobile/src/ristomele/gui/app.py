@@ -15,7 +15,7 @@ from ristomele.gui import iconfonts
 from ristomele.gui.manager import Manager
 from ristomele.logger import Logger
 from ristomele.gui.util import SmartRequests
-from ristomele.gui.error import MyExceptionHandler
+from ristomele.gui.error import MyExceptionHandler, ErrorMessage
 from ristomele.gui.tables import TablesScreen, EditTablesScreen
 from ristomele.gui.order import OrderListScreen, NewOrderScreen, ShowOrderScreen
 
@@ -211,6 +211,13 @@ class RistoMeleApp(App):
         new_order = model.Order.from_dict(order_data)
         return new_order
 
+    def reprint_order(self, order):
+        if order.id is None:
+            raise ErrorMessage("Impossibile stampare un ordine se non è stato prima salvato")
+        url = self.url('orders/%s/print/' % order.id)
+        resp = self.requests.post(url)
+        assert resp.status_code == 200
+
     def update_tables(self, tables):
         url = self.url('tables/')
         payload = [t.as_dict() for t in tables]
@@ -225,7 +232,7 @@ class RistoMeleApp(App):
         table_data = resp.json()
         return model.Restaurant(self.ROWS, self.COLS, table_data)
 
-    def print_order(self, order):
+    def print_receipt(self, order):
         s = order.as_textual_receipt()
         if platform == 'android':
             from ristomele.gui.printer import print_string

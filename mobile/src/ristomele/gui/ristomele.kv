@@ -349,7 +349,7 @@
             FlatButton:
                 text: "Ricevuta"
                 disabled: not root.order.is_saved
-                on_release: app.print_order(root.order)
+                on_release: app.print_receipt(root.order)
 
             FlatButton:
                 text: "Stampa Bar"

@@ -44,13 +44,13 @@ class ShowOrderScreen(MyScreen):
     def save_or_reprint(self, app):
         if self.order.is_saved:
             # reprint
-            print 'TODO reprint'
+            app.reprint_order(self.order)
         else:
             # save
             new_order = app.submit_order(self.order)
             self.order = new_order
             self.ids.content.text = new_order.as_textual_receipt()
-            app.print_order(new_order)
+            app.print_receipt(new_order)
 
     def go_back_dwim(self, app):
         if self.order.is_saved and app.root.history[-2].name == "new_order":
