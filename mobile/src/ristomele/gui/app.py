@@ -248,6 +248,10 @@ class RistoMeleApp(App):
 
     def print_receipt(self, order):
         printer_name = self.get_printer_name()
+        if not printer_name:
+            raise ErrorMessage(
+                message="Nessuna stampante configurata",
+                description="Selezionarne una nella schermata opzioni")
         s = order.as_textual_receipt()
         if platform == 'android':
             from ristomele.gui.printer import print_string
