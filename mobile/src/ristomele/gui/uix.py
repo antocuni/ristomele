@@ -169,7 +169,7 @@ Builder.load_string("""
 <MessageBox>:
 
     size_hint: 0.95, None
-    height: '350dp'
+    height: app.std_height * 12
 
     BoxLayout:
         orientation: 'vertical'
@@ -184,7 +184,7 @@ Builder.load_string("""
         FlatButton:
             text: 'OK'
             size_hint_y: None
-            height: '40dp'
+            height: app.std_height
             on_release: root.dismiss()
 """)
 class MessageBox(Popup):

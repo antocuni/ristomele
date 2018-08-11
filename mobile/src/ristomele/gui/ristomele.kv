@@ -100,7 +100,7 @@
         BoxLayout:
             id: layout
             orientation: 'horizontal'
-            height: '40dp'
+            height: app.std_height
             size_hint_y: None
 
             FlatButton:
@@ -133,7 +133,7 @@
         color: Theme.ICON
         show_border: False
         size_hint_y: None
-        height: '25dp'
+        height: app.std_height
 
 <EditTablesScreen>:
     BoxLayout:
@@ -147,7 +147,7 @@
             id: waiter_name
             hint_text: 'Nome cameriere'
             size_hint_y: None
-            height: '30dp'
+            height: app.std_height
             multiline: False
 
         GridLayout:
@@ -156,7 +156,7 @@
         BoxLayout:
             id: layout
             orientation: 'horizontal'
-            height: '40dp'
+            height: app.std_height
             size_hint_y: None
 
             FlatButton:
@@ -173,7 +173,7 @@
 
 <OrderItem>:
     layout: 'horizontal'
-    height: '40dp'
+    height: app.std_height
     size_hint_y: None
     current_cashier: app.get_cashier()
     fgcolor: Theme.PRIMARY if root.order.cashier == root.current_cashier else Theme.MUTED
@@ -186,16 +186,11 @@
             size: self.width, dp(1)
 
     FlatButton:
-        text: root.order.textual_id()
+        text: "%s   %s" % (root.order.textual_id(), root.order.table.name)
         show_border: False
         on_release: app.show_order(root.order)
         color: root.fgcolor
-
-    FlatButton:
-        text: root.order.table.name
-        show_border: False
-        color: root.fgcolor
-        on_release: app.show_order(root.order)
+        size_hint_x: 1
 
     FlatButton:
         text: root.order.cashier
@@ -217,13 +212,13 @@
         FlatButton:
             text: "Indietro"
             size_hint_y: None
-            height: '40dp'
+            height: app.std_height
             on_release: app.root.go_back()
 
 
 <MenuItem>:
     orientation: 'horizontal'
-    height: '30dp'
+    height: app.std_height
     size_hint_y: None
 
     MyLabel:
@@ -250,10 +245,11 @@
 
 <MenuSeparator>:
     orientation: 'horizontal'
-    height: '30dp'
+    height: app.std_height
     size_hint_y: None
     MyLabel:
-        text: root.item.name
+        text: "[b]%s[/b]" % root.item.name
+        markup: True
         text_size: self.size
         padding_x: 10
         color: (0, 0, 0, 1)
@@ -270,14 +266,14 @@
             id: customer_name
             hint_text: 'Nome'
             size_hint_y: None
-            height: '30dp'
+            height: app.std_height
             multiline: False
 
         TextInput:
             id: notes
             hint_text: 'Note'
             size_hint_y: None
-            height: '30dp'
+            height: app.std_height
             multiline: False
 
         ListView:
@@ -287,7 +283,7 @@
         BoxLayout:
             id: layout
             orientation: 'horizontal'
-            height: '40dp'
+            height: app.std_height
             size_hint_y: None
 
             FlatButton:
@@ -321,14 +317,14 @@
         MyLabel:
             text: "Totale: %.2f" % root.order.get_total()
             size_hint_y: None
-            height: '30dp'
+            height: app.std_height
             halign: 'right'
             text_size: self.size
             padding: '5dp', '5dp'
 
         BoxLayout:
             orientation: 'horizontal'
-            height: '30dp'
+            height: app.std_height
             size_hint_y: None
 
             TextInput:
@@ -346,7 +342,7 @@
         BoxLayout:
             id: layout
             orientation: 'horizontal'
-            height: '40dp'
+            height: app.std_height
             size_hint_y: None
 
             FlatButton:
@@ -359,7 +355,7 @@
                 on_release: app.print_receipt(root.order)
 
             FlatButton:
-                text: "Stampa Bar"
+                text: "Bar"
                 disabled: not root.order.is_saved
 
             FlatButton:
