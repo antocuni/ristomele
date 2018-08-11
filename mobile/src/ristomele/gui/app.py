@@ -241,14 +241,19 @@ class RistoMeleApp(App):
         return model.Restaurant(self.ROWS, self.COLS, table_data)
 
     def print_receipt(self, order):
+        printer_name = 'Printer Blue 3'
         s = order.as_textual_receipt()
         if platform == 'android':
             from ristomele.gui.printer import print_string
-            print_string(s)
+            print_string(printer_name, s)
         else:
             print
             print s
             print
+
+    def bluetooth_infos(self):
+        from ristomele.gui import printer
+        printer.print_all_paired_devices()
 
 def main():
     iconfonts.init()
