@@ -18,6 +18,7 @@
     color: Theme.PRIMARY
     disabled_color: Theme.MUTED
     show_border: True
+    font_size: app.font_size
 
     canvas.before:
         Color:
@@ -75,6 +76,8 @@
         FlatButton:
             text: "Bluetooth info"
             on_release: app.bluetooth_info()
+            size_hint_y: None
+            height: app.std_height
 
 
 # =====================================================================

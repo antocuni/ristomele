@@ -4,8 +4,9 @@ import pypath
 from urlparse import urljoin
 from kivy.app import App
 from kivy.resources import resource_find
-from kivy.properties import ObjectProperty
+from kivy.properties import ObjectProperty, ConfigParserProperty, AliasProperty
 from kivy.utils import platform
+from kivy.metrics import dp
 from kivy.core.window import Window
 import ristomele
 from ristomele import model
@@ -27,6 +28,13 @@ class RistoMeleApp(App):
 
     ROWS = 9
     COLS = 3
+
+    # these are needed so that we can change to font size in the options
+    font_size = ConfigParserProperty(15.0, 'ristomele', 'font_size', 'app',
+                                     val_type=float)
+    std_height = AliasProperty(lambda self: self.font_size + dp(15),
+                               bind=['font_size'])
+
 
     def get_application_config(self):
         root = pypath.local(ristomele.__file__).dirpath().dirpath().dirpath()

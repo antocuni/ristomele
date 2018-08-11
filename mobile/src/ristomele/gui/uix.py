@@ -70,6 +70,7 @@ Builder.load_string("""
 
     bgcolor: Theme.BG
     color: Theme.ICON
+    font_size: app.font_size
 
 <MyScreen>:
     canvas.before:
