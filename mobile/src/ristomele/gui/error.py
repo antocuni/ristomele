@@ -14,14 +14,16 @@ class ErrorMessage(Exception):
 
 class MyExceptionHandler(ExceptionHandler):
 
-    def __init__(self, app):
-        self.app = app
-        ExceptionManager.add_handler(self)
+    def __init__(self, add_handler=True):
+        if add_handler:
+            ExceptionManager.add_handler(self)
 
     def handle_exception(self, exc):
         if isinstance(exc, ErrorMessage):
-            box = MessageBox(title='Errore', message=exc.message,
-                             description=exc.description)
-            box.open()
+            self.show_error(exc.message, exc.description)
             return ExceptionManager.PASS
         return ExceptionManager.RAISE
+
+    def show_error(self, message, description):
+        box = MessageBox(title='Errore', message=message, description=description)
+        box.open()

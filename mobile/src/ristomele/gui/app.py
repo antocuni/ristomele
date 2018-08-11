@@ -60,7 +60,7 @@ class RistoMeleApp(App):
                                 filename=resource_find('data/scrolling.json'))
 
     def build(self):
-        self.exception_handler = MyExceptionHandler(self)
+        self.exception_handler = MyExceptionHandler()
         Window.bind(on_keyboard=self.on_keyboard)
         manager = Manager()
         manager.open(MainScreen(name='main'))
