@@ -140,7 +140,6 @@
     canvas.after:
         Color:
             rgba: Theme.MUTED
-
         Line:
             rectangle: self.x+1,self.y+1,self.width-1,self.height-1
 
@@ -240,19 +239,20 @@
 
 
 <MenuItem>:
+    canvas.after:
+        Color:
+            rgba: Theme.SEPARATOR
+        Line:
+            rectangle: self.x+1,self.y+1,self.width-1,1
+
     orientation: 'horizontal'
     height: app.std_height
     size_hint_y: None
 
-    MyLabel:
-        text: root.item.name
-        text_size: self.size
-        padding_x: 20
-        size_hint_x: 0.75
-
     BoxLayout:
         orientation: 'horizontal'
-        size_hint_x: 0.25
+        size_hint_x: None
+        width: app.std_height*3
         IconButton:
             icon: 'fa-minus'
             background_color: Theme.BGDANGER
@@ -266,6 +266,15 @@
             background_color: Theme.BGSUCCESS
             on_release: root.item.count += 1
 
+    MyLabel:
+        text: root.item.name
+        text_size: self.size
+        valign: 'middle'
+        padding_x: 20
+        size_hint_x: 0.75
+        size_hint_y: 1
+
+
 <MenuSeparator>:
     orientation: 'horizontal'
     height: app.std_height
@@ -275,6 +284,7 @@
         markup: True
         text_size: self.size
         padding_x: 10
+        padding_y: 10
         color: (0, 0, 0, 1)
 
 <NewOrderScreen>:
