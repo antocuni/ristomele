@@ -87,15 +87,15 @@
                 size_hint: 0.25, 1
 
                 IconButton:
-                    icon: 'fa-minus'
-                    size_hint: 1, 0.5
-                    on_release: app.font_size -= 1
-                    show_border: True
-
-                IconButton:
                     icon: 'fa-plus'
                     size_hint: 1, 0.5
                     on_release: app.font_size += 1
+                    show_border: True
+
+                IconButton:
+                    icon: 'fa-minus'
+                    size_hint: 1, 0.5
+                    on_release: app.font_size -= 1
                     show_border: True
 
         # FlatButton:
@@ -254,16 +254,16 @@
         orientation: 'horizontal'
         size_hint_x: 0.25
         IconButton:
-            icon: 'fa-minus-square'
-            color: Theme.MUTED
+            icon: 'fa-minus'
+            background_color: Theme.BGDANGER
             on_release: root.item.count = max(root.item.count-1, 0)
 
         MyLabel:
             text: str(root.item.count)
 
         IconButton:
-            icon: 'fa-plus-square'
-            color: Theme.MUTED
+            icon: 'fa-plus'
+            background_color: Theme.BGSUCCESS
             on_release: root.item.count += 1
 
 <MenuSeparator>:
