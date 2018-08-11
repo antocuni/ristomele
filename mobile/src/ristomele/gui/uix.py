@@ -173,8 +173,9 @@ Builder.load_string("""
     BoxLayout:
         orientation: 'vertical'
 
-        MyLabel:
+        Paragraph:
             text: root.message
+            size_hint_y: 1
 
         Paragraph:
             text: root.description

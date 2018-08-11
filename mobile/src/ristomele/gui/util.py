@@ -1,5 +1,6 @@
 import traceback
 import requests
+from kivy.utils import platform
 from requests import RequestException
 from ristomele.logger import Logger
 from ristomele.gui.error import ErrorMessage
@@ -38,3 +39,16 @@ class SmartRequests(object):
 
     def post(self, *args, **kwargs):
         return self.do_smart_request('post', *args, **kwargs)
+
+
+
+def make_bluetooth_printer_setting(**kwargs):
+    from kivy.uix.settings import SettingOptions
+    if platform == 'android':
+        from ristomele.gui.printer import get_all_printers
+        names = [dev.getName() for dev in get_all_printers()]
+    else:
+        names = ['<Console>']
+    #
+    options = [''] + names
+    return SettingOptions(options=options, **kwargs)

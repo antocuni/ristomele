@@ -14,7 +14,7 @@ from ristomele.gui.uix import MyScreen
 from ristomele.gui import iconfonts
 from ristomele.gui.manager import Manager
 from ristomele.logger import Logger
-from ristomele.gui.util import SmartRequests
+from ristomele.gui.util import SmartRequests, make_bluetooth_printer_setting
 from ristomele.gui.error import MyExceptionHandler, ErrorMessage
 from ristomele.gui.tables import TablesScreen, EditTablesScreen
 from ristomele.gui.order import OrderListScreen, NewOrderScreen, ShowOrderScreen
@@ -47,7 +47,8 @@ class RistoMeleApp(App):
             'timeout': '3',
         })
         config.setdefaults('ristomele', {
-            'cashier': ''
+            'cashier': '',
+            'printer': ''
         })
 
     def get_cashier(self):
@@ -60,8 +61,13 @@ class RistoMeleApp(App):
         except ValueError:
             return 3 # this should never happen, but whatever
 
+    def get_printer_name(self):
+        return self.config.get('ristomele', 'printer')
+
     def build_settings(self, settings):
         from kivy.config import Config
+        settings.register_type("bluetooth_printer",
+                               make_bluetooth_printer_setting)
         settings.add_json_panel('App', self.config,
                                 filename=resource_find('data/settings.json'))
         settings.add_json_panel('Scrolling', Config,
@@ -241,7 +247,7 @@ class RistoMeleApp(App):
         return model.Restaurant(self.ROWS, self.COLS, table_data)
 
     def print_receipt(self, order):
-        printer_name = 'Printer Blue 3'
+        printer_name = self.get_printer_name()
         s = order.as_textual_receipt()
         if platform == 'android':
             from ristomele.gui.printer import print_string
@@ -251,7 +257,7 @@ class RistoMeleApp(App):
             print s
             print
 
-    def bluetooth_infos(self):
+    def bluetooth_info(self):
         from ristomele.gui import printer
         printer.print_all_paired_devices()
 

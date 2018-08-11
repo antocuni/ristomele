@@ -1,5 +1,7 @@
 import time
-from jnius import autoclass
+from jnius import autoclass, JavaException
+from ristomele.logger import Logger
+from ristomele.gui.error import ErrorMessage
 
 # this is the device class of bluetooth printers, although I could not find
 # any official source for it. See e.g.:
@@ -69,18 +71,29 @@ def get_printer(name):
 def print_string(printer_name, s):
     printer = get_printer(printer_name)
     if printer is None:
-        # message box?
-        return
-    socket = None
-    socket = printer.createRfcommSocketToServiceRecord(
-        UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"))
-    recv_stream = socket.getInputStream()
-    send_stream = socket.getOutputStream()
-    print 'Connecting...'
-    socket.connect()
-    send_stream.write(s)
-    send_stream.write('\n\n\n\n')
-    send_stream.flush()
-    print 'Closing connection'
-    time.sleep(0.5)
-    socket.close()
+        raise ErrorMessage(
+            message="Impossibile trovare la stampante\n%s" % printer_name,
+            description=("Controllare che sia all'interno della lista "
+                         '"Dispositivi Associati" nelle opzioni bluetooth '
+                         "di Android, poi selezionarla nella schermata "
+                         "Opzioni dell'app"))
+    #
+    try:
+        socket = printer.createRfcommSocketToServiceRecord(
+            UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"))
+        recv_stream = socket.getInputStream()
+        send_stream = socket.getOutputStream()
+        print 'Connecting...'
+        socket.connect()
+        send_stream.write(s)
+        send_stream.write('\n\n\n\n\n')
+        send_stream.flush()
+        print 'Closing connection'
+        time.sleep(0.5)
+        socket.close()
+    except JavaException, e:
+        Logger.exception('Error during bluetooth printing')
+        raise ErrorMessage(
+            message="Impossibile connettersi alla stampante\n%s" % printer_name,
+            description=("Controllare che il cellulare abbia il bluetooth "
+                         "abilitato e che la stampante sia accesa"))

@@ -5,6 +5,11 @@
       "section": "ristomele",
       "key": "cashier"
     },
+    { "title": "Stampante",
+      "type": "bluetooth_printer",
+      "section": "ristomele",
+      "key": "printer"
+    },
     { "title": "Sync server", "type": "title"},
     { "title": "Indirizzo",
       "type": "string",
