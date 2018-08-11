@@ -44,6 +44,10 @@
     size_hint_x: None
     width: self.height
 
+<Header@MyLabel>:
+    size_hint_y: None
+    height: app.std_height + dp(10)
+
 # ==========
 # main menu
 # ==========
@@ -52,10 +56,8 @@
     BoxLayout:
         orientation: 'vertical'
 
-        MyLabel:
+        Header:
             text: "Menu Principale"
-            size_hint_y: None
-            height: "50dp"
 
         FlatButton:
             text: "Mappa tavoli"
@@ -89,10 +91,8 @@
         id: layout
         orientation: 'vertical'
 
-        MyLabel:
+        Header:
             text: "Mappa dei tavoli"
-            size_hint_y: None
-            height: '50dp'
 
         GridLayout:
             id: grid
@@ -140,10 +140,8 @@
         id: layout
         orientation: 'vertical'
 
-        MyLabel:
+        Header:
             text: "Modifica tavoli"
-            size_hint_y: None
-            height: '50dp'
 
         TextInput: 
             id: waiter_name
@@ -210,10 +208,8 @@
         id: layout
         orientation: 'vertical'
 
-        MyLabel:
+        Header:
             text: "Lista ordini"
-            size_hint_y: None
-            height: '50dp'
 
         ListView:
             adapter: SimpleListAdapter(data=root.orders, cls=Factory.OrderItem, args_converter=lambda i, x: {'order': x})
@@ -267,10 +263,8 @@
         id: layout
         orientation: 'vertical'
 
-        MyLabel:
+        Header:
             text: "Tavolo: %s" % root.order.table.name
-            size_hint_y: None
-            height: '50dp'
 
         TextInput:
             id: customer_name
@@ -311,14 +305,12 @@
         id: layout
         orientation: 'vertical'
 
-        MyLabel:
+        Header:
             text: "Riepilogo ordine"
-            size_hint_y: None
-            height: '50dp'
 
         ScrollView:
             size_hint_y: 1
-            Label:
+            MyLabel:
                 id: content
                 text: root.order.as_textual_receipt()
                 height: self.texture_size[1]
