@@ -2,7 +2,6 @@
 import os
 import pypath
 from urlparse import urljoin
-import requests
 from kivy.app import App
 from kivy.resources import resource_find
 from kivy.properties import ObjectProperty
@@ -77,10 +76,9 @@ class RistoMeleApp(App):
         return True
 
     def show_orders(self):
-        url = self.url('ordersx/')
+        url = self.url('orders/')
         resp = self.requests.get(url,
                             error="Impossibile caricare l'elenco degli ordini")
-        # XXX: check the return state
         order_data = resp.json()
         orders = [model.Order.from_dict(d) for d in order_data]
         screen = OrderListScreen(name='list_orders', orders=orders)
@@ -205,8 +203,10 @@ class RistoMeleApp(App):
     def submit_order(self, order):
         url = self.url('orders/')
         payload = order.as_dict()
-        resp = requests.post(url, json=payload)
-        # XXX: check the return state
+        error = ("ATTENZIONE!\n"
+                 "Impossibile contattare il server\n"
+                 "L'ordine NON È STATO INVIATO")
+        resp = self.requests.post(url, json=payload, error=error)
         order_data = resp.json()['order']
         new_order = model.Order.from_dict(order_data)
         return new_order
@@ -214,13 +214,14 @@ class RistoMeleApp(App):
     def update_tables(self, tables):
         url = self.url('tables/')
         payload = [t.as_dict() for t in tables]
-        resp = requests.put(url, json=payload)
-        # XXX: check the return state
+        resp = self.requests.put(url, json=payload,
+                            error="Impossibile salvare le modifiche ai tavoli")
+        assert resp.status_code == 200
 
     def load_restaurant(self):
         url = self.url('tables/')
-        resp = requests.get(url)
-        # XXX: check the return state
+        resp = self.requests.get(url,
+                                 error="Impossibile caricare l'elenco dei tavoli")
         table_data = resp.json()
         return model.Restaurant(self.ROWS, self.COLS, table_data)
 
