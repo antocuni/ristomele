@@ -48,6 +48,9 @@
     size_hint_y: None
     height: app.std_height + dp(10)
 
+<MyTextInput@TextInput>:
+    font_size: app.font_size
+
 # ==========
 # main menu
 # ==========
@@ -143,7 +146,7 @@
         Header:
             text: "Modifica tavoli"
 
-        TextInput: 
+        MyTextInput:
             id: waiter_name
             hint_text: 'Nome cameriere'
             size_hint_y: None
@@ -262,14 +265,14 @@
         Header:
             text: "Tavolo: %s" % root.order.table.name
 
-        TextInput:
+        MyTextInput:
             id: customer_name
             hint_text: 'Nome'
             size_hint_y: None
             height: app.std_height
             multiline: False
 
-        TextInput:
+        MyTextInput:
             id: notes
             hint_text: 'Note'
             size_hint_y: None
@@ -327,7 +330,7 @@
             height: app.std_height
             size_hint_y: None
 
-            TextInput:
+            MyTextInput:
                 id: money
                 hint_text: "Denaro ricevuto"
                 on_text: root.update_rest()
