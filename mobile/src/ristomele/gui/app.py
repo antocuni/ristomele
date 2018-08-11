@@ -15,6 +15,7 @@ from ristomele.gui.uix import MyScreen
 from ristomele.gui import iconfonts
 from ristomele.gui.manager import Manager
 from ristomele.logger import Logger
+from ristomele.gui.util import SmartRequests
 from ristomele.gui.error import MyExceptionHandler
 from ristomele.gui.tables import TablesScreen, EditTablesScreen
 from ristomele.gui.order import OrderListScreen, NewOrderScreen, ShowOrderScreen
@@ -61,6 +62,7 @@ class RistoMeleApp(App):
 
     def build(self):
         self.exception_handler = MyExceptionHandler()
+        self.requests = SmartRequests()
         Window.bind(on_keyboard=self.on_keyboard)
         manager = Manager()
         manager.open(MainScreen(name='main'))
@@ -75,8 +77,9 @@ class RistoMeleApp(App):
         return True
 
     def show_orders(self):
-        url = self.url('orders/')
-        resp = requests.get(url)
+        url = self.url('ordersx/')
+        resp = self.requests.get(url,
+                            error="Impossibile caricare l'elenco degli ordini")
         # XXX: check the return state
         order_data = resp.json()
         orders = [model.Order.from_dict(d) for d in order_data]

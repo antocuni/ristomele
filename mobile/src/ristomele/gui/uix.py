@@ -176,7 +176,7 @@ Builder.load_string("""
         MyLabel:
             text: root.message
 
-        ScrollableLabel:
+        Paragraph:
             text: root.description
 
         FlatButton:
