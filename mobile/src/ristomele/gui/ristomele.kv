@@ -50,6 +50,7 @@
 
 <MyTextInput@TextInput>:
     font_size: app.font_size
+    multiline: False
 
 # ==========
 # main menu
@@ -171,7 +172,6 @@
             hint_text: 'Nome cameriere'
             size_hint_y: None
             height: app.std_height
-            multiline: False
 
         GridLayout:
             id: grid
@@ -290,14 +290,13 @@
             hint_text: 'Nome'
             size_hint_y: None
             height: app.std_height
-            multiline: False
 
         MyTextInput:
             id: notes
             hint_text: 'Note'
             size_hint_y: None
-            height: app.std_height
-            multiline: False
+            height: app.std_height * 2
+            multiline: True
 
         ListView:
             id: item_list
