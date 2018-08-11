@@ -74,15 +74,35 @@
             text: "Configura tavoli"
             on_release: app.edit_tables()
 
-        FlatButton:
-            text: "Opzioni"
-            on_release: app.open_settings()
-
-        FlatButton:
-            text: "Bluetooth info"
-            on_release: app.bluetooth_info()
-            size_hint_y: None
+        BoxLayout:
+            orientation: 'horizontal'
             height: app.std_height
+
+            FlatButton:
+                text: "Opzioni"
+                on_release: app.open_settings()
+
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint: 0.25, 1
+
+                IconButton:
+                    icon: 'fa-minus'
+                    size_hint: 1, 0.5
+                    on_release: app.font_size -= 1
+                    show_border: True
+
+                IconButton:
+                    icon: 'fa-plus'
+                    size_hint: 1, 0.5
+                    on_release: app.font_size += 1
+                    show_border: True
+
+        # FlatButton:
+        #     text: "Bluetooth info"
+        #     on_release: app.bluetooth_info()
+        #     size_hint_y: None
+        #     height: app.std_height
 
 
 # =====================================================================
