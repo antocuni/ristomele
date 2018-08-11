@@ -14,8 +14,13 @@ class SmartRequests(object):
     400s and 500s status codes
     """
 
+    def __init__(self, app):
+        self.app = app
+
     def do_smart_request(self, method, *args, **kwargs):
         error_message = kwargs.pop('error', '')
+        kwargs.setdefault('timeout', self.app.get_timeout())
+
         meth = getattr(requests, method)
         try:
             resp = meth(*args, **kwargs)

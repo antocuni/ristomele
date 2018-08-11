@@ -43,7 +43,8 @@ class RistoMeleApp(App):
     def build_config(self, config):
         config.setdefaults('server', {
             'host': '192.168.1.3',
-            'port': '5000'
+            'port': '5000',
+            'timeout': '3',
         })
         config.setdefaults('ristomele', {
             'cashier': ''
@@ -51,6 +52,13 @@ class RistoMeleApp(App):
 
     def get_cashier(self):
         return self.config.get('ristomele', 'cashier')
+
+    def get_timeout(self):
+        timeout = self.config.get('server', 'timeout')
+        try:
+            return float(timeout)
+        except ValueError:
+            return 3 # this should never happen, but whatever
 
     def build_settings(self, settings):
         from kivy.config import Config
@@ -61,7 +69,7 @@ class RistoMeleApp(App):
 
     def build(self):
         self.exception_handler = MyExceptionHandler()
-        self.requests = SmartRequests()
+        self.requests = SmartRequests(self)
         Window.bind(on_keyboard=self.on_keyboard)
         manager = Manager()
         manager.open(MainScreen(name='main'))

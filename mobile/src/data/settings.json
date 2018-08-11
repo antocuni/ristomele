@@ -16,5 +16,10 @@
       "type": "string",
       "section": "server",
       "key": "port" 
+    },
+    { "title": "Timeout",
+      "type": "numeric",
+      "section": "server",
+      "key": "timeout"
     }
 ]
