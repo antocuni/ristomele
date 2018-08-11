@@ -153,7 +153,7 @@ class Paragraph(MyLabel):
 
 Builder.load_string('''
 <ScrollableLabel>:
-    Label:
+    MyLabel:
         size_hint_y: None
         height: self.texture_size[1]
         text_size: self.width, None
@@ -168,13 +168,16 @@ Builder.load_string("""
 <MessageBox>:
 
     size_hint: 0.95, None
-    height: '250dp'
+    height: '350dp'
 
     BoxLayout:
         orientation: 'vertical'
 
         MyLabel:
             text: root.message
+
+        ScrollableLabel:
+            text: root.description
 
         FlatButton:
             text: 'OK'
@@ -184,3 +187,4 @@ Builder.load_string("""
 """)
 class MessageBox(Popup):
     message = StringProperty()
+    description = StringProperty()

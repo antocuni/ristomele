@@ -15,6 +15,7 @@ from ristomele.gui.uix import MyScreen
 from ristomele.gui import iconfonts
 from ristomele.gui.manager import Manager
 from ristomele.logger import Logger
+from ristomele.gui.error import MyExceptionHandler
 from ristomele.gui.tables import TablesScreen, EditTablesScreen
 from ristomele.gui.order import OrderListScreen, NewOrderScreen, ShowOrderScreen
 
@@ -59,6 +60,7 @@ class RistoMeleApp(App):
                                 filename=resource_find('data/scrolling.json'))
 
     def build(self):
+        self.exception_handler = MyExceptionHandler(self)
         Window.bind(on_keyboard=self.on_keyboard)
         manager = Manager()
         manager.open(MainScreen(name='main'))
@@ -228,10 +230,6 @@ class RistoMeleApp(App):
             print
             print s
             print
-
-    def show_error(self, message):
-        box = MessageBox(title='Errore', message=message)
-        box.open()
 
 def main():
     iconfonts.init()
