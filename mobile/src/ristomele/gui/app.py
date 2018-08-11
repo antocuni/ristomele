@@ -229,6 +229,10 @@ class RistoMeleApp(App):
             print s
             print
 
+    def show_error(self, message):
+        box = MessageBox(title='Errore', message=message)
+        box.open()
+
 def main():
     iconfonts.init()
     RistoMeleApp().run()

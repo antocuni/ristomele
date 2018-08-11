@@ -4,6 +4,7 @@ from kivy.animation import Animation
 from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.screenmanager import Screen
+from kivy.uix.popup import Popup
 from kivy.uix.behaviors.button import ButtonBehavior
 from kivy.utils import get_color_from_hex
 
@@ -161,3 +162,25 @@ Builder.load_string('''
 
 class ScrollableLabel(ScrollView):
     text = StringProperty('')
+
+
+Builder.load_string("""
+<MessageBox>:
+
+    size_hint: 0.95, None
+    height: '250dp'
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        MyLabel:
+            text: root.message
+
+        FlatButton:
+            text: 'OK'
+            size_hint_y: None
+            height: '40dp'
+            on_release: root.dismiss()
+""")
+class MessageBox(Popup):
+    message = StringProperty()
