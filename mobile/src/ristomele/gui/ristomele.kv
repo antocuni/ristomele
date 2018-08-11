@@ -307,16 +307,6 @@
         Header:
             text: "Riepilogo ordine"
 
-        ScrollView:
-            size_hint_y: 1
-            MyLabel:
-                id: content
-                text: root.order.as_textual_receipt()
-                height: self.texture_size[1]
-                size_hint_y: None
-                color: (0, 0, 0, 1)
-                font_name: 'RobotoMono-Regular'
-
         MyLabel:
             text: "Totale: %.2f" % root.order.get_total()
             size_hint_y: None
@@ -333,6 +323,7 @@
             MyTextInput:
                 id: money
                 hint_text: "Denaro ricevuto"
+                input_type: "number"
                 on_text: root.update_rest()
 
             MyLabel:
@@ -341,6 +332,21 @@
                 halign: 'right'
                 text_size: self.size
                 padding: '5dp', '5dp'
+
+        MyLabel: # this is just an empty spacer
+            text: ""
+            size_hint_y: None
+            height: app.std_height
+
+        ScrollView:
+            size_hint_y: 1
+            MyLabel:
+                id: content
+                text: root.order.as_textual_receipt()
+                height: self.texture_size[1]
+                size_hint_y: None
+                color: (0, 0, 0, 1)
+                font_name: 'RobotoMono-Regular'
 
         BoxLayout:
             id: layout
