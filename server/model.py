@@ -84,4 +84,7 @@ class Order(db.Model):
             if item['is_drink'] and item['count'] > 0:
                 w('%2d %s' % (item['count'], item['name']))
         w('')
+        w('')
+        w('')
+        w('')
         return '\n'.join(lines)
