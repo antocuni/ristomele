@@ -1,3 +1,5 @@
+#-*- encoding: utf-8 -*-
+
 from datetime import datetime
 from kivy.event import EventDispatcher
 from kivy.properties import (StringProperty, ObjectProperty, ListProperty,
@@ -109,13 +111,13 @@ class Order(EventDispatcher):
         w = lines.append
         num = self.id or ''
         if self.date:
-            date = '[%s]' % self.date.strftime('%d/%m %H:%M')
+            date = u'[%s]' % self.date.strftime('%d/%m %H:%M')
         else:
-            date = ''
-        w('Numero ordine: %s %s' % (num, date))
-        w('Tavolo: %s [%s]' % (self.table.name, self.table.waiter))
-        w('Cassiere: %s' % (self.cashier))
-        w('Cliente: %s' % self.customer)
+            date = u''
+        w(u'Numero ordine: %s %s' % (num, date))
+        w(u'Tavolo: %s [%s]' % (self.table.name, self.table.waiter))
+        w(u'Cassiere: %s' % (self.cashier))
+        w(u'Cliente: %s' % self.customer)
         w('')
         for item in self.menu:
             if item.kind != 'item':
@@ -124,7 +126,7 @@ class Order(EventDispatcher):
                 continue
             subtot = item.count * item.price
             descr = item.name
-            price = '%s %5.2f' % (('x%d' % item.count).ljust(3), subtot)
+            price = u'%s %5.2f €' % (('x%d' % item.count).ljust(3), subtot)
             #
             descr = (descr + ' ')[:width]
             if len(descr) + len(price) > width:
@@ -133,11 +135,11 @@ class Order(EventDispatcher):
                 w(price.rjust(width))
             else:
                 # print on a single line
-                line = '%s%s' % (descr, price.rjust(width-len(descr)))
+                line = u'%s%s' % (descr, price.rjust(width-len(descr)))
                 w(line)
-        w('')
-        line = 'TOTALE: %.2f' % self.get_total()
+        w(u'')
+        line = u'TOTALE: %.2f €' % self.get_total()
         w(line.rjust(width))
-        w('')
-        w('RICEVUTA NON FISCALE')
-        return '\n'.join(lines)
+        w(u'')
+        w(u'RICEVUTA NON FISCALE')
+        return u'\n'.join(lines)

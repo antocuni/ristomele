@@ -1,7 +1,13 @@
 import time
 from jnius import autoclass, JavaException
 from ristomele.logger import Logger
+from ristomele import escpos
 from ristomele.gui.error import ErrorMessage
+
+# this is a hack to make sure that encodings.cp858 is available also on
+# android. Needed for escpos.magic_encode
+import encodings_cp858
+
 
 # this is the device class of bluetooth printers, although I could not find
 # any official source for it. See e.g.:
@@ -69,6 +75,7 @@ def get_printer(name):
     return printer
 
 def print_string(printer_name, s):
+    s = escpos.magic_encode(s)
     printer = get_printer(printer_name)
     if printer is None:
         raise ErrorMessage(
