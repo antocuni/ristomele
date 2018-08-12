@@ -10,6 +10,10 @@ TMPDIR = py.path.local.mkdtemp()
 STATIC = config.ROOT.join('server', 'static')
 ristomele = flask.Blueprint('ristomele', __name__)
 
+def spooldir_for(kind):
+    d = current_app.config['SPOOLDIR'].join(kind)
+    return d.ensure(dir=True)
+
 def error(message, status=403):
     myjson = flask.jsonify(result='error',
                            message=message)
@@ -49,7 +53,8 @@ def new_order():
     myorder = model.Order.from_dict(order_dict)
     model.db.session.add(myorder)
     model.db.session.commit()
-    print_order(myorder)
+    do_print_order(myorder)
+    do_print_drinks(myorder)
     return flask.jsonify(result='OK', order=myorder.as_dict())
 
 
@@ -59,28 +64,20 @@ def reprint_order(order_id):
     myorder = model.Order.query.get(order_id)
     if myorder is None:
         return error("Cannot find the requested order")
-    print_order(myorder, reprint=True)
+    do_print_order(myorder, reprint=True)
     return flask.jsonify(result='OK')
 
 
-@ristomele.route('/orders/<int:order_id>/print_drink/', methods=['POST'])
-def print_drink_order(order_id):
+@ristomele.route('/orders/<int:order_id>/print_drinks/', methods=['POST'])
+def print_drinks_order(order_id):
     from server import model
     myorder = model.Order.query.get(order_id)
     if myorder is None:
         return error("Cannot find the requested order")
-    #
-    # XXX
-    txt = myorder.drink_receipt()
-    print txt
-    ## with open('/dev/usb/lp1', 'wb') as f:
-    ##     f.write(txt)
-    ##     f.write('\n\n\n\n')
-    # XXX
+    do_print_drinks(myorder)
     return flask.jsonify(result='OK')
 
-
-def print_order(myorder, reprint=False):
+def do_print_order(myorder, reprint=False):
     menu = json.loads(myorder.menu)
     html = flask.render_template('order.html',
                                  static=str(STATIC),
@@ -92,11 +89,20 @@ def print_order(myorder, reprint=False):
     # spooldir: the idea is that we will have a deamon which prints all
     # the PDFs which are copied there
     pdf = topdf(html, 'order_%06d' % myorder.id, TMPDIR,
-                current_app.config['SPOOLDIR'])
+                spooldir_for('orders'))
     if not current_app.config['TESTING']:
         os.system('evince "%s" &' % pdf)
 
 
+def do_print_drinks(myorder):
+    txt = spooldir_for('drinks').join('order_%06d.txt' % myorder.id)
+    with txt.open('wb') as f:
+        receipt = myorder.drink_receipt()
+        f.write(receipt)
+    ## with open('/dev/usb/lp1', 'wb') as f:
+    ##     f.write(txt)
+    ##     f.write('\n\n\n\n')
+    # XXX
 
 @ristomele.route('/orders/', methods=['GET'])
 def all_orders():

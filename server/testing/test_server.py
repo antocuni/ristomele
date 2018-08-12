@@ -29,10 +29,10 @@ def example_order_data():
         customer='pippo',
         notes='my notes',
         menu=[
-            dict(kind='separator', name='First Dishes', count=0, price=0),
-            dict(kind='item',      name='Pasta', count=1, price=10),
-            dict(kind='separator', name='Desserts', count=0, price=0),
-            dict(kind='item',      name='Tiramisu', count=2, price=15),
+            dict(kind='separator', name='First Dishes', count=0, price=0, is_drink=False),
+            dict(kind='item',      name='Pasta', count=1, price=10, is_drink=False),
+            dict(kind='separator', name='Desserts', count=0, price=0, is_drink=False),
+            dict(kind='item',      name='Tiramisu', count=2, price=15, is_drink=False),
         ])
 
 class TestModel(object):
@@ -94,11 +94,26 @@ class TestServer(object):
             assert myorder.customer == ex['customer']
 
     def test_new_order_spooldir(self, client, spooldir, example_order_data):
-        assert spooldir.listdir() == []
+        orders_dir = spooldir.join('orders')
+        drinks_dir = spooldir.join('drinks')
+        for d in (orders_dir, drinks_dir):
+            assert d.check(exists=False) or d.listdir() == []
+        pdf = orders_dir.join('order_000001.pdf')
+        txt = drinks_dir.join('order_000001.txt')
+        #
         resp = client.post('/orders/', json=example_order_data)
-        assert spooldir.listdir() == [
-            spooldir.join('order_000001.pdf')
-            ]
+        assert orders_dir.listdir() == [pdf]
+        assert drinks_dir.listdir() == [txt]
+        #
+        pdf.remove()
+        resp = client.post('/orders/1/print/')
+        assert resp.status_code == 200
+        assert orders_dir.listdir() == [pdf]
+        #
+        txt.remove()
+        resp = client.post('/orders/1/print_drinks/')
+        assert resp.status_code == 200
+        assert drinks_dir.listdir() == [txt]
 
     def test_all_orders(self, client):
         o1 = model.Order(menu='101')
