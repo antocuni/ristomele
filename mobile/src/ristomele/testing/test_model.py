@@ -51,10 +51,10 @@ def test_Order_as_dict(example_order):
         customer='pippo',
         notes='my notes',
         menu=[
-            dict(kind='separator', name='First Dishes', count=0, price=0),
-            dict(kind='item',      name='Pasta', count=1, price=10),
-            dict(kind='separator', name='Desserts', count=0, price=0),
-            dict(kind='item',      name='Tiramisu', count=2, price=15),
+            dict(kind='separator', name='First Dishes', count=0, price=0, is_drink=False),
+            dict(kind='item',      name='Pasta', count=1, price=10, is_drink=False),
+            dict(kind='separator', name='Desserts', count=0, price=0, is_drink=False),
+            dict(kind='item',      name='Tiramisu', count=2, price=15, is_drink=False),
             ])
 
 def test_Menu_as_textural_recepit(example_order):
