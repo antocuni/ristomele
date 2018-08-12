@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 import pytest
 import textwrap
 from datetime import datetime
@@ -63,20 +64,20 @@ def test_Menu_as_textural_recepit(example_order):
         model.MenuItem(name='Even longer and longer item description', count=1, price=1)
     ])
     txt = example_order.as_textual_receipt(width=32)
-    assert txt == textwrap.dedent("""
+    assert txt == textwrap.dedent(u"""
         Numero ordine:  
         Tavolo: 11 [anto]
         Cassiere: gian
         Cliente: pippo
 
-        Pasta                  x1  10.00
-        Tiramisu               x2  30.00
+        Pasta                x1  10.00 €
+        Tiramisu             x2  30.00 €
         Very long item description 
-                               x1   1.00
+                             x1   1.00 €
         Even longer and longer item desc
-                               x1   1.00
+                             x1   1.00 €
 
-                           TOTALE: 42.00
+                         TOTALE: 42.00 €
 
         RICEVUTA NON FISCALE
         """).strip()
@@ -87,7 +88,7 @@ def test_Menu_as_textural_recepit(example_order):
     example_order.id = 1
     example_order.date = datetime(2015, 8, 15, 20, 0, 0)
     txt = example_order.as_textual_receipt(width=32)
-    exp = textwrap.dedent("""
+    exp = textwrap.dedent(u"""
         Numero ordine: 1 [15/08 20:00]
         Tavolo: 11 [anto]
         Cassiere: gian
