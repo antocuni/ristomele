@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 from flask_sqlalchemy import SQLAlchemy
+from server import escpos
 db = SQLAlchemy()
 
 class Table(db.Model):
@@ -61,3 +62,26 @@ class Order(db.Model):
         if self.date is not None:
             date = self.date.strftime('%d/%m %H:%M')
         return '%s [%s]' % (id, date)
+
+    def drink_receipt(self):
+        lines = []
+        w = lines.append
+        num = self.id or ''
+        if self.date:
+            date = '[%s]' % self.date.strftime('%d/%m %H:%M')
+        else:
+            date = ''
+        #
+        w(escpos.big() + 'Tavolo: %s' % self.table)
+        w(escpos.big() + self.waiter)
+        w('')
+        w(escpos.reset() + 'Numero ordine: %s %s' % (num, date))
+        w('Cassiere: %s' % (self.cashier))
+        w('Cliente: %s' % self.customer)
+        w('')
+        menu = json.loads(self.menu)
+        for item in menu:
+            if item['is_drink'] and item['count'] > 0:
+                w('%2d %s' % (item['count'], item['name']))
+        w('')
+        return '\n'.join(lines)

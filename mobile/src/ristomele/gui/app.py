@@ -120,6 +120,7 @@ class RistoMeleApp(App):
 
     def new_order(self, table):
         Item = model.MenuItem
+        Drink = lambda name, price: model.MenuItem(name=name, price=price, is_drink=True)
         Sep = lambda name: model.MenuItem(kind='separator', name=name)
 
         fugassin1 = [
@@ -187,29 +188,29 @@ class RistoMeleApp(App):
             Item(name='Semifreddo alla nutella', price=3.5),
 
             Sep(name='Vino'),
-            Item(name='Sangria', price=3.5),
-            Item(name='Bottiglia rosso', price=5),
-            Item(name='Bottiglia bianco', price=5),
+            Drink(name='Sangria', price=3.5),
+            Drink(name='Bottiglia rosso', price=5),
+            Drink(name='Bottiglia bianco', price=5),
 
-            Item(name='Bicchiere grande rosso ', price=2.5),
-            Item(name='Bicchiere grande bianco ', price=2.5),
+            Drink(name='Bicchiere grande rosso ', price=2.5),
+            Drink(name='Bicchiere grande bianco ', price=2.5),
 
-            Item(name='Bicchiere piccolo rosso ', price=1),
-            Item(name='Bicchiere piccolo bianco ', price=1),
+            Drink(name='Bicchiere piccolo rosso ', price=1),
+            Drink(name='Bicchiere piccolo bianco ', price=1),
 
             Sep(name='Altre bevande'),
 
-            Item(name='Birra alla spina Weiss', price=4),
-            Item(name='Birra alla spina Pils', price=3.5),
+            Drink(name='Birra alla spina Weiss', price=4),
+            Drink(name='Birra alla spina Pils', price=3.5),
 
-            Item(name='Coca Cola', price=1.5),
-            Item(name='Fanta', price=1.5),
-            Item(name='Gazzosa', price=1.5),
-            Item(name='The Limone', price=1.5),
-            Item(name='The Pesca', price=1.5),
+            Drink(name='Coca Cola', price=1.5),
+            Drink(name='Fanta', price=1.5),
+            Drink(name='Gazzosa', price=1.5),
+            Drink(name='The Limone', price=1.5),
+            Drink(name='The Pesca', price=1.5),
 
-            Item(name='Acqua naturale 0.5L', price=1),
-            Item(name='Acqua frizzante 0.5L', price=1),
+            Drink(name='Acqua naturale 0.5L', price=1),
+            Drink(name='Acqua frizzante 0.5L', price=1),
 
             Item(name='Caffe', price=1),
         ]

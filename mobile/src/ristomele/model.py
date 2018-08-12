@@ -36,8 +36,9 @@ class Restaurant(EventDispatcher):
 class MenuItem(EventDispatcher):
     kind = OptionProperty("item", options=["item", "separator"])
     name = StringProperty()
-    count = NumericProperty(default=0)
-    price = NumericProperty(default=0)
+    count = NumericProperty(0)
+    price = NumericProperty(0)
+    is_drink = BooleanProperty(False)
 
     @classmethod
     def from_dict(cls, data):
@@ -47,7 +48,8 @@ class MenuItem(EventDispatcher):
         return dict(kind=self.kind,
                     name=self.name,
                     count=self.count,
-                    price=self.price)
+                    price=self.price,
+                    is_drink=self.is_drink)
 
 
 class Order(EventDispatcher):

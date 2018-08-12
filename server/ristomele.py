@@ -63,6 +63,23 @@ def reprint_order(order_id):
     return flask.jsonify(result='OK')
 
 
+@ristomele.route('/orders/<int:order_id>/print_drink/', methods=['POST'])
+def print_drink_order(order_id):
+    from server import model
+    myorder = model.Order.query.get(order_id)
+    if myorder is None:
+        return error("Cannot find the requested order")
+    #
+    # XXX
+    txt = myorder.drink_receipt()
+    print txt
+    ## with open('/dev/usb/lp1', 'wb') as f:
+    ##     f.write(txt)
+    ##     f.write('\n\n\n\n')
+    # XXX
+    return flask.jsonify(result='OK')
+
+
 def print_order(myorder, reprint=False):
     menu = json.loads(myorder.menu)
     html = flask.render_template('order.html',
