@@ -241,6 +241,13 @@ class RistoMeleApp(App):
         resp = self.requests.post(url)
         assert resp.status_code == 200
 
+    def print_drinks(self, order):
+        if order.id is None:
+            raise ErrorMessage("Impossibile stampare un ordine se non è stato prima salvato")
+        url = self.url('orders/%s/print_drinks/' % order.id)
+        resp = self.requests.post(url)
+        assert resp.status_code == 200
+
     def update_tables(self, tables):
         url = self.url('tables/')
         payload = [t.as_dict() for t in tables]

@@ -4,3 +4,4 @@ py
 cython==0.23.1
 kivy==1.9.1
 freezegun
+docopt

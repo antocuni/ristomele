@@ -395,6 +395,7 @@
             FlatButton:
                 text: "Bar"
                 disabled: not root.order.is_saved
+                on_release: app.print_drinks(root.order)
 
             FlatButton:
                 text: "Indietro"
