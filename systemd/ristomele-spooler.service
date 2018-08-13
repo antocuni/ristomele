@@ -5,6 +5,6 @@ After=network.target
 [Service]
 User=pi
 WorkingDirectory=/home/pi/ristomele/
-ExecStart=/home/pi/ristomele/venv/bin/python -m server.spooler /tmp/spooldir/drinks
+ExecStart=/home/pi/ristomele/venv/bin/python -m server.spooler /tmp/spooldir/
 Restart=on-failure
 RestartSec=5s

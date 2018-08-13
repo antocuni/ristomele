@@ -8,6 +8,7 @@ Options:
 """
 
 import sys
+import os
 import time
 import traceback
 import py
@@ -38,14 +39,37 @@ def main():
     logging.info('Spooler starting')
     orders_dir = spooldir.join('orders').ensure(dir=True)
     drinks_dir = spooldir.join('drinks').ensure(dir=True)
+    i = 0
     while True:
-        logging.info('beat')
+        i += 1
+        if i % 30 == 0:
+            logging.info('I am still alive :)')
         print_orders(orders_dir)
         print_drinks(drinks_dir, printer)
         time.sleep(1)
 
+def exec_cmd(cmdline):
+    logging.info('EXEC: %s', cmdline)
+    ret = os.system(cmdline)
+    if ret != 0:
+        logging.error('return value: %s', ret)
+        return False
+    return True
+
 def print_orders(orders_dir):
-    pass
+    try:
+        for html in orders_dir.listdir('*.html'):
+            logging.info('Found HTML: %s', html.basename)
+            pdf = html.new(ext='pdf')
+            if not exec_cmd('wkhtmltopdf "%s" "%s"' % (html, pdf)):
+                continue
+            if not exec_cmd('lp "%s"' % pdf):
+                continue
+            logging.info('Removing %s and %s', html.basename, pdf.basename)
+            html.remove()
+            pdf.remove()
+    except:
+        logging.exception('ERROR!')
 
 def print_drinks(d, printer):
     try:
