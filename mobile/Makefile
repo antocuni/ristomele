@@ -17,6 +17,7 @@ RELEASE := bin/$(apk).apk
 
 P4A := /home/antocuni/.virtualenvs/p4a/bin/p4a
 ADB := /extra/android/android-sdk-linux_x86/platform-tools/adb
+ZIPALIGN := /data/extra/android/android-sdk-linux_x86/platform-tools/zipalign
 this := $(abspath $(lastword $(MAKEFILE_LIST))) # abspath of the Makefile
 ROOT := $(dir $(this))
 
@@ -56,31 +57,30 @@ logcat:
 	$(ADB) logcat | grep python
 
 
-# release:
-# # build APK
-# 	@echo [BUILD] $(UNSIGNED)
-# 	@ cd $(P4A)/dist/default; ./build.py $(BUILDFLAGS) release
-# 	@cp $(P4A)/dist/default/$(UNSIGNED) $(ROOT)/bin
-# # sign
-# 	@echo [JARSIGNER] $(UNALIGNED)
-# 	@jarsigner \
-# 		-sigalg SHA1withRSA \
-# 		-digestalg SHA1 \
-# 		-keystore play/mykey.keystore \
-# 		-storepass password \
-# 		$(UNSIGNED) \
-# 		alias_name
-# 	@mv $(UNSIGNED) $(UNALIGNED)
-# 	@echo
-# # zipalign
-# 	@echo [ZIPALIGN] $(RELEASE)
-# 	@rm -f $(RELEASE)
-# 	@zipalign 4 $(UNALIGNED) $(RELEASE)
-# 	@rm $(UNALIGNED)
+release:
+	@echo [BUILD] $(UNSIGNED)
+	$(P4A) apk $(BUILDFLAGS) --release
+	@mv *.apk bin
+	#sign
+	@echo [JARSIGNER] $(UNALIGNED)
+	@jarsigner \
+		-sigalg SHA1withRSA \
+		-digestalg SHA1 \
+		-keystore play/mykey.keystore \
+		-storepass password \
+		$(UNSIGNED) \
+		alias_name
+	@mv $(UNSIGNED) $(UNALIGNED)
+	@echo
+	# zipalign
+	@echo [ZIPALIGN] $(RELEASE)
+	@rm -f $(RELEASE)
+	@$(ZIPALIGN) 4 $(UNALIGNED) $(RELEASE)
+	@rm $(UNALIGNED)
 
 
-# key: play/mykey.keystore
 
-# play/mykey.keystore:
-# 	keytool -genkey -v -keystore play/mykey.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000
+key: play/mykey.keystore
 
+play/mykey.keystore:
+	keytool -genkey -v -keystore play/mykey.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000
