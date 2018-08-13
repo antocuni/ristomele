@@ -1,0 +1,7 @@
+# Assign a recognizable name to the thermal printers
+
+# NOTE: the symlink MUST be in the usb/ directory, else it creates a link to
+# the "parent/root/whatever" usb device, instead of a link to the usblp
+# subsystem
+
+SUBSYSTEMS=="usb", ATTRS{serial}=="Printer", ATTRS{manufacturer}=="STMicroelectronics", SYMLINK+="usb/lp-thermal"
