@@ -13,7 +13,7 @@ from kivy.app import App
 from kivy.lang import Builder
 from kivy.clock import Clock
 
-DEFAULT_HOST = '192.168.1.190'
+DEFAULT_HOST = '192.168.1.6'
 DEFAULT_PORT = '5000'
 
 TIMEOUT = (5, 20) # connect_timeout, read_timeout
