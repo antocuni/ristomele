@@ -17,16 +17,17 @@ from server import config
 LOGFILE = config.ROOT.join('log', 'spooler.log')
 
 def setup_logging():
+    formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s',
+                                  datefmt='%m/%d/%Y %H:%M:%S')
     logging.root.setLevel(logging.INFO)
-    #
-    h1 = logging.StreamHandler(sys.stdout)
-    h1.setLevel(logging.INFO)
-    logging.root.addHandler(h1)
-    #
-    h2 = logging.FileHandler(str(LOGFILE))
-    h2.setLevel(logging.INFO)
-    logging.root.addHandler(h2)
-
+    handlers = [
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler(str(LOGFILE))
+    ]
+    for h in handlers:
+        h.setLevel(logging.INFO)
+        h.setFormatter(formatter)
+        logging.root.addHandler(h)
 
 def main():
     setup_logging()
