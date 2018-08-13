@@ -64,8 +64,17 @@ def print_drinks_order(order_id):
     do_print_drinks(myorder)
     return flask.jsonify(result='OK')
 
+def filter_menu(menu):
+    res = []
+    for item in menu:
+        if item['kind'] == 'item' and item['count'] == 0:
+            continue
+        res.append(item)
+    return res
+
 def do_print_order(myorder, reprint=False):
     menu = json.loads(myorder.menu)
+    menu = filter_menu(menu)
     html = flask.render_template('order.html',
                                  static=str(STATIC),
                                  reprint=reprint,
