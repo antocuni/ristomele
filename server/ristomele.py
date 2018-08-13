@@ -26,6 +26,11 @@ def split_columns(items):
     ]
     return columns
 
+@ristomele.route('/apk/', methods=['GET'])
+def get_apk():
+    apk = config.ROOT.join('mobile', 'bin', 'RistoMele-0.1-debug.apk')
+    return flask.send_file(str(apk), as_attachment=True)
+
 
 @ristomele.route('/orders/', methods=['POST'])
 def new_order():
