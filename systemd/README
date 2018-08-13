@@ -1,8 +1,0 @@
-cp ristomele.service /etc/systemd/system/
-chown root /etc/systemd/system/ristomele.service
-chmod 644 /etc/systemd/system/ristomele.service
-
-# now in theory we could do "systemctl enable ristomele", to automatically
-# start at at boot, but it doesn't work. Instead, we do it manually
-
-ln -s /etc/systemd/system/ristomele.service /etc/systemd/system/multi-user.target.wants/ristomele.service
