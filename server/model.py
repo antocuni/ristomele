@@ -64,6 +64,7 @@ class Order(db.Model):
         return '%s [%s]' % (id, date)
 
     def drink_receipt(self):
+        has_drinks = False
         lines = []
         w = lines.append
         num = self.id or ''
@@ -83,8 +84,12 @@ class Order(db.Model):
         for item in menu:
             if item['is_drink'] and item['count'] > 0:
                 w('%2d %s' % (item['count'], item['name']))
+                has_drinks = True
         w('')
         w('')
         w('')
         w('')
-        return '\n'.join(lines)
+        if has_drinks:
+            return '\n'.join(lines)
+        else:
+            return None

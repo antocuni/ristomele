@@ -80,9 +80,12 @@ def do_print_order(myorder, reprint=False):
 
 
 def do_print_drinks(myorder):
+    receipt = myorder.drink_receipt()
+    if receipt is None:
+        return # no drinks, no receipt
+    #
     txt = spooldir_for('drinks').join('order_%06d.txt' % myorder.id)
     with txt.open('wb') as f:
-        receipt = myorder.drink_receipt()
         f.write(receipt)
 
 @ristomele.route('/orders/', methods=['GET'])

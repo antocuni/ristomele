@@ -40,7 +40,7 @@ def test_Order_from_dict(example_order, example_order_data):
         assert o_item.price == d_item['price']
 
 def test_Order_get_total(example_order):
-    assert example_order.get_total() == 10 + 2*15
+    assert example_order.get_total() == 10 + 2*15 + 3
 
 def test_Order_as_dict(example_order):
     d = example_order.as_dict()
@@ -55,6 +55,7 @@ def test_Order_as_dict(example_order):
             dict(kind='item',      name='Pasta', count=1, price=10, is_drink=False),
             dict(kind='separator', name='Desserts', count=0, price=0, is_drink=False),
             dict(kind='item',      name='Tiramisu', count=2, price=15, is_drink=False),
+            dict(kind='item',      name='Birra', count=1, price=3, is_drink=True),
             ])
 
 def test_Menu_as_textural_recepit(example_order):
@@ -72,12 +73,13 @@ def test_Menu_as_textural_recepit(example_order):
 
         Pasta                x1  10.00 €
         Tiramisu             x2  30.00 €
+        Birra                x1   3.00 €
         Very long item description 
                              x1   1.00 €
         Even longer and longer item desc
                              x1   1.00 €
 
-                         TOTALE: 42.00 €
+                         TOTALE: 45.00 €
 
         RICEVUTA NON FISCALE
         """).strip()

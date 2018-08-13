@@ -33,6 +33,7 @@ def example_order_data():
             dict(kind='item',      name='Pasta', count=1, price=10, is_drink=False),
             dict(kind='separator', name='Desserts', count=0, price=0, is_drink=False),
             dict(kind='item',      name='Tiramisu', count=2, price=15, is_drink=False),
+            dict(kind='item',      name='Birra', count=1, price=3, is_drink=True),
         ])
 
 class TestModel(object):
@@ -71,6 +72,9 @@ class TestModel(object):
 
 class TestServer(object):
 
+    def dir_is_empty(self, d):
+        return d.check(exists=False) or d.listdir() == []
+
     def test_new_order(self, client, example_order_data):
         ex = example_order_data
         with freeze_time('2018-08-15 20:00'):
@@ -96,11 +100,11 @@ class TestServer(object):
     def test_new_order_spooldir(self, client, spooldir, example_order_data):
         orders_dir = spooldir.join('orders')
         drinks_dir = spooldir.join('drinks')
-        for d in (orders_dir, drinks_dir):
-            assert d.check(exists=False) or d.listdir() == []
         html = orders_dir.join('order_000001.html')
         txt = drinks_dir.join('order_000001.txt')
         #
+        assert self.dir_is_empty(orders_dir)
+        assert self.dir_is_empty(drinks_dir)
         resp = client.post('/orders/', json=example_order_data)
         assert orders_dir.listdir() == [html]
         assert drinks_dir.listdir() == [txt]
@@ -114,6 +118,16 @@ class TestServer(object):
         resp = client.post('/orders/1/print_drinks/')
         assert resp.status_code == 200
         assert drinks_dir.listdir() == [txt]
+
+    def test_print_drinks_only_if_any(self, client, spooldir, example_order_data):
+        # remove the only drink the the menu
+        beer = example_order_data['menu'].pop()
+        assert beer['is_drink']
+        #
+        # check that we don't print the drink receipt
+        drinks_dir = spooldir.join('drinks')
+        resp = client.post('/orders/', json=example_order_data)
+        assert self.dir_is_empty(drinks_dir)
 
     def test_all_orders(self, client):
         o1 = model.Order(menu='101')
