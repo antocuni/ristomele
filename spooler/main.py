@@ -1,9 +1,9 @@
 """
-Usage: spooler/main.py SPOOLDIR -p DEVICE [OPTIONS]
+Usage: spooler/main.py SPOOLDIR [options]
 
 Options:
 
-  -p --printer DEVICE   The device of the printer (e.g. /dev/usb/lp1)
+  -p --printer=DEVICE   The device of the printer [Default: /dev/usb/lp0]
   -h --help             Show help
 """
 
