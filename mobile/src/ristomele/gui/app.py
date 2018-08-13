@@ -50,7 +50,7 @@ class RistoMeleApp(App):
 
     def build_config(self, config):
         config.setdefaults('server', {
-            'host': '192.168.1.3',
+            'host': '192.168.1.6',
             'port': '5000',
             'timeout': '3',
         })
