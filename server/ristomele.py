@@ -6,7 +6,6 @@ import flask
 from flask import current_app
 from server import config
 
-TMPDIR = py.path.local.mkdtemp()
 STATIC = config.ROOT.join('server', 'static')
 ristomele = flask.Blueprint('ristomele', __name__)
 
@@ -18,18 +17,6 @@ def error(message, status=403):
     myjson = flask.jsonify(result='error',
                            message=message)
     return myjson, status
-
-def topdf(html, basename, htmldir, pdfdir):
-    htmlname = htmldir.join(basename + '.html')
-    pdfname = pdfdir.join(basename + '.pdf')
-    with htmlname.open('w') as f:
-        f.write(html.encode('utf8'))
-    cmdline = 'wkhtmltopdf "%s" "%s"' % (htmlname, pdfname)
-    print cmdline
-    ret = os.system(cmdline)
-    if ret != 0:
-        raise ValueError('Error when executing wkhtmltopdf')
-    return pdfname
 
 def split_columns(items):
     n = len(items)/2
@@ -85,13 +72,11 @@ def do_print_order(myorder, reprint=False):
                                  order=myorder,
                                  columns=split_columns(menu))
     #
-    # we generate the HTML in a temporary dir, but the PDF into a
-    # spooldir: the idea is that we will have a deamon which prints all
-    # the PDFs which are copied there
-    pdf = topdf(html, 'order_%06d' % myorder.id, TMPDIR,
-                spooldir_for('orders'))
-    if not current_app.config['TESTING']:
-        os.system('evince "%s" &' % pdf)
+    html_file = spooldir_for('orders').join('order_%06d.html' % myorder.id)
+    with html_file.open('wb') as f:
+        f.write(html.encode('utf8'))
+    #
+    # XXX: reimplement the evince preview functionality
 
 
 def do_print_drinks(myorder):
@@ -99,10 +84,6 @@ def do_print_drinks(myorder):
     with txt.open('wb') as f:
         receipt = myorder.drink_receipt()
         f.write(receipt)
-    ## with open('/dev/usb/lp1', 'wb') as f:
-    ##     f.write(txt)
-    ##     f.write('\n\n\n\n')
-    # XXX
 
 @ristomele.route('/orders/', methods=['GET'])
 def all_orders():
@@ -110,8 +91,6 @@ def all_orders():
     orders = model.Order.query.order_by(model.Order.id.desc()).all()
     orders = [order.as_dict() for order in orders]
     return flask.jsonify(orders)
-
-
 
 def _update_one_table(name, waiter):
     from server import model

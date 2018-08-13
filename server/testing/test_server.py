@@ -98,17 +98,17 @@ class TestServer(object):
         drinks_dir = spooldir.join('drinks')
         for d in (orders_dir, drinks_dir):
             assert d.check(exists=False) or d.listdir() == []
-        pdf = orders_dir.join('order_000001.pdf')
+        html = orders_dir.join('order_000001.html')
         txt = drinks_dir.join('order_000001.txt')
         #
         resp = client.post('/orders/', json=example_order_data)
-        assert orders_dir.listdir() == [pdf]
+        assert orders_dir.listdir() == [html]
         assert drinks_dir.listdir() == [txt]
         #
-        pdf.remove()
+        html.remove()
         resp = client.post('/orders/1/print/')
         assert resp.status_code == 200
-        assert orders_dir.listdir() == [pdf]
+        assert orders_dir.listdir() == [html]
         #
         txt.remove()
         resp = client.post('/orders/1/print_drinks/')
