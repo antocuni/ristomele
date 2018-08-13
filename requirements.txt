@@ -4,3 +4,4 @@ py
 freezegun
 docopt
 uwsgi
+wsgi-request-logger

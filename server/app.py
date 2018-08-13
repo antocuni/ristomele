@@ -10,17 +10,11 @@ from server.ristomele import ristomele
 MOBILE = config.ROOT.join('mobile')
 DB = config.ROOT.join('db.sqlite')
 SPOOLDIR = py.path.local('/tmp/spooldir').ensure(dir=True)
-
-def setup_logging(app):
-    logfile = config.ROOT.join('log', 'ristomele.log')
-    handler = logging.FileHandler(str(logfile))
-    handler.setLevel(logging.INFO)  # only log errors and above
-    app.logger.addHandler(handler)  # attach the handler to the app's logger
+LOGFILE = config.ROOT.join('log', 'ristomele.log')
 
 def create_app(dbpath=DB):
     from server import model
     app = flask.Flask('risto_server', root_path='server')
-    setup_logging(app)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///%s' % dbpath
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SPOOLDIR'] = SPOOLDIR
@@ -32,4 +26,13 @@ def create_app(dbpath=DB):
     with app.app_context():
         model.db.create_all()
     return app
+
+def create_logged_app():
+    from requestlogger import WSGILogger, ApacheFormatter
+    handler = logging.FileHandler(str(LOGFILE))
+    handler.setLevel(logging.INFO)
+    logging.root.addHandler(handler)
+    app = create_app()
+    logged_app = WSGILogger(app, [handler], ApacheFormatter())
+    return logged_app
 
