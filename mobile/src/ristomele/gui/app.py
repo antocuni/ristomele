@@ -138,10 +138,10 @@ class RistoMeleApp(App):
             Item(name='Boscaiolo + mortadella', price=5),
             Item(name='Boscaiolo + speck', price=5.5),
             Item(name='Wurstel', price=4),
-            Item(name='Salsiccia', price=4.5),
-            Item(name='Salsiccia + stracchino', price=5.5),
+            Item(name='Foc. Salsiccia', price=4.5),
+            Item(name='Foc. Salsiccia + stracchino', price=5.5),
 
-            Item(name='Porchetta', price=5),
+            Item(name='Foc. Porchetta', price=5),
             Item(name='Mortadella', price=3),
             Item(name='Mortadella + stracchino', price=4),
             Item(name='Nutella', price=3.5),
@@ -151,10 +151,10 @@ class RistoMeleApp(App):
             Sep(name='Focaccini'),
             Item(name='Zeneize de Me', price=1.5),
             Item(name='Salame', price=3),
-            Item(name='Salsiccia', price=4.5),
+            Item(name='Foc. Salsiccia', price=4.5),
             Item(name='Nutella', price=3.5),
             Item(name='Prosciutto Cotto', price=3),
-            Item(name='Porchetta', price=5),
+            Item(name='Foc. Porchetta', price=5),
         ]
 
         fugassin = fugassin1
