@@ -6,6 +6,7 @@ import json
 import flask
 from flask import current_app
 from server import config
+from server import escpos
 
 STATIC = config.ROOT.join('server', 'static')
 ristomele = flask.Blueprint('ristomele', __name__)
@@ -99,6 +100,7 @@ def do_print_drinks(myorder):
     if receipt is None:
         return # no drinks, no receipt
     #
+    receipt = escpos.magic_encode(receipt)
     txt = spooldir_for('drinks').join('order_%06d.txt' % myorder.id)
     with txt.open('wb') as f:
         f.write(receipt)

@@ -1,3 +1,5 @@
+#-*- encoding: utf-8 -*-
+
 import os
 from datetime import datetime
 import pytest
@@ -128,6 +130,29 @@ class TestServer(object):
         drinks_dir = spooldir.join('drinks')
         resp = client.post('/orders/', json=example_order_data)
         assert self.dir_is_empty(drinks_dir)
+
+    def test_new_order_unicode(self, client, example_order_data):
+        ex = example_order_data
+        ex['customer'] = u'àèìò'
+        with freeze_time('2018-08-15 20:00'):
+            resp = client.post('/orders/', json=ex)
+            assert resp.json == {
+                'result': 'OK',
+                'order': {
+                    'id': 1,
+                    'date': '2018-08-15 20:00:00',
+                    'cashier': ex['cashier'],
+                    'table': ex['table'],
+                    'waiter': ex['waiter'],
+                    'customer': ex['customer'],
+                    'notes': ex['notes'],
+                    'menu': ex['menu'],
+                    }
+                }
+            #
+            myorder = model.Order.query.get(1)
+            assert myorder.date == datetime(2018, 8, 15, 20, 0, 0)
+            assert myorder.customer == ex['customer']
 
     def test_all_orders(self, client):
         o1 = model.Order(menu='101')
