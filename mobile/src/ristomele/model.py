@@ -27,7 +27,8 @@ class Restaurant(EventDispatcher):
         tables = []
         for row in range(self.rows):
             for col in range(self.cols):
-                tname = '%s%s' % (col+1, row+1)
+                i = (col*self.rows) + row + 1
+                tname = str(i)
                 waiter = name2waiter.get(tname, '')
                 tables.append(Table(name=tname, waiter=waiter))
         super(Restaurant, self).__init__(tables=tables)

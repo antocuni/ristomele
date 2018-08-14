@@ -11,14 +11,14 @@ def example_order(example_order_data):
 
 def test_Restaurant():
     tables = [
-        dict(name='11', waiter='pippo'),
-        dict(name='12', waiter='pluto')
+        dict(name='1', waiter='pippo'),
+        dict(name='2', waiter='pluto')
     ]
     r = model.Restaurant(2, 3, tables)
     assert len(r.tables) == 6
     names = [t.name for t in r.tables]
-    assert names == ['11', '21', '31',
-                     '12', '22', '32']
+    assert names == ['1', '3', '5',
+                     '2', '4', '6']
     t11 = r.tables[0]
     t12 = r.tables[3]
     assert t11.waiter == 'pippo'
