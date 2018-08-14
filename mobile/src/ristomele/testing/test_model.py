@@ -66,6 +66,7 @@ def test_Menu_as_textural_recepit(example_order):
     ])
     txt = example_order.as_textual_receipt(width=32)
     assert txt == textwrap.dedent(u"""
+        COPIA CLIENTE
         Numero ordine:  
         Tavolo: 11 [anto]
         Cassiere: gian
@@ -91,6 +92,7 @@ def test_Menu_as_textural_recepit(example_order):
     example_order.date = datetime(2015, 8, 15, 20, 0, 0)
     txt = example_order.as_textual_receipt(width=32)
     exp = textwrap.dedent(u"""
+        COPIA CLIENTE
         Numero ordine: 1 [15/08 20:00]
         Tavolo: 11 [anto]
         Cassiere: gian

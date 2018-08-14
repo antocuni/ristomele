@@ -1,7 +1,9 @@
 # -*- encoding: utf-8 -*-
 import os
+import time
 import pypath
 from urlparse import urljoin
+from datetime import datetime
 from kivy.app import App
 from kivy.resources import resource_find
 from kivy.properties import ObjectProperty, ConfigParserProperty, AliasProperty
@@ -11,7 +13,7 @@ from kivy.core.window import Window
 import ristomele
 from ristomele import model
 import ristomele.gui.uix # side effects
-from ristomele.gui.uix import MyScreen
+from ristomele.gui.uix import MyScreen, MessageBox
 from ristomele.gui import iconfonts
 from ristomele.gui.manager import Manager
 from ristomele.logger import Logger
@@ -262,6 +264,19 @@ class RistoMeleApp(App):
         table_data = resp.json()
         return model.Restaurant(self.ROWS, self.COLS, table_data)
 
+    def set_timestamp(self):
+        url = self.url('timestamp/')
+        payload = {'timestamp': time.time()}
+        resp = self.requests.post(url, json=payload,
+                                 error="Impossibile impostare l'ora sul server")
+        assert resp.status_code == 200
+        server_timestamp = resp.json()['timestamp']
+        dt = datetime.fromtimestamp(server_timestamp)
+        formatted = dt.strftime('%d/%m/%Y %H:%M:%S')
+        box = MessageBox(title='Operazione completata',
+                         message='Ora sul server impostata a:\n %s' % formatted)
+        box.open()
+
     def print_receipt(self, order):
         printer_name = self.get_printer_name()
         if not printer_name:
@@ -269,6 +284,8 @@ class RistoMeleApp(App):
                 message="Nessuna stampante configurata",
                 description="Selezionarne una nella schermata opzioni")
         s = order.as_textual_receipt()
+        s += '\n\n\n%s\n\n\n' % ('-'*32)
+        s += order.as_textual_receipt(title='COPIA CAMERIERE')
         if platform == 'android':
             from ristomele.gui.printer import print_string
             print_string(printer_name, s)

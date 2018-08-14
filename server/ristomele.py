@@ -1,4 +1,5 @@
 import os
+import time
 from datetime import datetime
 import py
 import json
@@ -147,3 +148,14 @@ def update_many_tables():
     model.db.session.commit()
     tables = [t.as_dict() for t in tables]
     return flask.jsonify(tables)
+
+
+@ristomele.route('/timestamp/', methods=['POST'])
+def set_datetime():
+    timestamp = flask.request.json['timestamp']
+    timestamp = float(timestamp)
+    ret = os.system('sudo date -s @%s' % timestamp)
+    if ret != 0:
+        return error("Cannot set the date")
+    return flask.jsonify(result='OK',
+                         timestamp=time.time())

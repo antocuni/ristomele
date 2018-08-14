@@ -89,15 +89,22 @@
 
                 IconButton:
                     icon: 'fa-plus'
-                    size_hint: 1, 0.5
+                    size_hint: 1, 0.33
                     on_release: app.font_size += 1
                     show_border: True
 
                 IconButton:
                     icon: 'fa-minus'
-                    size_hint: 1, 0.5
+                    size_hint: 1, 0.33
                     on_release: app.font_size -= 1
                     show_border: True
+
+                IconButton:
+                    icon: 'fa-clock-o'
+                    size_hint: 1, 0.33
+                    on_release: app.set_timestamp()
+                    show_border: True
+
 
         # FlatButton:
         #     text: "Bluetooth info"

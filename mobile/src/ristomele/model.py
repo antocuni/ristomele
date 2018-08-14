@@ -109,9 +109,7 @@ class Order(EventDispatcher):
             total += item.count * item.price
         return total
 
-    def as_textual_receipt(self, width=32):
-        lines = []
-        w = lines.append
+    def _receipt_info(self, w):
         num = self.id or ''
         if self.date:
             date = u'[%s]' % self.date.strftime('%d/%m %H:%M')
@@ -121,6 +119,12 @@ class Order(EventDispatcher):
         w(u'Tavolo: %s [%s]' % (self.table.name, self.table.waiter))
         w(u'Cassiere: %s' % (self.cashier))
         w(u'Cliente: %s' % self.customer)
+
+    def as_textual_receipt(self, width=32, title=u'COPIA CLIENTE'):
+        lines = []
+        w = lines.append
+        w(title)
+        self._receipt_info(w)
         w('')
         for item in self.menu:
             if item.kind != 'item':
