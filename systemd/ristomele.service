@@ -1,8 +1,0 @@
-[Unit]
-Description=ristomele uwsgi service
-After=network.target
-
-[Service]
-ExecStart=/home/pi/ristomele/venv/bin/uwsgi --ini /home/pi/ristomele/uwsgi.ini
-Restart=on-failure
-RestartSec=5s

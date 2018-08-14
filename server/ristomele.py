@@ -26,6 +26,11 @@ def split_columns(items):
     ]
     return columns
 
+@ristomele.route('/apk/', methods=['GET'])
+def get_apk():
+    apk = config.ROOT.join('mobile', 'bin', 'RistoMele-0.1-debug.apk')
+    return flask.send_file(str(apk), as_attachment=True)
+
 
 @ristomele.route('/orders/', methods=['POST'])
 def new_order():
@@ -64,8 +69,17 @@ def print_drinks_order(order_id):
     do_print_drinks(myorder)
     return flask.jsonify(result='OK')
 
+def filter_menu(menu):
+    res = []
+    for item in menu:
+        if item['kind'] == 'item' and item['count'] == 0:
+            continue
+        res.append(item)
+    return res
+
 def do_print_order(myorder, reprint=False):
     menu = json.loads(myorder.menu)
+    menu = filter_menu(menu)
     html = flask.render_template('order.html',
                                  static=str(STATIC),
                                  reprint=reprint,
