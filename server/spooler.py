@@ -4,6 +4,8 @@ Usage: spooler SPOOLDIR [options]
 Options:
 
   -p --printer=DEVICE   The device of the printer [Default: /dev/usb/lp0]
+  --evince              For local development: don't print anything, but
+                        show generated pdfs using evince
   -h --help             Show help
 """
 
@@ -33,6 +35,7 @@ def setup_logging():
 def main():
     setup_logging()
     args = docopt.docopt(__doc__)
+    evince = args['--evince']
     spooldir = py.path.local(args['SPOOLDIR'])
     printer = py.path.local(args['--printer'])
     #
@@ -44,7 +47,7 @@ def main():
         i += 1
         if i % 30 == 0:
             logging.info('I am still alive :)')
-        print_orders(orders_dir)
+        print_orders(orders_dir, evince)
         print_drinks(drinks_dir, printer)
         time.sleep(1)
 
@@ -56,14 +59,17 @@ def exec_cmd(cmdline):
         return False
     return True
 
-def print_orders(orders_dir):
+def print_orders(orders_dir, evince):
+    print_cmd = 'lp'
+    if evince:
+        print_cmd = 'evince'
     try:
         for html in orders_dir.listdir('*.html'):
             logging.info('Found HTML: %s', html.basename)
             pdf = html.new(ext='pdf')
             if not exec_cmd('wkhtmltopdf "%s" "%s"' % (html, pdf)):
                 continue
-            if not exec_cmd('lp "%s"' % pdf):
+            if not exec_cmd('%s "%s"' % (print_cmd, pdf)):
                 continue
             logging.info('Removing %s and %s', html.basename, pdf.basename)
             html.remove()
