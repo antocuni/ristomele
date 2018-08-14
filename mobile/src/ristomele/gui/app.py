@@ -191,19 +191,23 @@ class RistoMeleApp(App):
 
             Sep(name='Vino'),
             Drink(name='Sangria', price=3.5),
-            Drink(name='Bottiglia rosso', price=5),
+            Drink(name='Bottiglia dolcetto', price=5),
+            Drink(name='Bottiglia barbera', price=5),
             Drink(name='Bottiglia bianco', price=5),
 
-            Drink(name='Bicchiere grande rosso ', price=2.5),
+            Drink(name='Bicchiere grande dolcetto ', price=2.5),
+            Drink(name='Bicchiere grande barbera ', price=2.5),
             Drink(name='Bicchiere grande bianco ', price=2.5),
 
-            Drink(name='Bicchiere piccolo rosso ', price=1),
+            Drink(name='Bicchiere piccolo dolcetto ', price=1),
+            Drink(name='Bicchiere piccolo barbera ', price=1),
             Drink(name='Bicchiere piccolo bianco ', price=1),
 
             Sep(name='Altre bevande'),
 
             Drink(name='Birra alla spina Weiss', price=4),
-            Drink(name='Birra alla spina Pils', price=3.5),
+            Drink(name='Birra alla spina Chiara', price=3.5),
+            #Drink(name='Birra alla spina Rossa', price=3.5),
 
             Drink(name='Coca Cola', price=1.5),
             Drink(name='Fanta', price=1.5),
