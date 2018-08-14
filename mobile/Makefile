@@ -24,7 +24,8 @@ ROOT := $(dir $(this))
 # ==================
 # configure build.py
 
-BUILDFLAGS  = --dir $(ROOT)/launcher
+BUILDFLAGS  = --arch armeabi-v7a
+BUILDFLAGS += --dir $(ROOT)/launcher
 BUILDFLAGS += --package $(PACKAGE)
 BUILDFLAGS += --name $(NAME)
 BUILDFLAGS += --version $(VERSION)
@@ -40,10 +41,12 @@ BUILDFLAGS += --bootstrap=sdl2
 BUILDFLAGS += --requirements=python2,kivy
 
 BASE=/extra/android/
-export ANDROIDAPI=19
+export ANDROIDAPI=27
 export ANDROIDSDK=$(BASE)/android-sdk-linux_x86/
-export ANDROIDNDK=$(BASE)/android-ndk-r9c/
-export ANDROIDNDKVER=r9c
+#export ANDROIDNDK=$(BASE)/android-ndk-r9c/
+#export ANDROIDNDKVER=r9c
+export ANDROIDNDK=$(BASE)/android-ndk-r17b
+export ANDROIDNDKVER=r17b
 
 debug:
 	@echo [DEBUG] $(DEBUG)
