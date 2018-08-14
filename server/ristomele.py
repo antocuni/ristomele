@@ -3,6 +3,7 @@ import time
 from datetime import datetime
 import py
 import json
+from collections import Counter, defaultdict
 import flask
 from flask import current_app
 from server import config
@@ -161,3 +162,25 @@ def set_datetime():
         return error("Cannot set the date")
     return flask.jsonify(result='OK',
                          timestamp=time.time())
+
+@ristomele.route('/stats/', methods=['GET'])
+def stats():
+    from server import model
+    days = defaultdict(Counter)
+    orders = model.Order.query.all()
+    for order in orders:
+        daily_counter = days[order.date.date()]
+        daily_counter[order.cashier] += 1
+        daily_counter['Ordini'] += 1
+        menu = json.loads(order.menu)
+        for item in menu:
+            if item['kind'] != 'item':
+                continue
+            daily_counter[item['name']] += item['count']
+    #
+    return flask.render_template('stats.html', days=days)
+
+@ristomele.route('/static/bootstrap.min.css', methods=['GET'])
+def send_static():
+    css = config.ROOT.join('server', 'static', 'bootstrap.min.css')
+    return flask.send_file(str(css))
