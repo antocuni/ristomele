@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/bootstrap.min.css">
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Statistiche</h1>
+      
+      {% for date, counter in days.items() %}
+      <div class="row">
+        <h2>{{date.strftime("%d/%m/%Y")}}</h2>
+
+        <table class="table">
+          <tr>
+            <td><b>Ordini</b></td>
+            <td>{{counter.pop('Ordini', 0)}}</td>
+          </tr>
+
+          {% for name, count in counter.most_common() %}
+          <tr>
+            <td>{{name}}</td>
+            <td>{{count}}</td>
+          </tr>
+          {% endfor %}
+        </table>
+          
+      </div>
+      {% endfor %}
+    </div>
+  </body>
+</html>
+
