@@ -1,0 +1,77 @@
+Stampante Bluetooth
+====================
+
+non va bene fare una richiesta bloccante dal tablet: nel caso migliore la GUI
+si blocca per 2/3 secondi, ma nel caso peggiore (ad esempio se la stampante
+non è collegata) si attende anche 30 secondi o più.
+
+Soluzione: fare un thread separato tipo "sync server": avere una coda di
+richieste di stampa, e una property "status"; mettere un sistema per eliminare
+automaticamente le stampe doppie se si fa click 2 volte; fare in modo che
+nella finestra di riepilogo ordine un pulsante "lampeggi" mentre la stampa è
+in corso
+
+
+Invia Ordine
+============
+
+al momento lo status è solo OK/errore: tuttavia, se l'ordine viene salvato sul
+DB e c'è un problema DOPO (ad esempio durante la stampa dei drink), al palmare
+viene fuori "Errore Wifi": quindi la cassiera è portata a fare ripetutamente
+l'invio dell'ordine.
+
+
+Lista ordini
+=============
+
+Con 700 e passa ordini, è semplicemente troppo lenta a caricarsi nella app: ci
+sta anche 5-6 secondi (e a volte va in timeout). Provare a spedire solo le
+info generiche di un ordine (senza il menu) e/o a paginare.
+
+
+Stampante bar/cucina
+=====================
+
+Mettere un led e/o un altro indicatore che segnali quando ci sono file nello
+spooler: a volte la stampante si inceppa, quindi non si sa se semplicemente
+non ci sono ordini in arrivo o se si è inceppata
+
+
+Clienti in attesa di ordinare
+==============================
+
+Pensare ad un sistema per avere una coda a priorità (visibile nell'app) per
+sapere quali tavoli sono in attesa di ordinare
+
+
+Ordini multipli
+================
+
+Pensare ad un sistema per emettere scontrini multipli ma raccogliere gli
+ordini in una stampa sola per facilitare i camerieri
+
+
+Self test
+==============
+
+Mettere un pulsante per controllare che tutto funzioni dopo il setup: spooler
+di stampa e stampante bar. Magari stampare anche delle informazioni di self
+test tipo indirizzo IP e cose del genere.
+
+Mettere un sistema di warning per ricordarsi di settare l'orario
+
+
+Logs
+=====
+
+Fare una paginetta che contiene i log, così da poterli leggere facilmente. "I
+am still alive" dello spooler non serve a nulla così frequente, magari
+metterlo una volta ogni 5 minuti o giù di lì
+
+
+Ordinazioni dal cell
+=====================
+
+Pagina web da cui poter fare un "pre-ordine", così che la cassiera deve solo
+incassare e fare l'invio vero e proprio
+
