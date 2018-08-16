@@ -12,6 +12,11 @@ nella finestra di riepilogo ordine un pulsante "lampeggi" mentre la stampa è
 in corso
 
 
+Secondo me il tablet "vecchio" di raffaella aveva problemi al bluetooth, ogni
+tanto sembrava bloccarsi. Sarebbe da provare a fare degli stress test: fare
+stampe in continuo ad intervalli irregolari e vedere quante vanno a buon fine
+
+
 Invia Ordine
 ============
 
