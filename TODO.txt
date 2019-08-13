@@ -26,14 +26,6 @@ viene fuori "Errore Wifi": quindi la cassiera è portata a fare ripetutamente
 l'invio dell'ordine.
 
 
-Lista ordini
-=============
-
-Con 700 e passa ordini, è semplicemente troppo lenta a caricarsi nella app: ci
-sta anche 5-6 secondi (e a volte va in timeout). Provare a spedire solo le
-info generiche di un ordine (senza il menu) e/o a paginare.
-
-
 Stampante bar/cucina
 =====================
 
