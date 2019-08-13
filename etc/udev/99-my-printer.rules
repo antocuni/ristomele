@@ -4,4 +4,9 @@
 # the "parent/root/whatever" usb device, instead of a link to the usblp
 # subsystem
 
+# for orange and blue printers
 SUBSYSTEMS=="usb", ATTRS{serial}=="Printer", ATTRS{manufacturer}=="STMicroelectronics", SYMLINK+="usb/lp-thermal"
+
+# for goojprt printer
+SUBSYSTEMS=="usb", ATTRS{serial}=="001E00110241341000000128", ATTRS{manufacturer}=="Caysn", SYMLINK+="usb/lp-thermal"
+    
