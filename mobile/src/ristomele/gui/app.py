@@ -28,7 +28,7 @@ class MainScreen(MyScreen):
 class RistoMeleApp(App):
     from kivy.uix.settings import SettingsWithTabbedPanel as settings_cls
 
-    ROWS = 9
+    ROWS = 8
     COLS = 3
 
     # these are needed so that we can change to font size in the options
