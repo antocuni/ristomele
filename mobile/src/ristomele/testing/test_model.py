@@ -39,6 +39,18 @@ def test_Order_from_dict(example_order, example_order_data):
         assert o_item.count == d_item['count']
         assert o_item.price == d_item['price']
 
+def test_Order_from_dict_incomplete(example_order_data):
+    data = example_order_data
+    del data['menu']
+    o = model.Order.from_dict(data)
+    assert o.id is None
+    assert o.date is None
+    assert o.table.name == data['table']
+    assert o.table.waiter == data['waiter']
+    assert o.customer == data['customer']
+    assert o.notes == data['notes']
+    assert o.menu == []
+
 def test_Order_get_total(example_order):
     assert example_order.get_total() == 10 + 2*15 + 3
 

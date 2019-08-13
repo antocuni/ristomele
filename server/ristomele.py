@@ -110,7 +110,7 @@ def do_print_drinks(myorder):
 def all_orders():
     from server import model
     orders = model.Order.query.order_by(model.Order.id.desc()).all()
-    orders = [order.as_dict() for order in orders]
+    orders = [order.as_dict_light() for order in orders]
     return flask.jsonify(orders)
 
 def _update_one_table(name, waiter):

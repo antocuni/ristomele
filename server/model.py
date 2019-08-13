@@ -26,6 +26,9 @@ class Order(db.Model):
 
     @classmethod
     def from_dict(cls, data):
+        menu = data.get('menu')
+        if menu is not None:
+            menu = json.dumps(menu)
         return cls(
             date = datetime.now(),
             cashier = data['cashier'],
@@ -33,7 +36,7 @@ class Order(db.Model):
             waiter = data['waiter'],
             customer = data['customer'],
             notes = data['notes'],
-            menu = json.dumps(data['menu'])
+            menu = menu,
             )
 
     def _load_menu(self):
@@ -44,6 +47,14 @@ class Order(db.Model):
             return None
 
     def as_dict(self):
+        d = self.as_dict_light()
+        d['menu'] = self._load_menu()
+        return d
+
+    def as_dict_light(self):
+        """
+        Like as_dict, but without the menu
+        """
         return dict(
             id = self.id,
             date = self.date.strftime('%Y-%m-%d %H:%M:%S') if self.date else None,
@@ -52,7 +63,7 @@ class Order(db.Model):
             waiter = self.waiter,
             customer = self.customer,
             notes = self.notes,
-            menu = self._load_menu())
+            menu = None)
 
     def textual_id(self):
         id = ''

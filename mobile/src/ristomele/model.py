@@ -72,6 +72,13 @@ class Order(EventDispatcher):
         if date is not None:
             date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
         table = Table(name=data['table'], waiter=data['waiter'])
+        #
+        if data.get('menu') is None:
+            # XXX: we should somehow mark the Order as "light" or "incomplete"
+            menu = []
+        else:
+            menu = [MenuItem.from_dict(d) for d in data['menu']]
+        #
         return cls(
             id = data.get('id'),
             date = date,
@@ -79,7 +86,7 @@ class Order(EventDispatcher):
             table = table,
             customer = data['customer'],
             notes = data['notes'],
-            menu = [MenuItem.from_dict(d) for d in data['menu']]
+            menu = menu
             )
 
     def textual_id(self):

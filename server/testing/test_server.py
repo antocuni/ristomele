@@ -48,6 +48,15 @@ class TestModel(object):
         assert myorder.notes == 'my notes'
         assert json.loads(myorder.menu) == example_order_data['menu']
 
+    def test_Order_from_dict_incomplete(self, example_order_data):
+        del example_order_data['menu']
+        myorder = model.Order.from_dict(example_order_data)
+        assert myorder.table == '11'
+        assert myorder.waiter == 'anto'
+        assert myorder.customer == 'pippo'
+        assert myorder.notes == 'my notes'
+        assert myorder.menu is None
+
     def test_textual_id(self, example_order_data):
         with freeze_time('2018-08-15 20:00'):
             myorder = model.Order.from_dict(example_order_data)
@@ -63,6 +72,18 @@ class TestModel(object):
             date = mydict.pop('date')
             assert id is None
             assert date == '2018-08-15 20:00:00'
+            assert mydict == example_order_data
+
+    def test_Order_as_dict_light(self, example_order_data):
+        with freeze_time('2018-08-15 20:00'):
+            myorder = model.Order.from_dict(example_order_data)
+            mydict = myorder.as_dict_light()
+            id = mydict.pop('id')
+            date = mydict.pop('date')
+            assert id is None
+            assert date == '2018-08-15 20:00:00'
+            #
+            example_order_data['menu'] = None
             assert mydict == example_order_data
 
     def test_Order_as_dict_error(self, example_order_data):
@@ -155,17 +176,18 @@ class TestServer(object):
             assert myorder.customer == ex['customer']
 
     def test_all_orders(self, client):
-        o1 = model.Order(menu='101')
-        o2 = model.Order(menu='102')
-        o3 = model.Order(menu='103')
+        o1 = model.Order(notes='note1', menu='101')
+        o2 = model.Order(notes='note2', menu='102')
+        o3 = model.Order(notes='note3', menu='103')
         model.db.session.add_all([o1, o2, o3])
         model.db.session.commit()
         resp = client.get('/orders/')
-        items = [(item['id'], item['menu']) for item in resp.json]
+        items = [(item['id'], item['notes'], item.get('menu'))
+                  for item in resp.json]
         assert items == [
-            (3, 103),
-            (2, 102),
-            (1, 101)
+            (3, 'note3', None),
+            (2, 'note2', None),
+            (1, 'note1', None)
             ]
 
     def test_tables(self, client):
