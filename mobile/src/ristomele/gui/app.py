@@ -222,7 +222,12 @@ class RistoMeleApp(App):
         screen = NewOrderScreen(name='new_order', order=order)
         self.root.open(screen)
 
-    def show_order(self, order):
+    def show_order(self, order, reload=False):
+        if reload:
+            url = self.url('orders/%s/' % order.id)
+            resp = self.requests.get(url, error="Impossibile caricare l'ordine")
+            order_data = resp.json()['order']
+            order = model.Order.from_dict(order_data)
         screen = ShowOrderScreen(title='order', order=order)
         self.root.open(screen)
 

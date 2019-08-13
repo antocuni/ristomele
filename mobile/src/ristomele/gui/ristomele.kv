@@ -217,7 +217,7 @@
     FlatButton:
         text: "%s   %s" % (root.order.textual_id(), root.order.table.name)
         show_border: False
-        on_release: app.show_order(root.order)
+        on_release: app.show_order(root.order, reload=True)
         color: root.fgcolor
         size_hint_x: 1
 
@@ -225,7 +225,7 @@
         text: root.order.cashier
         show_border: False
         color: root.fgcolor
-        on_release: app.show_order(root.order)
+        on_release: app.show_order(root.order, reload=True)
 
 <OrderListScreen>:
     BoxLayout:
