@@ -7,7 +7,6 @@ from datetime import datetime
 from kivy.app import App
 from kivy.resources import resource_find
 from kivy.properties import ObjectProperty, ConfigParserProperty, AliasProperty
-from kivy.utils import platform
 from kivy.metrics import dp
 from kivy.core.window import Window
 import ristomele
@@ -17,6 +16,7 @@ from ristomele.gui.uix import MyScreen, MessageBox
 from ristomele.gui import iconfonts
 from ristomele.gui.manager import Manager
 from ristomele.logger import Logger
+from ristomele.gui.print_service import PrintService
 from ristomele.gui.util import SmartRequests, make_bluetooth_printer_setting
 from ristomele.gui.error import MyExceptionHandler, ErrorMessage
 from ristomele.gui.tables import TablesScreen, EditTablesScreen
@@ -84,6 +84,8 @@ class RistoMeleApp(App):
                                 filename=resource_find('data/scrolling.json'))
 
     def build(self):
+        self.print_service = PrintService(app=self)
+        self.print_service.start()
         self.exception_handler = MyExceptionHandler()
         self.requests = SmartRequests(self)
         Window.bind(on_keyboard=self.on_keyboard)
@@ -103,6 +105,10 @@ class RistoMeleApp(App):
 
     def on_pause(self):
         return True
+
+    def on_stop(self):
+        self.print_service.stop()
+        pass
 
     def show_orders(self):
         url = self.url('orders/')
@@ -292,13 +298,7 @@ class RistoMeleApp(App):
         s = order.as_textual_receipt()
         s += '\n\n\n%s\n\n\n' % ('-'*32)
         s += order.as_textual_receipt(title='COPIA CAMERIERE')
-        if platform == 'android':
-            from ristomele.gui.printer import print_string
-            print_string(printer_name, s)
-        else:
-            print
-            print s
-            print
+        self.print_service.submit(printer_name, s)
 
     def bluetooth_info(self):
         from ristomele.gui import printer

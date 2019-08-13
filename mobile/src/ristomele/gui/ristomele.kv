@@ -398,6 +398,7 @@
                 text: "Ricevuta"
                 disabled: not root.order.is_saved
                 on_release: app.print_receipt(root.order)
+                color: Theme.status(app.print_service.status_class)
 
             FlatButton:
                 text: "Bar"

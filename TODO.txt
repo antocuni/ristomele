@@ -1,22 +1,3 @@
-Stampante Bluetooth
-====================
-
-non va bene fare una richiesta bloccante dal tablet: nel caso migliore la GUI
-si blocca per 2/3 secondi, ma nel caso peggiore (ad esempio se la stampante
-non è collegata) si attende anche 30 secondi o più.
-
-Soluzione: fare un thread separato tipo "sync server": avere una coda di
-richieste di stampa, e una property "status"; mettere un sistema per eliminare
-automaticamente le stampe doppie se si fa click 2 volte; fare in modo che
-nella finestra di riepilogo ordine un pulsante "lampeggi" mentre la stampa è
-in corso
-
-
-Secondo me il tablet "vecchio" di raffaella aveva problemi al bluetooth, ogni
-tanto sembrava bloccarsi. Sarebbe da provare a fare degli stress test: fare
-stampe in continuo ad intervalli irregolari e vedere quante vanno a buon fine
-
-
 Invia Ordine
 ============
 
