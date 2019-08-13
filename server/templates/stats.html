@@ -10,6 +10,7 @@
       
       {% for date, counter in days.items() %}
       <div class="row">
+        <div class="col-lg-6">
         <h2>{{date.strftime("%d/%m/%Y")}}</h2>
 
         <table class="table">
@@ -25,7 +26,7 @@
           </tr>
           {% endfor %}
         </table>
-          
+        </div>
       </div>
       {% endfor %}
     </div>
