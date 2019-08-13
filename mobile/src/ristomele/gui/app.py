@@ -130,89 +130,81 @@ class RistoMeleApp(App):
         Drink = lambda name, price: model.MenuItem(name=name, price=price, is_drink=True)
         Sep = lambda name: model.MenuItem(kind='separator', name=name)
 
-        fugassin1 = [
+        fugassin = [
             Sep(name='Focaccini'),
             Item(name='Zeneize de Me', price=1.5),
-            Item(name='Stracchino', price=3),
-            Item(name='Salame', price=3),
-            Item(name='Salame + stracchino', price=4),
-            Item(name='Prosciutto cotto', price=3),
-            Item(name='Prosciutto cotto + stracchino', price=4.5),
-            Item(name='Speck', price=3.5),
-            Item(name='Boscaiolo + cotto', price=5),
-            Item(name='Boscaiolo + mortadella', price=5),
-            Item(name='Boscaiolo + speck', price=5.5),
-            Item(name='Wurstel', price=4),
-            Item(name='Foc. Salsiccia', price=4.5),
-            Item(name='Foc. Salsiccia + stracchino', price=5.5),
-
-            Item(name='Foc. Porchetta', price=5),
-            Item(name='Mortadella', price=3),
-            Item(name='Mortadella + stracchino', price=4),
+            Item(name='Boscaiolo + cotto', price=5.5),
+            Item(name='Boscaiolo + crudo', price=5.5),
+            Item(name='Cotto', price=3.5),
+            Item(name='Cotto + stracchino', price=4.5),
+            Item(name='Crudo', price=3.5),
+            Item(name='Crudo + stracchino', price=4.5),
+            Item(name='Gorgonzola', price=3.5),
+            Item(name='Gorgonzola + noci', price=4),
+            Item(name='Gorgonzola + miele + noci', price=4.5),
+            Item(name='Marmellata fichi', price=3),
+            Item(name='Marmellata cigliege', price=3),
+            Item(name='Marmellata + stracchino', price=4),
             Item(name='Nutella', price=3.5),
+            Item(name='Porchetta', price=5),
+            Item(name='Porchetta + stracchino', price=6),
+            Item(name='Porchetta + gorgonzola', price=6),
+            Item(name='Salame', price=3),
+            Item(name='Salame + gorgonzola', price=4),
+            Item(name='Salame + stracchino', price=4),
+            Item(name='Salsiccia', price=4.5),
+            Item(name='Salsiccia + stracchino', price=5.5),
+            Item(name='Salsiccia + gorgonzola', price=5.5),
+            Item(name='Stracchino', price=3),
         ]
-
-        fugassin2 = [
-            Sep(name='Focaccini'),
-            Item(name='Zeneize de Me', price=1.5),
-            Item(name='Foc. Salame', price=3),
-            Item(name='Foc. Salsiccia', price=4.5),
-            Item(name='Foc. Nutella', price=3.5),
-            Item(name='Foc. Prosciutto Cotto', price=3),
-            #Item(name='Foc. Porchetta', price=5),
-        ]
-
-        fugassin = fugassin2
 
         items = [
             Item(name='Coperto', price=1),
             Sep(name='Primi'),
-            Item(name='Ravioli', price=7),
+            Item(name='Ravioli au Tuccu', price=7),
+            Item(name='Ravioli burro e salvia', price=7),
+            Item(name='Ravioli nel vino', price=7),
 
             Sep(name='Secondi'),
-
             Item(name='Salsiccia', price=4),
             Item(name='Salsiccia + patatine', price=5),
             Item(name='Salsiccia + pomodori', price=5),
 
-            ## Item(name='Porchetta', price=4.5),
-            ## Item(name='Porchetta + patatine', price=5.5),
-            ## Item(name='Porchetta + pomodori', price=5.5),
+            Item(name='Porchetta', price=4.5),
+            Item(name='Porchetta + patatine', price=5.5),
+            Item(name='Porchetta + pomodori', price=5.5),
 
             Item(name='Arrosto', price=5),
             Item(name='Arrosto + patatine', price=6),
             Item(name='Arrosto + pomodori', price=6),
 
             Sep(name='Contorni'),
-
             Item(name='Patatine fritte', price=2),
             Item(name='Pomodori', price=2),
 
         ] + fugassin + [
 
             Sep(name='Dolci'),
-            Item(name='Dolci misti', price=3),
-            Item(name='Semifreddo alla nutella', price=3.5),
+            Item(name='Torte miste', price=3),
 
             Sep(name='Vino'),
             Drink(name='Sangria', price=3.5),
-            Drink(name='Bottiglia dolcetto', price=5),
             Drink(name='Bottiglia barbera', price=5),
+            Drink(name='Bottiglia dolcetto', price=5),
             Drink(name='Bottiglia bianco', price=5),
 
-            Drink(name='Bicchiere grande dolcetto ', price=2.5),
             Drink(name='Bicchiere grande barbera ', price=2.5),
+            Drink(name='Bicchiere grande dolcetto ', price=2.5),
             Drink(name='Bicchiere grande bianco ', price=2.5),
 
-            Drink(name='Bicchiere piccolo dolcetto ', price=1),
             Drink(name='Bicchiere piccolo barbera ', price=1),
+            Drink(name='Bicchiere piccolo dolcetto ', price=1),
             Drink(name='Bicchiere piccolo bianco ', price=1),
 
             Sep(name='Altre bevande'),
 
             Drink(name='Birra alla spina Weiss', price=4),
             Drink(name='Birra alla spina Chiara', price=3.5),
-            #Drink(name='Birra alla spina Rossa', price=3.5),
 
             Drink(name='Coca Cola', price=1.5),
             Drink(name='Fanta', price=1.5),
