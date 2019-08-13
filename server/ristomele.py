@@ -62,6 +62,14 @@ def reprint_order(order_id):
     do_print_order(myorder, reprint=True)
     return flask.jsonify(result='OK')
 
+@ristomele.route('/orders/<int:order_id>/', methods=['GET'])
+def get_order(order_id):
+    from server import model
+    myorder = model.Order.query.get(order_id)
+    if myorder is None:
+        return error("Cannot find the requested order")
+    return flask.jsonify(result='OK', order=myorder.as_dict())
+
 
 @ristomele.route('/orders/<int:order_id>/print_drinks/', methods=['POST'])
 def print_drinks_order(order_id):

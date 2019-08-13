@@ -190,6 +190,26 @@ class TestServer(object):
             (1, 'note1', None)
             ]
 
+    def test_get_order(self, client, example_order_data):
+        example_order_data['menu'] = ['foo', 'bar']
+        with freeze_time('2018-08-15 20:00'):
+            myorder = model.Order.from_dict(example_order_data)
+            model.db.session.add_all([myorder])
+            model.db.session.commit()
+            assert myorder.id == 1
+            resp = client.get('/orders/1/')
+            assert resp.json == {
+                'result': 'OK',
+                'order': {'cashier': 'gian',
+                          'customer': 'pippo',
+                          'date': '2018-08-15 20:00:00',
+                          'id': 1,
+                          'menu': ['foo', 'bar'],
+                          'notes': 'my notes',
+                          'table': '11',
+                          'waiter': 'anto'},
+                }
+
     def test_tables(self, client):
         resp = client.put('/tables/11/', json=dict(waiter='anto'))
         assert resp.status_code == 200
