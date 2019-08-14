@@ -50,7 +50,7 @@ def main():
     i = 0
     while True:
         i += 1
-        if i % 30 == 0:
+        if i % 300 == 0:
             logging.info('I am still alive :)')
         print_orders(orders_dir, evince)
         print_drinks(drinks_dir, printer)
