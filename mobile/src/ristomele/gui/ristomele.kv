@@ -384,6 +384,12 @@
                 color: (0, 0, 0, 1)
                 font_name: 'RobotoMono-Regular'
 
+        MyLabel:
+            text: "Non ancora inviato" if root.order.id is None else "Inviato"
+            bgcolor: Theme.bgstatus("danger" if root.order.id is None else "success")
+            size_hint_y: None
+            height: app.std_height
+
         BoxLayout:
             id: layout
             orientation: 'horizontal'

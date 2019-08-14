@@ -1,12 +1,3 @@
-Invia Ordine
-============
-
-al momento lo status è solo OK/errore: tuttavia, se l'ordine viene salvato sul
-DB e c'è un problema DOPO (ad esempio durante la stampa dei drink), al palmare
-viene fuori "Errore Wifi": quindi la cassiera è portata a fare ripetutamente
-l'invio dell'ordine.
-
-
 Stampante bar/cucina
 =====================
 
