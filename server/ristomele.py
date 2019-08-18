@@ -184,19 +184,30 @@ def timestamp():
 @ristomele.route('/stats/', methods=['GET'])
 def stats():
     from server import model
-    days = defaultdict(Counter)
+    total_money = Counter()
+    total_orders = Counter()
+    by_cashier = defaultdict(Counter)
+    by_item = defaultdict(Counter)
     orders = model.Order.query.all()
     for order in orders:
-        daily_counter = days[order.date.date()]
-        daily_counter[order.cashier] += 1
-        daily_counter['Ordini'] += 1
+        dt = order.date.date()
+        total_orders[dt] += 1
+        total_money[dt] += order.get_total()
+        by_cashier[dt][order.cashier] += 1
+        #
+        item_counter = by_item[dt]
+        item_counter['Ordini'] += 1
         menu = json.loads(order.menu)
         for item in menu:
             if item['kind'] != 'item':
                 continue
-            daily_counter[item['name']] += item['count']
+            item_counter[item['name']] += item['count']
     #
-    return flask.render_template('stats.html', days=days)
+    return flask.render_template('stats.html',
+                                 by_item=by_item,
+                                 by_cashier=by_cashier,
+                                 total_orders=total_orders,
+                                 total_money=total_money)
 
 @ristomele.route('/static/bootstrap.min.css', methods=['GET'])
 def send_static():

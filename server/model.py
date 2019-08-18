@@ -105,3 +105,12 @@ class Order(db.Model):
             return '\n'.join(lines)
         else:
             return None
+
+    def get_total(self):
+        menu = self._load_menu()
+        total = 0
+        for item in menu:
+            if item['kind'] != 'item':
+                continue
+            total += item['count'] * item['price']
+        return total

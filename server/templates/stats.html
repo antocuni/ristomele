@@ -8,15 +8,30 @@
     <div class="container">
       <h1>Statistiche</h1>
       
-      {% for date, counter in days.items() %}
+      {% for date, counter in by_item.items() %}
       <div class="row">
         <div class="col-lg-6">
         <h2>{{date.strftime("%d/%m/%Y")}}</h2>
 
         <table class="table">
+          {% for name, count in by_cashier[date].most_common() %}
+          <tr style="border-bottom: 2px">
+            <td>{{name}}</td>
+            <td>{{count}}</td>
+          </tr>
+          {% endfor %}
           <tr>
             <td><b>Ordini</b></td>
-            <td>{{counter.pop('Ordini', 0)}}</td>
+            <td>{{total_orders[date]}}</td>
+          </tr>
+          <tr>
+            <td><b>Totale</b></td>
+            <td>{{total_money[date]}} €</td>
+          </tr>
+          
+          <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
           </tr>
 
           {% for name, count in counter.most_common() %}
