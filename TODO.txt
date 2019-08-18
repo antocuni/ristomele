@@ -1,23 +1,28 @@
-Stampante bar/cucina
-=====================
-
-Mettere un led e/o un altro indicatore che segnali quando ci sono file nello
-spooler: a volte la stampante si inceppa, quindi non si sa se semplicemente
-non ci sono ordini in arrivo o se si è inceppata
-
-
 Clienti in attesa di ordinare
 ==============================
 
 Pensare ad un sistema per avere una coda a priorità (visibile nell'app) per
 sapere quali tavoli sono in attesa di ordinare
 
+Ordinazioni dal cell
+--------------------
 
-Ordini multipli
-================
+Pagina web da cui poter fare un "pre-ordine", così che la cassiera deve solo
+incassare e fare l'invio vero e proprio
 
-Pensare ad un sistema per emettere scontrini multipli ma raccogliere gli
-ordini in una stampa sola per facilitare i camerieri
+
+Stampante bar/cucina
+=====================
+
+Mettere un led e/o un altro indicatore che segnali quando ci sono file nello
+spooler: a volte la stampante si inceppa, quindi non si sa se semplicemente
+non ci sono ordini in arrivo o se si è inceppata.
+
+Da CUPS a volte risultano stampe cancellate (ad esempio se spegniamo e
+riaccendiamo la stampante), ma dal "nome" della stampa non si capisce quali
+ordini mancano. Magari c'è un modo per associare un nome più significativo ai
+vari jobs?
+
 
 
 Self test
@@ -37,10 +42,4 @@ Fare una paginetta che contiene i log, così da poterli leggere facilmente. "I
 am still alive" dello spooler non serve a nulla così frequente, magari
 metterlo una volta ogni 5 minuti o giù di lì
 
-
-Ordinazioni dal cell
-=====================
-
-Pagina web da cui poter fare un "pre-ordine", così che la cassiera deve solo
-incassare e fare l'invio vero e proprio
 
