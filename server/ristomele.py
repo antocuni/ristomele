@@ -9,6 +9,13 @@ from flask import current_app
 from server import config
 from server import escpos
 
+# apparently, if you use a long cable, /dev/usb/lp-thermal gets disconnected
+# from time to time and loses the first chars of a print. We this hack, we
+# print enough whitespace at the beginning so that even if some chars are
+# lost, the receipt is still readable. The cost is some wasted paper :(
+LONG_CABLE_HACK = 0
+#LONG_CABLE_HACK = 200
+
 STATIC = config.ROOT.join('server', 'static')
 ristomele = flask.Blueprint('ristomele', __name__)
 
@@ -110,6 +117,8 @@ def do_print_drinks(myorder):
         return # no drinks, no receipt
     #
     receipt = escpos.magic_encode(receipt)
+    if LONG_CABLE_HACK:
+        receipt = ' '*LONG_CABLE_HACK + '\n' + receipt
     txt = spooldir_for('drinks').join('order_%06d.txt' % myorder.id)
     with txt.open('wb') as f:
         f.write(receipt)
