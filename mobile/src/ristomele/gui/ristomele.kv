@@ -222,6 +222,12 @@
         size_hint_x: 1
 
     FlatButton:
+        text: root.order.customer
+        show_border: False
+        on_release: app.show_order(root.order, reload=True)
+        color: root.fgcolor
+
+    FlatButton:
         text: root.order.cashier
         show_border: False
         color: root.fgcolor
