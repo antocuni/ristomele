@@ -9,12 +9,16 @@ from ristomele.gui.error import ErrorMessage
 import encodings_cp858
 
 
-# this is the device class of bluetooth printers, although I could not find
-# any official source for it. See e.g.:
+# I couldn't find any official doc for the device class of bluetooth
+# printers. Many sources seems to indicate the class is 0x680, however our
+# GOOJPRT printer reports as 0x604:
+#
 #    https://stackoverflow.com/questions/45301406/android-bluetooth-printer-connectivity
 #    https://stackoverflow.com/questions/23273355/is-it-possible-to-get-list-of-bluetooth-printers-in-android
 #    http://bluetooth-pentest.narod.ru/software/bluetooth_class_of_device-service_generator.html
-BLUETOOTH_PRINTER_CLASS = 0x680
+#
+#
+BLUETOOTH_PRINTER_CLASS = (0x680, 0x604)
 
 # this is the PDF manual of our printers
 # https://www.slideshare.net/AdaiseNascimento/58-mm-mini-portable-thermal-printer-instruction-manual
@@ -49,7 +53,7 @@ def get_all_printers():
     devices = []
     for device in get_paired_devices():
         cls = device.getBluetoothClass().getDeviceClass()
-        if cls == BLUETOOTH_PRINTER_CLASS:
+        if cls in BLUETOOTH_PRINTER_CLASS:
             devices.append(device)
     return devices
 
@@ -65,7 +69,7 @@ def get_printer(name):
         return None
     #
     cls = printer.getBluetoothClass().getDeviceClass()
-    if cls != BLUETOOTH_PRINTER_CLASS:
+    if cls not in BLUETOOTH_PRINTER_CLASS:
         print 'WARNING: found device %s, but the class is %s instead of %s' % (
             name, hex(cls), hex(BLUETOOTH_PRINTER_CLASS))
         return None

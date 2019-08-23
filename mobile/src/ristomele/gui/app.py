@@ -84,6 +84,7 @@ class RistoMeleApp(App):
                                 filename=resource_find('data/scrolling.json'))
 
     def build(self):
+        #self.bluetooth_info()
         self.print_service = PrintService(app=self)
         self.print_service.start()
         self.exception_handler = MyExceptionHandler()
