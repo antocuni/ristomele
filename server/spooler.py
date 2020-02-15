@@ -4,8 +4,8 @@ Usage: spooler SPOOLDIR [options]
 Options:
 
   -p --printer=DEVICE   The device of the printer [Default: /dev/usb/lp-thermal]
-  --evince              For local development: don't print anything, but
-                        show generated pdfs using evince
+  --pdf                 For local development: don't print anything, but
+                        show generated pdfs using okular
   -h --help             Show help
 """
 
@@ -38,7 +38,7 @@ def setup_logging():
 def main():
     setup_logging()
     args = docopt.docopt(__doc__)
-    evince = args['--evince']
+    show_pdf = args['--pdf']
     spooldir = py.path.local(args['SPOOLDIR'])
     printer = py.path.local(args['--printer'])
     #
@@ -52,7 +52,7 @@ def main():
         i += 1
         if i % 300 == 0:
             logging.info('I am still alive :)')
-        print_orders(orders_dir, evince)
+        print_orders(orders_dir, show_pdf)
         print_drinks(drinks_dir, printer)
         time.sleep(1)
 
@@ -64,10 +64,10 @@ def exec_cmd(cmdline):
         return False
     return True
 
-def print_orders(orders_dir, evince):
+def print_orders(orders_dir, show_pdf):
     print_cmd = 'lp'
-    if evince:
-        print_cmd = 'evince'
+    if show_pdf:
+        print_cmd = 'okular'
     try:
         for html in orders_dir.listdir('*.html'):
             logging.info('Found HTML: %s', html.basename)
