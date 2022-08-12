@@ -81,6 +81,20 @@ appropriate IP):
     http://192.168.1.6:631/
 
 
+Install the app on mobile
+===========================
+
+Visit:
+    http://192.168.1.6:5000/apk/
+
+If you want to install it manually, the correct apk is the following:
+
+$ md5sum mobile/bin/RistoMele-0.1-debug.apk
+6743a4c4c63349cbe9a024685660f6e9  mobile/bin/RistoMele-0.1-debug.apk
+
+$ ls -l --time-style=full mobile/bin/RistoMele-0.1-debug.apk
+-rw-r--r-- 1 pi pi 9780426 2018-08-14 16:14:31.249924765 +0200 mobile/bin/RistoMele-0.1-debug.apk
+
 
 For local development
 ======================

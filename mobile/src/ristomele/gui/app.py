@@ -309,4 +309,3 @@ class RistoMeleApp(App):
 def main():
     iconfonts.init()
     RistoMeleApp().run()
-
