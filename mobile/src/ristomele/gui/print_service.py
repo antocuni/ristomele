@@ -60,7 +60,7 @@ class PrintService(EventDispatcher):
     # ==============================
     # PrintService thread
     # ==============================
-    
+
     def run(self):
         Logger.info('PrintService: thread started')
         while self.running:
@@ -74,10 +74,12 @@ class PrintService(EventDispatcher):
                 if platform == 'android':
                     from ristomele.gui.printer import print_string
                     print_string(printer_name, text)
+                elif platform == 'linux':
+                    from ristomele.gui.linux_printer import print_string
+                    print_string(text)
                 else:
                     print 'Fake connection to the printer...'
                     time.sleep(2)
-                    raise ErrorMessage("problem")
                     print
                     print text
                     print

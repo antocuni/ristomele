@@ -10,6 +10,12 @@
       "section": "ristomele",
       "key": "printer"
     },
+    { "title": "Stampa copia cameriere",
+      "type": "bool",
+      "section": "ristomele",
+      "key": "print_waiter_copy"
+    },
+
     { "title": "Dimensione carattere",
       "type": "numeric",
       "section": "ristomele",
@@ -26,7 +32,7 @@
     { "title": "Porta",
       "type": "string",
       "section": "server",
-      "key": "port" 
+      "key": "port"
     },
     { "title": "Timeout",
       "type": "numeric",

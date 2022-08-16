@@ -58,7 +58,8 @@ class RistoMeleApp(App):
         })
         config.setdefaults('ristomele', {
             'cashier': '',
-            'printer': ''
+            'printer': '',
+            'print_waiter_copy': True,
         })
 
     def get_cashier(self):
@@ -219,11 +220,14 @@ class RistoMeleApp(App):
 
             Sep(name='Vino'),
             Drink(name='Sangria', price=4),
-            Drink(name='Bottiglia rosso ', price=8),
+            Drink(name='Bottiglia Barbera ', price=8),
+            Drink(name='Bottiglia Bonarda ', price=8),
             Drink(name='Bottiglia bianco ', price=8),
-            Drink(name='Bicchiere piccolo rosso ', price=1.5),
+            Drink(name='Bicchiere piccolo Barbera ', price=1.5),
+            Drink(name='Bicchiere piccolo Bonarda ', price=1.5),
             Drink(name='Bicchiere piccolo bianco ', price=1.5),
-            Drink(name='Bicchiere grande rosso ', price=3),
+            Drink(name='Bicchiere grande Barbera ', price=3),
+            Drink(name='Bicchiere grande Bonarda ', price=3),
             Drink(name='Bicchiere grande bianco ', price=3),
 
             Sep(name='Altre bevande'),
@@ -239,7 +243,7 @@ class RistoMeleApp(App):
             Item(name='Caffe', price=1),
         ]
 
-        items = items_13
+        items = items_14
         order = model.Order(table=table, menu=items,
                             cashier=self.get_cashier())
         screen = NewOrderScreen(name='new_order', order=order)
@@ -313,8 +317,12 @@ class RistoMeleApp(App):
                 message="Nessuna stampante configurata",
                 description="Selezionarne una nella schermata opzioni")
         s = order.as_textual_receipt()
-        s += '\n\n\n%s\n\n\n' % ('-'*32)
-        s += order.as_textual_receipt(title='COPIA CAMERIERE')
+
+        ## opt = self.config.get('ristomele', 'print_waiter_copy')
+        ## if opt and opt != '0':
+        if True:
+            s += '\n\n\n%s\n\n\n' % ('-'*32)
+            s += order.as_textual_receipt(title='COPIA CAMERIERE')
         self.print_service.submit(printer_name, s)
 
     def bluetooth_info(self):
