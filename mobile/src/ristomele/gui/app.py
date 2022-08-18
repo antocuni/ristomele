@@ -225,6 +225,7 @@ class RistoMeleApp(App):
 
         if self.is_sagra:
             s = order.as_textual_receipt(self)
+            s += '\n.\n.\n.' # leave some space for easier cutting
         else:
             s = order.as_textual_receipt(self, title='COPIA CLIENTE')
             s += '\n\n\n%s\n\n\n' % ('-'*32)
