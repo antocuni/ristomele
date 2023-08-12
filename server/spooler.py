@@ -72,7 +72,7 @@ def print_orders(orders_dir, show_pdf):
         for html in orders_dir.listdir('*.html'):
             logging.info('Found HTML: %s', html.basename)
             pdf = html.new(ext='pdf')
-            if not exec_cmd('wkhtmltopdf "%s" "%s"' % (html, pdf)):
+            if not exec_cmd('wkhtmltopdf --page-size A5 "%s" "%s"' % (html, pdf)):
                 continue
             if not exec_cmd('%s "%s"' % (print_cmd, pdf)):
                 continue

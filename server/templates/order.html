@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="{{static}}/bootstrap.min.css">
   </head>
 
-  <body style="font-size: 14pt">
+  <body style="font-size: 11pt">
     <div class="container">
       {% if reprint %}
       <h1 class="text-center">RISTAMPA</h1>
@@ -34,11 +34,11 @@
 
       <br>
       <br>
-      
+
       <div class="row">
         {% for column_content in columns %}
         <div class="col-xs-6">
-        <table class="table table-condensed" style="font-size: 13pt">
+        <table class="table table-condensed" style="font-size: 10pt">
           {% for item in column_content %}
             {% if item.kind == 'separator' %}
               <tr>
