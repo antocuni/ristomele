@@ -191,26 +191,29 @@ class RistoMeleApp(App):
         items_14 = [
             Item(name='Coperto', price=1.5),
             Sep(name='Primi'),
-            Item(name='Ravioli au Tuccu', price=7.5),
-            Item(name='Ravioli nel vino', price=7.5),
-            Item(name='Trenette al pesto', price=6),
+            Item(name='Ravioli au Tuccu', price=8),
+            Item(name='Trenette al pesto', price=6.5),
 
             Sep(name='Secondi'),
             Item(name='Salsiccia', price=4),
             Item(name='Salsiccia + patatine', price=5),
             Item(name='Salsiccia + pomodori', price=5),
+            Item(name='Salsiccia + verdure', price=5),
 
             Item(name='Porchetta', price=4),
             Item(name='Porchetta + patatine', price=5),
             Item(name='Porchetta + pomodori', price=5),
+            Item(name='Porchetta + verdure', price=5),
 
             Item(name='Arrosto', price=5),
             Item(name='Arrosto + patatine', price=6),
             Item(name='Arrosto + pomodori', price=6),
+            Item(name='Arrosto + verdure', price=6),
 
             Sep(name='Contorni'),
             Item(name='Patatine fritte', price=2.5),
             Item(name='Pomodori', price=2),
+            Item(name='Verdure grigliate', price=2.5),
 
             Sep(name='Dolci'),
             Item(name='Panna cotta caramello', price=3),
@@ -232,6 +235,7 @@ class RistoMeleApp(App):
 
             Sep(name='Altre bevande'),
             Drink(name='Birra alla spina PILS', price=5),
+            Drink(name='Birra alla spina WEISS', price=5),
             Drink(name='Bicchiere Spuma', price=0.5),
             Drink(name='Coca Cola', price=2),
             Drink(name='Aranciata', price=2),

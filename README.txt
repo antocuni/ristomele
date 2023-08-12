@@ -75,7 +75,7 @@ a different manufacturer.
 Laser printer / CUPS
 ====================
 
-The laster printer is managed by CUPS; you can set it up by visting (using the
+The laser printer is managed by CUPS; you can set it up by visting (using the
 appropriate IP):
 
     http://192.168.1.6:631/
