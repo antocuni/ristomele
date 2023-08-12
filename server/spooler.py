@@ -38,7 +38,7 @@ def setup_logging():
 def main():
     setup_logging()
     args = docopt.docopt(__doc__)
-    show_pdf = args['--pdf']
+    keep_pdf = args['--pdf']
     spooldir = py.path.local(args['SPOOLDIR'])
     printer = py.path.local(args['--printer'])
     #
@@ -52,7 +52,7 @@ def main():
         i += 1
         if i % 300 == 0:
             logging.info('I am still alive :)')
-        print_orders(orders_dir, show_pdf)
+        print_orders(orders_dir, keep_pdf)
         print_drinks(drinks_dir, printer)
         time.sleep(1)
 
@@ -64,21 +64,27 @@ def exec_cmd(cmdline):
         return False
     return True
 
-def print_orders(orders_dir, show_pdf):
+def print_orders(orders_dir, keep_pdf):
     print_cmd = 'lp'
-    if show_pdf:
-        print_cmd = 'okular'
+    ## if show_pdf:
+    ##     print_cmd = 'okular'
     try:
         for html in orders_dir.listdir('*.html'):
             logging.info('Found HTML: %s', html.basename)
             pdf = html.new(ext='pdf')
             if not exec_cmd('wkhtmltopdf --page-size A5 "%s" "%s"' % (html, pdf)):
                 continue
-            if not exec_cmd('%s "%s"' % (print_cmd, pdf)):
-                continue
-            logging.info('Removing %s and %s', html.basename, pdf.basename)
-            html.remove()
-            pdf.remove()
+            if keep_pdf:
+                keep_dir = py.path.local('/tmp/printed_orders').ensure(dir=True)
+                pdf.copy(keep_dir)
+                html.remove()
+                pdf.remove()
+            else:
+                if not exec_cmd('%s "%s"' % (print_cmd, pdf)):
+                    continue
+                logging.info('Removing %s and %s', html.basename, pdf.basename)
+                html.remove()
+                pdf.remove()
     except:
         logging.exception('ERROR!')
 

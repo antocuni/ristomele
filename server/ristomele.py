@@ -60,7 +60,7 @@ def new_order():
     return flask.jsonify(result='OK', order=myorder.as_dict())
 
 
-@ristomele.route('/orders/<int:order_id>/print/', methods=['POST'])
+@ristomele.route('/orders/<int:order_id>/print/', methods=['GET', 'POST'])
 def reprint_order(order_id):
     from server import model
     myorder = model.Order.query.get(order_id)
