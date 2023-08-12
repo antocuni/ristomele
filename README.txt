@@ -110,3 +110,19 @@ Start the spooler by:
 Start the app by:
   $ cd mobile/
   $ python launcher/main.py
+
+
+
+Rename the bluetooth printers
+==============================
+
+XXX this is not something which I have tried so far, but this is what I have
+found online. It seems you need to send AT commands, and one of them does the rename
+
+- most pages suggest AT*AGLN:
+https://adam-dej.github.io/2014/07/08/scale-interface.html
+https://stackoverflow.com/questions/30625910/how-do-i-renename-a-bluetooth-device
+https://content.u-blox.com/sites/default/files/products/documents/OBS421-OBS418-OLS425BluetoothSPA_ATComManual_%28UBX-15013158%29.pdf
+
+- some page suggest to send AT+NAME:
+https://droiduino-cc.medium.com/changing-arduino-bluetooth-name-if-you-are-using-hc05-module-6f184a242467
