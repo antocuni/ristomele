@@ -45,8 +45,8 @@ class SmartRequests(object):
 def make_bluetooth_printer_setting(**kwargs):
     from kivy.uix.settings import SettingOptions
     if platform == 'android':
-        from ristomele.gui.printer import get_all_printers
-        names = [dev.getName() for dev in get_all_printers()]
+        from ristomele.gui.printer import get_all_printers, get_full_name
+        names = [get_full_name(dev) for dev in get_all_printers()]
     else:
         names = ['<Console>']
     #

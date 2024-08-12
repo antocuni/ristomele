@@ -49,6 +49,12 @@ def print_all_paired_devices():
     for device in get_paired_devices():
         describe_device(device)
 
+def get_full_name(device):
+    """
+    Return a string which contains both the name and the bluetooth address
+    """
+    return '%s\n%s' % (device.getName(), device.getAddress())
+
 def get_all_printers():
     devices = []
     for device in get_paired_devices():
@@ -60,7 +66,7 @@ def get_all_printers():
 def get_printer(name):
     printer = None
     for device in get_paired_devices():
-        if device.getName() == name:
+        if get_full_name(device) == name:
             printer = device
             break
     #
