@@ -198,9 +198,9 @@ class RistoMeleApp(App):
             Drink(name='Acqua frizzante 0.5L', price=1),
             ## Drink(name='Bicchiere Spuma', price=0.5),
             ## Drink(name='Bottiglia Spuma', price=3),
-            Item(name='Amaro camatti', price=3),
-            Item(name='Liquore liquirizia', price=3),
-            Item(name='Caffe', price=1),
+            Drink(name='Amaro camatti', price=3),
+            Drink(name='Liquore liquirizia', price=3),
+            Drink(name='Caffe', price=1),
         ]
 
         # ====== 14/15 agosto, ristorante =====

@@ -20,6 +20,9 @@ LONG_CABLE_HACK = 0
 # receipt
 USE_PDF_FOR_FOOD = False
 
+# do we want to print drinks in the food receipt?
+INCLUDE_DRINKS = False
+
 STATIC = config.ROOT.join('server', 'static')
 ristomele = flask.Blueprint('ristomele', __name__)
 
@@ -109,7 +112,8 @@ def do_print_order_lp(myorder, reprint=False):
     """
     Print the order using a thermal printer
     """
-    receipt = myorder.food_receipt(reprint=reprint)
+    receipt = myorder.food_receipt(reprint=reprint,
+                                   include_drinks=INCLUDE_DRINKS)
     if receipt is None:
         return # no food, no receipt
     #
