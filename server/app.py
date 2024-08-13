@@ -20,6 +20,7 @@ def create_app(dbpath=DB):
     app.config['SPOOLDIR'] = SPOOLDIR
     SPOOLDIR.join('orders').ensure(dir=True)
     SPOOLDIR.join('drinks').ensure(dir=True)
+    SPOOLDIR.join('food').ensure(dir=True)
     app.register_blueprint(srczip)
     app.register_blueprint(ristomele)
     model.db.init_app(app)
@@ -35,4 +36,3 @@ def create_logged_app():
     app = create_app()
     logged_app = WSGILogger(app, [handler], ApacheFormatter())
     return logged_app
-

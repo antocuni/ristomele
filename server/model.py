@@ -106,6 +106,46 @@ class Order(db.Model):
         else:
             return None
 
+    def food_receipt(self, reprint=False):
+        has_food = False
+        lines = []
+        w = lines.append
+        num = self.id or ''
+        if self.date:
+            date = '[%s]' % self.date.strftime('%d/%m %H:%M')
+        else:
+            date = ''
+        #
+        if reprint:
+            w(escpos.big() + 'RISTAMPA')
+        w(escpos.big() + 'Tavolo: %s' % self.table)
+        w(escpos.big() + self.waiter)
+        w('')
+        w(escpos.reset() + 'Numero ordine: %s %s' % (num, date))
+        w('Cassiere: %s' % (self.cashier))
+        w('Cliente: %s' % self.customer)
+        w('')
+        if self.notes:
+            w('Note:')
+            w(self.notes)
+            w('')
+        menu = json.loads(self.menu)
+        for item in menu:
+            if item['count'] > 0:
+                w('%2d %s' % (item['count'], item['name']))
+                if not item['is_drink']:
+                    has_food = True
+        w('')
+        w('')
+        w('')
+        w('')
+        w('')
+        if True or has_food:
+            return '\n'.join(lines)
+        else:
+            return None
+
+
     def get_total(self):
         menu = self._load_menu()
         total = 0

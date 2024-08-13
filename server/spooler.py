@@ -72,7 +72,7 @@ def print_orders(orders_dir, keep_pdf):
         for html in orders_dir.listdir('*.html'):
             logging.info('Found HTML: %s', html.basename)
             pdf = html.new(ext='pdf')
-            if not exec_cmd('wkhtmltopdf --page-size A5 "%s" "%s"' % (html, pdf)):
+            if not exec_cmd('wkhtmltopdf --enable-local-file-access --page-size A5 "%s" "%s"' % (html, pdf)):
                 continue
             if keep_pdf:
                 keep_dir = py.path.local('/tmp/printed_orders').ensure(dir=True)

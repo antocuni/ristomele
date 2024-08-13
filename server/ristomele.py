@@ -16,6 +16,10 @@ from server import escpos
 LONG_CABLE_HACK = 0
 #LONG_CABLE_HACK = 200
 
+# if True, we print using PDF and laser printer. Else, we print a small
+# receipt
+USE_PDF_FOR_FOOD = False
+
 STATIC = config.ROOT.join('server', 'static')
 ristomele = flask.Blueprint('ristomele', __name__)
 
@@ -96,6 +100,29 @@ def filter_menu(menu):
     return res
 
 def do_print_order(myorder, reprint=False):
+    if USE_PDF_FOR_FOOD:
+        do_print_order_pdf(myorder, reprint)
+    else:
+        do_print_order_lp(myorder, reprint)
+
+def do_print_order_lp(myorder, reprint=False):
+    """
+    Print the order using a thermal printer
+    """
+    receipt = myorder.food_receipt(reprint=reprint)
+    if receipt is None:
+        return # no food, no receipt
+    #
+    receipt = escpos.magic_encode(receipt)
+    txt = spooldir_for('food').join('order_%06d.txt' % myorder.id)
+    with txt.open('wb') as f:
+        f.write(receipt)
+
+
+def do_print_order_pdf(myorder, reprint=False):
+    """
+    print the order using PDF/laser printer
+    """
     menu = json.loads(myorder.menu)
     menu = filter_menu(menu)
     html = flask.render_template('order.html',
