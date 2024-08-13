@@ -23,6 +23,14 @@ USE_PDF_FOR_FOOD = False
 # do we want to print drinks in the food receipt?
 INCLUDE_DRINKS = False
 
+# do we want to print "zeneize de me" in the food receipt?
+#
+# XXX I think option is wrong: what it does is to avoid printing zeneize
+# altogheter.  I think that what we want is to avoid printing receipts which
+# include ONLY zeneize. But if we have a zeneize + others, we want to print
+# everything.
+INCLUDE_ZENEIZE = True
+
 STATIC = config.ROOT.join('server', 'static')
 ristomele = flask.Blueprint('ristomele', __name__)
 
@@ -113,7 +121,8 @@ def do_print_order_lp(myorder, reprint=False):
     Print the order using a thermal printer
     """
     receipt = myorder.food_receipt(reprint=reprint,
-                                   include_drinks=INCLUDE_DRINKS)
+                                   include_drinks=INCLUDE_DRINKS,
+                                   include_zeneize=INCLUDE_ZENEIZE)
     if receipt is None:
         return # no food, no receipt
     #

@@ -106,8 +106,17 @@ class Order(db.Model):
         else:
             return None
 
-    def food_receipt(self, reprint=False, include_drinks=True):
-        has_food = False
+    def food_receipt(self, reprint=False, include_drinks=True,
+                     include_zeneize=True):
+        def should_include(item):
+            if item['count'] <= 0:
+                return False
+            if item['is_drink'] and not include_drinks:
+                return False
+            if 'Zeneize' in item['name'] and not include_zeneize:
+                return False
+            return True
+
         lines = []
         w = lines.append
         num = self.id or ''
@@ -130,11 +139,11 @@ class Order(db.Model):
             w(self.notes)
             w('')
         menu = json.loads(self.menu)
+        items_printed = 0
         for item in menu:
-            if item['count'] > 0 and (not item['is_drink'] or include_drinks):
+            if should_include(item):
                 w('%2d %s' % (item['count'], item['name']))
-                if not item['is_drink']:
-                    has_food = True
+                items_printed += 1
         w('')
         w('')
         w('')
@@ -147,7 +156,7 @@ class Order(db.Model):
         w('')
         w('')
 
-        if True or has_food:
+        if items_printed > 0:
             return '\n'.join(lines)
         else:
             return None
