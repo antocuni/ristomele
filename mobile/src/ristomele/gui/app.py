@@ -265,7 +265,7 @@ class RistoMeleApp(App):
             Item(name='Caffe', price=1),
         ]
 
-        items = items_13
+        items = items_14
         order = model.Order(table=table, menu=items,
                             cashier=self.get_cashier())
         screen = NewOrderScreen(name='new_order', order=order)
