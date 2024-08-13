@@ -103,7 +103,7 @@ class RistoMeleApp(App):
     def on_start(self):
         box = MessageBox(title='Avviso',
                          message="Ricordarsi di impostare l'ora sul server")
-        box.open()
+        #box.open()
 
     def on_pause(self):
         return True
