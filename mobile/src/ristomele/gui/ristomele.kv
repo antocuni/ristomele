@@ -403,19 +403,19 @@
             size_hint_y: None
 
             FlatButton:
-                text: "Ristampa" if root.order.is_saved else "Salva"
+                text: "Cibo" if root.order.is_saved else "Salva"
                 on_release: root.save_or_reprint(app)
+
+            FlatButton:
+                text: "Bar"
+                disabled: not root.order.is_saved
+                on_release: app.print_drinks(root.order)
 
             FlatButton:
                 text: "Ricevuta"
                 disabled: not root.order.is_saved
                 on_release: app.print_receipt(root.order)
                 color: Theme.status(app.print_service.status_class)
-
-            FlatButton:
-                text: "Bar"
-                disabled: not root.order.is_saved
-                on_release: app.print_drinks(root.order)
 
             FlatButton:
                 text: "Indietro"
