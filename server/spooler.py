@@ -63,7 +63,7 @@ def main():
         if i % 300 == 0:
             logging.info('I am still alive :)')
         print_html_orders(html_orders_dir, keep_pdf)
-        #print_receipt(drinks_dir, LP_CONFIG['drinks'])
+        print_receipt(drinks_dir, LP_CONFIG['drinks'])
         print_receipt(food_dir, LP_CONFIG['food'])
         time.sleep(1)
 
