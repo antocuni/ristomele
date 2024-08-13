@@ -8,10 +8,15 @@
 # udevadm info -a  -p $(udevadm info -q path -n /dev/usb/lp0)
 
 # for orange and blue printers
-SUBSYSTEMS=="usb", ATTRS{serial}=="Printer", ATTRS{manufacturer}=="STMicroelectronics", SYMLINK+="usb/lp-thermal"
+#SUBSYSTEMS=="usb", ATTRS{serial}=="Printer", ATTRS{manufacturer}=="STMicroelectronics", SYMLINK+="usb/lp-thermal", MODE="0666"
 
 # for goojprt printer
-SUBSYSTEMS=="usb", ATTRS{serial}=="001E00110241341000000128", ATTRS{manufacturer}=="Caysn", SYMLINK+="usb/lp-thermal"
+#SUBSYSTEMS=="usb", ATTRS{serial}=="001E00110241341000000128", ATTRS{manufacturer}=="Caysn", SYMLINK+="usb/lp-thermal", MODE="0666"
+
+# The rules above didn't work, becuase lp-thermal created a symlink to ../bus/usb/ instead of lp. The following were suggested by chatgpt:
+KERNEL=="lp*", ATTRS{serial}=="Printer", ATTRS{manufacturer}=="STMicroelectronics", SYMLINK+="usb/lp-thermal", MODE="0666"
+KERNEL=="lp*", ATTRS{serial}=="001E00110241341000000128", ATTRS{manufacturer}=="Caysn", SYMLINK+="usb/lp-thermal", MODE="0666"
+
 
 # for "big" Aclass" printers
 SUBSYSTEMS=="usb", ATTRS{product}=="Aclass-Printer", SYMLINK+="usb/lp-big"
