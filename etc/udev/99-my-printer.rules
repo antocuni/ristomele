@@ -4,9 +4,15 @@
 # the "parent/root/whatever" usb device, instead of a link to the usblp
 # subsystem
 
+# To find the attributes:
+# udevadm info -a  -p $(udevadm info -q path -n /dev/usb/lp0)
+
 # for orange and blue printers
 SUBSYSTEMS=="usb", ATTRS{serial}=="Printer", ATTRS{manufacturer}=="STMicroelectronics", SYMLINK+="usb/lp-thermal"
 
 # for goojprt printer
 SUBSYSTEMS=="usb", ATTRS{serial}=="001E00110241341000000128", ATTRS{manufacturer}=="Caysn", SYMLINK+="usb/lp-thermal"
-    
+
+# for "big" Aclass" printers
+SUBSYSTEMS=="usb", ATTRS{product}=="Aclass-Printer", SYMLINK+="usb/lp-big"
+SUBSYSTEMS=="usb", ATTRS{serial}=="Aclass-8888-12340", SYMLINK+="usb/lp-aclass-1"
