@@ -1,6 +1,8 @@
 """
 Usage: spooler SPOOLDIR [options]
 
+XXX --printer is ignored!
+
 Options:
 
   -p --printer=DEVICE   The device of the printer [Default: /dev/usb/lp-thermal]
@@ -22,6 +24,12 @@ import logging
 from server import config
 LOGFILE = config.ROOT.join('log', 'spooler.log')
 
+LP_CONFIG = {
+    'drinks': '/dev/usb/lp-thermal',
+    'food': '/dev/usb/lp-big',
+}
+
+
 def setup_logging():
     formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s',
                                   datefmt='%m/%d/%Y %H:%M:%S')
@@ -40,20 +48,23 @@ def main():
     args = docopt.docopt(__doc__)
     keep_pdf = args['--pdf']
     spooldir = py.path.local(args['SPOOLDIR'])
-    printer = py.path.local(args['--printer'])
+    #printer = py.path.local(args['--printer'])
     #
     logging.info('Spooler starting')
     logging.info('spooldir: %s', spooldir)
-    logging.info('printer: %s', printer)
-    orders_dir = spooldir.join('orders').ensure(dir=True)
+    #logging.info('printer: %s', printer)
+    logging.info('printer: %s', LP_CONFIG)
+    html_orders_dir = spooldir.join('orders').ensure(dir=True)
     drinks_dir = spooldir.join('drinks').ensure(dir=True)
+    food_dir = spooldir.join('food').ensure(dir=True)
     i = 0
     while True:
         i += 1
         if i % 300 == 0:
             logging.info('I am still alive :)')
-        print_orders(orders_dir, keep_pdf)
-        print_drinks(drinks_dir, printer)
+        print_html_orders(html_orders_dir, keep_pdf)
+        #print_receipt(drinks_dir, LP_CONFIG['drinks'])
+        print_receipt(food_dir, LP_CONFIG['food'])
         time.sleep(1)
 
 def exec_cmd(cmdline):
@@ -64,7 +75,7 @@ def exec_cmd(cmdline):
         return False
     return True
 
-def print_orders(orders_dir, keep_pdf):
+def print_html_orders(orders_dir, keep_pdf):
     print_cmd = 'lp'
     ## if show_pdf:
     ##     print_cmd = 'okular'
@@ -88,12 +99,12 @@ def print_orders(orders_dir, keep_pdf):
     except:
         logging.exception('ERROR!')
 
-def print_drinks(d, printer):
+def print_receipt(d, printer):
     try:
         for txt in d.listdir('*.txt'):
-            logging.info('Printing %s', txt.basename)
+            logging.info('Printing %s/%s', d.basename, txt.basename)
             content = txt.read()
-            with printer.open('wb') as f:
+            with open(printer, 'wb') as f:
                 f.write(content)
             txt.remove()
             logging.info('DONE')
