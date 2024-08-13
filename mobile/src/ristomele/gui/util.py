@@ -48,6 +48,8 @@ def make_bluetooth_printer_setting(**kwargs):
         from ristomele.gui.printer import get_all_printers, get_full_name
         names = [get_full_name(dev) for dev in get_all_printers()]
     else:
+        # on linux, we use linux_printer.py, which automatically selects the
+        # first /dev/usb/lp* device which is available
         names = ['<Console>']
     #
     options = [''] + names

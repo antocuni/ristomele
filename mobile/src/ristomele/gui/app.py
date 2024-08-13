@@ -322,9 +322,8 @@ class RistoMeleApp(App):
                 description="Selezionarne una nella schermata opzioni")
         s = order.as_textual_receipt()
 
-        ## opt = self.config.get('ristomele', 'print_waiter_copy')
-        ## if opt and opt != '0':
-        if True:
+        opt = self.config.get('ristomele', 'print_waiter_copy')
+        if opt and opt != '0':
             s += '\n\n\n%s\n\n\n' % ('-'*32)
             s += order.as_textual_receipt(title='COPIA CAMERIERE')
         self.print_service.submit(printer_name, s)
