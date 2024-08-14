@@ -9,6 +9,15 @@ from flask import current_app
 from server import config
 from server import escpos
 
+# TODO
+
+# we want an option to select between "sagra" mode and "ristorante" mode.
+# In sagra mode:
+#     - INCLUDE_ZENEIZE = False (but we need to fix it)
+#     - we don't print drinks receipt (not implemented)
+#     - the food receipt should be slightly different: order num should be BIG
+
+
 # apparently, if you use a long cable, /dev/usb/lp-thermal gets disconnected
 # from time to time and loses the first chars of a print. We this hack, we
 # print enough whitespace at the beginning so that even if some chars are
@@ -30,6 +39,7 @@ INCLUDE_DRINKS = False
 # include ONLY zeneize. But if we have a zeneize + others, we want to print
 # everything.
 INCLUDE_ZENEIZE = True
+
 
 STATIC = config.ROOT.join('server', 'static')
 ristomele = flask.Blueprint('ristomele', __name__)

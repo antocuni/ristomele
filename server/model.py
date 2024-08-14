@@ -127,8 +127,9 @@ class Order(db.Model):
         #
         if reprint:
             w(escpos.big() + 'RISTAMPA')
-        w(escpos.big() + 'Ordine: %s %s' % (num, date))
         w(escpos.big() + self.waiter)
+        #w(escpos.big() + 'Ordine: %s %s' % (num, date))
+        w(escpos.reset() + 'Ordine: %s %s' % (num, date))
         w('')
         w(escpos.reset() + 'Tavolo: %s' % self.table)
         w('Cassiere: %s' % (self.cashier))
