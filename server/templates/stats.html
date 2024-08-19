@@ -7,7 +7,13 @@
   <body>
     <div class="container">
       <h1>Statistiche</h1>
-      
+
+        {% if show_money %}
+            <a href="/stats/?hide_money">Nascondi €</a>
+        {% else %}
+            <a href="/stats/">Visualizza €</a>
+        {% endif %}
+
       {% for date, counter in by_item.items() %}
       <div class="row">
         <div class="col-lg-6">
@@ -24,11 +30,13 @@
             <td><b>Ordini</b></td>
             <td>{{total_orders[date]}}</td>
           </tr>
+          {% if show_money %}
           <tr>
             <td><b>Totale</b></td>
             <td>{{total_money[date]}} €</td>
           </tr>
-          
+          {% endif %}
+
           <tr>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
@@ -47,4 +55,3 @@
     </div>
   </body>
 </html>
-

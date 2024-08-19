@@ -234,6 +234,9 @@ def timestamp():
 @ristomele.route('/stats/', methods=['GET'])
 def stats():
     from server import model
+    hide_money = 'hide_money' in flask.request.args
+    show_money = not hide_money
+    #
     total_money = Counter()
     total_orders = Counter()
     by_cashier = defaultdict(Counter)
@@ -254,6 +257,7 @@ def stats():
             item_counter[item['name']] += item['count']
     #
     return flask.render_template('stats.html',
+                                 show_money=show_money,
                                  by_item=by_item,
                                  by_cashier=by_cashier,
                                  total_orders=total_orders,
