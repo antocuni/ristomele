@@ -239,6 +239,7 @@ def stats():
     #
     total_money = Counter()
     total_orders = Counter()
+    total_foc = Counter()
     by_cashier = defaultdict(Counter)
     by_item = defaultdict(Counter)
     orders = model.Order.query.all()
@@ -255,12 +256,15 @@ def stats():
             if item['kind'] != 'item':
                 continue
             item_counter[item['name']] += item['count']
+            if item['name'].startswith('Foc. '):
+                total_foc[dt] += item['count']
     #
     return flask.render_template('stats.html',
                                  show_money=show_money,
                                  by_item=by_item,
                                  by_cashier=by_cashier,
                                  total_orders=total_orders,
+                                 total_foc=total_foc,
                                  total_money=total_money)
 
 @ristomele.route('/static/bootstrap.min.css', methods=['GET'])

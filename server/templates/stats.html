@@ -30,6 +30,12 @@
             <td><b>Ordini</b></td>
             <td>{{total_orders[date]}}</td>
           </tr>
+          {% if total_foc[date] %}
+          <tr>
+            <td><b>Totale focaccini</b></td>
+            <td>{{total_foc[date]}}</td>
+          </tr>
+          {% endif %}
           {% if show_money %}
           <tr>
             <td><b>Totale</b></td>
