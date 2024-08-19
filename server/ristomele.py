@@ -260,6 +260,7 @@ def stats():
                 total_foc[dt] += item['count']
     #
     return flask.render_template('stats.html',
+                                 sorted=sorted,
                                  show_money=show_money,
                                  by_item=by_item,
                                  by_cashier=by_cashier,

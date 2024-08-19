@@ -10,11 +10,9 @@
 
         {% if show_money %}
             <a href="/stats/?hide_money">Nascondi €</a>
-        {% else %}
-            <a href="/stats/">Visualizza €</a>
         {% endif %}
 
-      {% for date, counter in by_item.items() %}
+      {% for date, counter in sorted(by_item.items(), reverse=True) %}
       <div class="row">
         <div class="col-lg-6">
         <h2>{{date.strftime("%d/%m/%Y")}}</h2>
