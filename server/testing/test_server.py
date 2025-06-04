@@ -121,26 +121,26 @@ class TestServer(object):
             assert myorder.customer == ex['customer']
 
     def test_new_order_spooldir(self, client, spooldir, example_order_data):
-        orders_dir = spooldir.join('orders')
+        food_dir = spooldir.join('food')
         drinks_dir = spooldir.join('drinks')
-        html = orders_dir.join('order_000001.html')
-        txt = drinks_dir.join('order_000001.txt')
+        food_txt = food_dir.join('order_000001.txt')
+        drinks_txt = drinks_dir.join('order_000001.txt')
         #
-        assert self.dir_is_empty(orders_dir)
+        assert self.dir_is_empty(food_dir)
         assert self.dir_is_empty(drinks_dir)
         resp = client.post('/orders/', json=example_order_data)
-        assert orders_dir.listdir() == [html]
-        assert drinks_dir.listdir() == [txt]
+        assert food_dir.listdir() == [food_txt]
+        assert drinks_dir.listdir() == [drinks_txt]
         #
-        html.remove()
+        food_txt.remove()
         resp = client.post('/orders/1/print/')
         assert resp.status_code == 200
-        assert orders_dir.listdir() == [html]
+        assert food_dir.listdir() == [food_txt]
         #
-        txt.remove()
+        drinks_txt.remove()
         resp = client.post('/orders/1/print_drinks/')
         assert resp.status_code == 200
-        assert drinks_dir.listdir() == [txt]
+        assert drinks_dir.listdir() == [drinks_txt]
 
     def test_print_drinks_only_if_any(self, client, spooldir, example_order_data):
         # remove the only drink the the menu
