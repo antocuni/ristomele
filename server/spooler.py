@@ -1,14 +1,10 @@
 """
 Usage: spooler SPOOLDIR [options]
 
-XXX --printer is ignored!
-
 Options:
 
-  -p --printer=DEVICE   The device of the printer [Default: /dev/usb/lp-thermal]
-  --pdf                 For local development: don't print anything, but
-                        show generated pdfs using okular
-  -h --help             Show help
+  --dev        Development mode
+  -h --help    Show help
 """
 
 # NOTE: by default we print to /dev/usb/lp-thermal: this is a symlink which is
@@ -46,9 +42,11 @@ def setup_logging():
 def main():
     setup_logging()
     args = docopt.docopt(__doc__)
-    keep_pdf = args['--pdf']
     spooldir = py.path.local(args['SPOOLDIR'])
-    #printer = py.path.local(args['--printer'])
+    keep_pdf = args['--dev']
+    if args['--dev']:
+        for key in LP_CONFIG:
+            LP_CONFIG[key] = '/dev/tty'
     #
     logging.info('Spooler starting')
     logging.info('spooldir: %s', spooldir)
@@ -60,7 +58,7 @@ def main():
     i = 0
     while True:
         i += 1
-        if i % 300 == 0:
+        if i % 600 == 0:
             logging.info('I am still alive :)')
         print_html_orders(html_orders_dir, keep_pdf)
         print_receipt(drinks_dir, LP_CONFIG['drinks'])

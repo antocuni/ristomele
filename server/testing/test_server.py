@@ -135,6 +135,7 @@ class TestModel(object):
         order.menu = json.dumps([
             dict(kind='item', name='Birra', count=1, price=3, is_drink=True),
             dict(kind='item', name='Zeneize de me', count=1, price=3, is_drink=False),
+            dict(kind='item', name='Dummy', count=0, price=3, is_drink=False),
         ])
         assert order.is_fila_A()
         assert order.food_receipt() is None

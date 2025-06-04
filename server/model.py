@@ -116,7 +116,7 @@ class Order(db.Model):
         for item in menu:
             is_drink = item['is_drink']
             is_zeneize = 'Zeneize' in item['name']
-            if not is_drink and not is_zeneize:
+            if item['count'] > 0 and not is_drink and not is_zeneize:
                 return False
         return True
 
