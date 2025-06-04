@@ -92,6 +92,34 @@ class TestModel(object):
         order_dict = order.as_dict()
         assert order_dict['menu'] is None
 
+    def test_drink_receipt(self):
+        # an order with drinks
+        order = model.Order(
+            table='11',
+            cashier='gian',
+            waiter='anto',
+            menu=json.dumps([
+                dict(kind='item', name='Birra', count=1, price=3, is_drink=True),
+                dict(kind='item', name='Pasta', count=1, price=10, is_drink=False),
+            ])
+        )
+        assert order.drink_receipt() is not None
+        #
+        # an order without drinks
+        order = model.Order(
+            table='11',
+            cashier='gian',
+            waiter='anto',
+            menu=json.dumps([
+                dict(kind='item', name='Pasta', count=1, price=10, is_drink=False),
+            ])
+        )
+        assert order.drink_receipt() is None
+
+
+
+
+
 
 class TestServer(object):
 
