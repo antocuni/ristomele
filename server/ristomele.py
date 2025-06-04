@@ -122,7 +122,8 @@ def filter_menu(menu):
 
 def do_print_order(myorder, reprint=False):
     if USE_PDF_FOR_FOOD:
-        do_print_order_pdf(myorder, reprint)
+        assert False, 'uncomment do_print_order_pdf'
+        #do_print_order_pdf(myorder, reprint)
     else:
         do_print_order_lp(myorder, reprint)
 
@@ -142,23 +143,23 @@ def do_print_order_lp(myorder, reprint=False):
         f.write(receipt)
 
 
-def do_print_order_pdf(myorder, reprint=False):
-    """
-    print the order using PDF/laser printer
-    """
-    menu = json.loads(myorder.menu)
-    menu = filter_menu(menu)
-    html = flask.render_template('order.html',
-                                 static=str(STATIC),
-                                 reprint=reprint,
-                                 order=myorder,
-                                 columns=split_columns(menu))
-    #
-    html_file = spooldir_for('orders').join('order_%06d.html' % myorder.id)
-    with html_file.open('wb') as f:
-        f.write(html.encode('utf8'))
-    #
-    # XXX: reimplement the evince preview functionality
+## def do_print_order_pdf(myorder, reprint=False):
+##     """
+##     print the order using PDF/laser printer
+##     """
+##     menu = json.loads(myorder.menu)
+##     menu = filter_menu(menu)
+##     html = flask.render_template('order.html',
+##                                  static=str(STATIC),
+##                                  reprint=reprint,
+##                                  order=myorder,
+##                                  columns=split_columns(menu))
+##     #
+##     html_file = spooldir_for('orders').join('order_%06d.html' % myorder.id)
+##     with html_file.open('wb') as f:
+##         f.write(html.encode('utf8'))
+##     #
+##     # XXX: reimplement the evince preview functionality
 
 
 def do_print_drinks(myorder):
