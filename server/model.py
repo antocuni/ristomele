@@ -2,6 +2,7 @@ from datetime import datetime
 import json
 from flask_sqlalchemy import SQLAlchemy
 from server import escpos
+from server import config
 db = SQLAlchemy()
 
 class Table(db.Model):
@@ -106,14 +107,27 @@ class Order(db.Model):
         else:
             return None
 
-    def food_receipt(self, reprint=False, include_drinks=True,
-                     include_zeneize=True):
+    def is_fila_A(self):
+        """
+        Only for Sagra: this is a "fila A" order only if it contains only
+        drinks and "Zeneize"
+        """
+        menu = json.loads(self.menu)
+        for item in menu:
+            is_drink = item['is_drink']
+            is_zeneize = 'Zeneize' in item['name']
+            if not is_drink and not is_zeneize:
+                return False
+        return True
+
+    def food_receipt(self, reprint=False):
+        if config.MODE == 'sagra' and self.is_fila_A():
+            return None # don't print
+
         def should_include(item):
             if item['count'] <= 0:
                 return False
-            if item['is_drink'] and not include_drinks:
-                return False
-            if 'Zeneize' in item['name'] and not include_zeneize:
+            if item['is_drink'] and config.MODE == 'sagra':
                 return False
             return True
 
@@ -127,11 +141,15 @@ class Order(db.Model):
         #
         if reprint:
             w(escpos.big() + 'RISTAMPA')
-        w(escpos.big() + self.waiter)
-        #w(escpos.big() + 'Ordine: %s %s' % (num, date))
-        w(escpos.reset() + 'Ordine: %s %s' % (num, date))
-        w('')
-        w(escpos.reset() + 'Tavolo: %s' % self.table)
+
+        if config.MODE == 'sagra':
+            w(escpos.big() + 'Ordine: %s %s' % (num, date))
+        else:
+            w(escpos.big() + self.waiter)
+            w(escpos.reset() + 'Ordine: %s %s' % (num, date))
+            w('')
+            w(escpos.reset() + 'Tavolo: %s' % self.table)
+
         w('Cassiere: %s' % (self.cashier))
         w('Cliente: %s' % self.customer)
         w('')

@@ -7,6 +7,7 @@ import json
 from freezegun import freeze_time
 from server.app import create_app
 from server import model
+from server import config
 
 @pytest.fixture
 def spooldir(tmpdir):
@@ -115,6 +116,41 @@ class TestModel(object):
             ])
         )
         assert order.drink_receipt() is None
+
+    def test_sagra(self, monkeypatch):
+        monkeypatch.setattr(config, 'MODE', 'sagra')
+        # order with only drinks
+        order = model.Order(
+            table='11',
+            cashier='gian',
+            waiter='anto',
+            menu=json.dumps([
+                dict(kind='item', name='Birra', count=1, price=3, is_drink=True),
+            ])
+        )
+        assert order.is_fila_A()
+        assert order.food_receipt() is None
+        #
+        # order with drinks + Zeneize
+        order.menu = json.dumps([
+            dict(kind='item', name='Birra', count=1, price=3, is_drink=True),
+            dict(kind='item', name='Zeneize de me', count=1, price=3, is_drink=False),
+        ])
+        assert order.is_fila_A()
+        assert order.food_receipt() is None
+        #
+        # drinks + Zeneize + Nutella: we print Zeneize and Nutella, NOT drinks
+        order.menu = json.dumps([
+            dict(kind='item', name='Birra', count=1, price=3, is_drink=True),
+            dict(kind='item', name='Zeneize de me', count=1, price=3, is_drink=False),
+            dict(kind='item', name='Foc. Nutella', count=1, price=3, is_drink=False),
+        ])
+        assert not order.is_fila_A()
+        s = order.food_receipt()
+        assert s is not None
+        assert 'Birra' not in s
+        assert 'Zeneize de me' in s
+        assert 'Foc. Nutella' in s
 
 
 
