@@ -39,6 +39,8 @@ class RistoMeleApp(App):
     std_height = AliasProperty(lambda self: self.font_size * 2,
                                bind=['font_size'])
 
+    columns = ConfigParserProperty(1, 'ristomele', 'columns', 'app',
+                                   val_type=int)
 
     def get_application_config(self):
         root = pypath.local(ristomele.__file__).dirpath().dirpath().dirpath()
@@ -62,6 +64,7 @@ class RistoMeleApp(App):
             'cashier': '',
             'printer': '',
             'print_waiter_copy': True,
+            'columns': 1,
         })
 
     def get_cashier(self):

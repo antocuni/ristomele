@@ -321,9 +321,26 @@
             height: app.std_height*2 if self.text else app.std_height
             multiline: True
 
-        ListView:
-            id: item_list
-            adapter: ListAdapter(data=root.order.menu, cls=root.item_class, args_converter=lambda i, x: {'x': x})
+        # TEMP: uncomment this to restore the single-column layout
+        # ListView:
+        #     id: item_list
+        #     adapter: ListAdapter(data=root.order.menu, cls=root.item_class, args_converter=lambda i, x: {'x': x})
+
+        # TEMP: comment this to restore the single-column layout
+        # TEMP: see also order.py:NewOrderScreen:on_enter
+        ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+
+            GridLayout:
+                id: item_grid
+                cols: app.columns
+                spacing: dp(8)
+                padding: dp(8)
+                size_hint_y: None
+                row_default_height: app.std_height
+                row_force_default: True
+                height: self.minimum_height
 
         BoxLayout:
             id: layout

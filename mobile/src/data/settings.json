@@ -22,6 +22,12 @@
       "key": "font_size"
     },
 
+    { "title": "Numero colonne",
+      "type": "numeric",
+      "section": "ristomele",
+      "key": "columns"
+    },
+
     { "title": "Sync server", "type": "title"},
     { "title": "Indirizzo",
       "type": "string",

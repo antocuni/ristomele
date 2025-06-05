@@ -1,3 +1,4 @@
+from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
@@ -13,9 +14,6 @@ class OrderListScreen(MyScreen):
     orders = ListProperty()
 
 
-
-
-
 class MenuItem(BoxLayout):
     item = ObjectProperty()
 
@@ -25,6 +23,39 @@ class MenuSeparator(BoxLayout):
 
 class NewOrderScreen(MyScreen):
     order = ObjectProperty()
+
+    # TEMP: comment out if we don't want to support multiple columns. See also
+    # ristomele.kv:NewOrderScreen
+    def on_enter(self):
+        grid = self.ids.item_grid
+        grid.clear_widgets()
+
+        num_columns = grid.cols  # Automatically get number of columns from layout
+        col = 0  # Track current column position in the row
+
+        for index, menu_item in enumerate(self.order.menu):
+            if menu_item.kind == 'separator':
+                # If not at start of row, pad with empty widgets to align separator
+                if col != 0:
+                    for _ in range(num_columns - col):
+                        grid.add_widget(Widget(size_hint_y=None, height=0))
+                # Add separator widget (should span full row visually)
+                separator = MenuSeparator(item=menu_item)
+                separator.size_hint_x = 1
+                separator.size_hint_y = None
+                if not hasattr(separator, 'height'):
+                    separator.height = app.std_height  # fallback
+                grid.add_widget(separator)
+                # Pad the rest of the row so it aligns
+                for _ in range(num_columns - 1):
+                    grid.add_widget(Widget(size_hint_y=None, height=0))
+                col = 0  # Reset column counter
+            else:
+                widget = MenuItem(item=menu_item)
+                grid.add_widget(widget)
+                col += 1
+                if col >= num_columns:
+                    col = 0
 
     def item_class(self, x, index):
         if x.kind == 'item':
