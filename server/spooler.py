@@ -7,8 +7,8 @@ Options:
   -h --help    Show help
 """
 
-# NOTE: by default we print to /dev/usb/lp-thermal: this is a symlink which is
-# created by a custom udev rule: look at etc/udev/*
+# XXX: I don't know what happens if we disconnect/reconnect an LP while the
+# spooler is running
 
 import sys
 import os
@@ -18,12 +18,60 @@ import py
 import docopt
 import logging
 from server import config
+from server.printers import LPrinter, LPMatch
 LOGFILE = config.ROOT.join('log', 'spooler.log')
 
-LP_CONFIG = {
-    'drinks': '/dev/usb/lp-thermal',
-    'food': '/dev/usb/lp-big',
+LP_CONFIG = {}
+LP_PREFERENCE = {
+    'food': [
+        LPMatch(serial="Aclass-8888-12340"),
+    ],
+    'drinks': [
+        LPMatch(vendor="STMicroelectronics", serial="Printer")
+    ]
 }
+
+def init_LP_CONFIG():
+    global LP_CONFIG
+    LP_CONFIG = {}
+    role_to_printer = find_best_printers(LPrinter.all(), LP_PREFERENCE)
+    for role in LP_PREFERENCE:
+        LP_CONFIG[role] = role_to_printer.get(role)
+
+
+def find_best_printers(available_printers, role_preferences):
+    """
+    Returns a dict mapping role name to the best available printer,
+    ensuring no printer is assigned to more than one role.
+    """
+    assigned_printers = set()
+    role_to_printer = {}
+
+    for role, preferences in role_preferences.items():
+        # Try preferred matches first
+        for pref in preferences:
+            for printer in available_printers:
+                if printer in assigned_printers:
+                    continue
+                if pref == printer:
+                    role_to_printer[role] = printer
+                    assigned_printers.add(printer)
+                    break
+            if role in role_to_printer:
+                break
+
+    # Fallback: assign first unassigned printer
+    for role in role_preferences:
+        if role not in role_to_printer:
+            for printer in available_printers:
+                if printer not in assigned_printers:
+                    role_to_printer[role] = printer
+                    assigned_printers.add(printer)
+                    break
+
+    return role_to_printer
+
+
 
 
 def setup_logging():
@@ -41,6 +89,7 @@ def setup_logging():
 
 def main():
     setup_logging()
+    init_LP_CONFIG()
     args = docopt.docopt(__doc__)
     spooldir = py.path.local(args['SPOOLDIR'])
     keep_pdf = args['--dev']
@@ -50,8 +99,7 @@ def main():
     #
     logging.info('Spooler starting')
     logging.info('spooldir: %s', spooldir)
-    #logging.info('printer: %s', printer)
-    logging.info('printer: %s', LP_CONFIG)
+    logging.info('LP_CONFIG: %s', LP_CONFIG)
     html_orders_dir = spooldir.join('orders').ensure(dir=True)
     drinks_dir = spooldir.join('drinks').ensure(dir=True)
     food_dir = spooldir.join('food').ensure(dir=True)
