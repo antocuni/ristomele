@@ -50,7 +50,7 @@ def make_bluetooth_printer_setting(**kwargs):
     else:
         # on linux, we use linux_printer.py, which automatically selects the
         # first /dev/usb/lp* device which is available
-        names = ['<Console>']
+        names = ['<Auto>', '<Console>']
     #
     options = [''] + names
     return SettingOptions(options=options, **kwargs)

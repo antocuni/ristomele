@@ -6,6 +6,8 @@ Foc = lambda name, price: model.MenuItem(name='Foc. '+ name, price=price)
 Sep = lambda name: model.MenuItem(kind='separator', name=name)
 
 def get_menu():
+    # REMEMBER TO CHANGE config.mode between 'sagra' and 'ristorante'
+    #
     #return menu_13_agosto()
     #return menu_14_agosto()
     return menu_sagra()

@@ -80,7 +80,7 @@ class ShowOrderScreen(MyScreen):
             # save
             new_order = app.submit_order(self.order)
             self.order = new_order
-            self.ids.content.text = new_order.as_textual_receipt()
+            self.ids.content.text = new_order.as_textual_receipt(app)
             app.print_receipt(new_order)
 
     def go_back_dwim(self, app):

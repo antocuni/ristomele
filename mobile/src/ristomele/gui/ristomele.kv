@@ -401,7 +401,7 @@
             size_hint_y: 1
             MyLabel:
                 id: content
-                text: root.order.as_textual_receipt()
+                text: root.order.as_textual_receipt(app, use_escpos=False)
                 height: self.texture_size[1]
                 size_hint_y: None
                 color: (0, 0, 0, 1)

@@ -222,11 +222,14 @@ class RistoMeleApp(App):
             raise ErrorMessage(
                 message="Nessuna stampante configurata",
                 description="Selezionarne una nella schermata opzioni")
-        s = order.as_textual_receipt()
 
-        if not self.is_sagra:
+        if self.is_sagra:
+            s = order.as_textual_receipt(self)
+        else:
+            s = order.as_textual_receipt(self, title='COPIA CLIENTE')
             s += '\n\n\n%s\n\n\n' % ('-'*32)
-            s += order.as_textual_receipt(title='COPIA CAMERIERE')
+            s += order.as_textual_receipt(self, title='COPIA CAMERIERE')
+
         self.print_service.submit(printer_name, s)
 
     def bluetooth_info(self):

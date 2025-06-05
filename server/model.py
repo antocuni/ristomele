@@ -109,6 +109,9 @@ class Order(db.Model):
 
     def is_fila_A(self):
         """
+        THIS LOGIC MUST BE MANUALLY KEPT IN SYNC WITH
+        mobile/src/gui//model.py:is_fila_A()
+
         Only for Sagra: this is a "fila A" order only if it contains only
         drinks and "Zeneize"
         """

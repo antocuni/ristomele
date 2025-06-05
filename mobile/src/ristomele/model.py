@@ -1,5 +1,6 @@
 #-*- encoding: utf-8 -*-
 
+from ristomele import escpos
 from datetime import datetime
 from kivy.event import EventDispatcher
 from kivy.properties import (StringProperty, ObjectProperty, ListProperty,
@@ -116,22 +117,49 @@ class Order(EventDispatcher):
             total += item.count * item.price
         return total
 
-    def _receipt_info(self, w):
+    def is_fila_A(self):
+        """
+        THIS LOGIC MUST BE MANUALLY KEPT IN SYNC WITH
+        server/model.py:is_fila_A()
+
+        Only for Sagra: this is a "fila A" order only if it contains only
+        drinks and "Zeneize"
+        """
+        for item in self.menu:
+            is_drink = item.is_drink
+            is_zeneize = 'Zeneize' in item.name
+            if item.count > 0 and not is_drink and not is_zeneize:
+                return False
+        return True
+
+    def _receipt_info(self, app, w, use_escpos):
         num = self.id or ''
         if self.date:
             date = u'[%s]' % self.date.strftime('%d/%m %H:%M')
         else:
             date = u''
-        w(u'Numero ordine: %s %s' % (num, date))
-        w(u'Tavolo: %s [%s]' % (self.table.name, self.table.waiter))
-        w(u'Cassiere: %s' % (self.cashier))
-        w(u'Cliente: %s' % self.customer)
 
-    def as_textual_receipt(self, width=32, title=u'COPIA CLIENTE'):
+        if app.is_sagra:
+            fila = u'Fila A' if self.is_fila_A() else u'Fila B'
+            if use_escpos:
+                w(escpos.big() + fila)
+                w(escpos.reset())
+            else:
+                w(fila)
+            w(u'Numero ordine: %s %s' % (num, date))
+            w(u'Cassiere: %s' % (self.cashier))
+            w(u'Cliente: %s' % self.customer)
+        else:
+            w(u'Numero ordine: %s %s' % (num, date))
+            w(u'Tavolo: %s [%s]' % (self.table.name, self.table.waiter))
+            w(u'Cassiere: %s' % (self.cashier))
+            w(u'Cliente: %s' % self.customer)
+
+    def as_textual_receipt(self, app, width=32, title=u'', use_escpos=True):
         lines = []
         w = lines.append
         w(title)
-        self._receipt_info(w)
+        self._receipt_info(app, w, use_escpos)
         w('')
         for item in self.menu:
             if item.kind != 'item':
