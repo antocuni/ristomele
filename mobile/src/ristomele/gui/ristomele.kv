@@ -65,7 +65,7 @@
 
         FlatButton:
             text: "Nuovo ordine" if app.is_sagra else "Mappa tavoli"
-            on_release: app.show_tables()
+            on_release: app.new_order_or_show_tables()
 
         FlatButton:
             text: "Lista ordini"

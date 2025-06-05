@@ -14,6 +14,7 @@ def menu_sagra():
     return [
         Sep('Focaccini'),
         Foc('Zeneize de Me', 2),
+        Foc('Zeneize de Me + zucchero', 2),
         Foc('Boscaiolo e cotto', 5.5),
         Foc('Boscaiolo e crudo', 5.5),
         Foc('Boscaiolo e speck', 5.5),

@@ -131,12 +131,17 @@ class RistoMeleApp(App):
         screen = OrderListScreen(name='list_orders', orders=orders)
         self.root.open(screen)
 
-    def show_tables(self):
+    def new_order_or_show_tables(self):
         # this is a bit magic: it always "unwind" the screenmanager stack to
         # make sure that the tables screen is immediately above the main.
         self.root.unwind('main')
-        tables = TablesScreen(name='tables', restaurant=self.load_restaurant())
-        self.root.open(tables)
+
+        if self.is_sagra:
+            table = model.Table(name="N/A", waiter="N/A")
+            self.new_order(table)
+        else:
+            tables = TablesScreen(name='tables', restaurant=self.load_restaurant())
+            self.root.open(tables)
 
     def edit_tables(self):
         screen = EditTablesScreen(name='edit_tables',
