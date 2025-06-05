@@ -64,7 +64,7 @@
             text: "Menu Principale"
 
         FlatButton:
-            text: "Mappa tavoli"
+            text: "Nuovo ordine" if app.is_sagra else "Mappa tavoli"
             on_release: app.show_tables()
 
         FlatButton:

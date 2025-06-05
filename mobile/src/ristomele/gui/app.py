@@ -42,6 +42,11 @@ class RistoMeleApp(App):
     columns = ConfigParserProperty(1, 'ristomele', 'columns', 'app',
                                    val_type=int)
 
+
+    # NOTE: we need to use val_type=int, because kivy is buggy with val_type=bool
+    is_sagra = ConfigParserProperty(1, 'ristomele', 'is_sagra', 'app',
+                                    val_type=int)
+
     def get_application_config(self):
         root = pypath.local(ristomele.__file__).dirpath().dirpath().dirpath()
         ini = root.join('ristomele.ini')
@@ -63,7 +68,7 @@ class RistoMeleApp(App):
         config.setdefaults('ristomele', {
             'cashier': '',
             'printer': '',
-            'print_waiter_copy': True,
+            'is_sagra': 1,
             'columns': 1,
         })
 
@@ -214,8 +219,7 @@ class RistoMeleApp(App):
                 description="Selezionarne una nella schermata opzioni")
         s = order.as_textual_receipt()
 
-        opt = self.config.get('ristomele', 'print_waiter_copy')
-        if opt and opt != '0':
+        if not self.is_sagra:
             s += '\n\n\n%s\n\n\n' % ('-'*32)
             s += order.as_textual_receipt(title='COPIA CAMERIERE')
         self.print_service.submit(printer_name, s)

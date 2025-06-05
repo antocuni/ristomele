@@ -10,10 +10,11 @@
       "section": "ristomele",
       "key": "printer"
     },
-    { "title": "Stampa copia cameriere",
+    { "title": "Modalità Sagra",
+      "descr": "NO copia cameriere, SI Fila A/B",
       "type": "bool",
       "section": "ristomele",
-      "key": "print_waiter_copy"
+      "key": "is_sagra"
     },
 
     { "title": "Dimensione carattere",

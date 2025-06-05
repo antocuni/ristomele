@@ -71,7 +71,11 @@ class PrintService(EventDispatcher):
                 continue
             Logger.info('PrintService: got text, printing: %s' % text[:50])
             with self.printing():
-                if platform == 'android':
+                if printer_name == '<Console>':
+                    print
+                    print text
+                    print
+                elif platform == 'android':
                     from ristomele.gui.printer import print_string
                     print_string(printer_name, text)
                 elif platform == 'linux':
