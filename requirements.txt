@@ -5,3 +5,4 @@ freezegun
 docopt
 uwsgi
 wsgi-request-logger
+pyudev

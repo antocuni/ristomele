@@ -36,7 +36,8 @@ def init_LP_CONFIG():
     LP_CONFIG = {}
     role_to_printer = find_best_printers(LPrinter.all(), LP_PREFERENCE)
     for role in LP_PREFERENCE:
-        LP_CONFIG[role] = role_to_printer.get(role)
+        lp = role_to_printer.get(role)
+        LP_CONFIG[role] = lp.path if lp is not None else None
 
 
 def find_best_printers(available_printers, role_preferences):
