@@ -19,5 +19,16 @@ KERNEL=="lp*", ATTRS{serial}=="001E00110241341000000128", ATTRS{manufacturer}=="
 
 
 # for "big" Aclass" printers
-SUBSYSTEMS=="usb", ATTRS{product}=="Aclass-Printer", SYMLINK+="usb/lp-big"
-SUBSYSTEMS=="usb", ATTRS{serial}=="Aclass-8888-12340", SYMLINK+="usb/lp-aclass-1"
+# SUBSYSTEMS=="usb", ATTRS{product}=="Aclass-Printer", SYMLINK+="usb/lp-big"
+# SUBSYSTEMS=="usb", ATTRS{serial}=="Aclass-8888-12340", SYMLINK+="usb/lp-aclass-1"
+
+# SUBSYSTEMS=="usb", ATTRS{product}=="POS80 Printer USB", SYMLINK+="usb/lp-big"
+# SUBSYSTEMS=="usb", ATTRS{serial}=="76669C740E30", SYMLINK+="usb/lp-pos80-1"
+
+SUBSYSTEM=="usb", ATTRS{product}=="Aclass-Printer", ENV{LP_ALIAS}="lp-big"
+SUBSYSTEM=="usb", ATTRS{serial}=="Aclass-8888-12340", ENV{LP_ALIAS}="lp-aclass-1"
+
+SUBSYSTEM=="usb", ATTRS{product}=="POS80 Printer USB", ENV{LP_ALIAS}="lp-big"
+SUBSYSTEM=="usb", ATTRS{serial}=="76669C740E30", ENV{LP_ALIAS}="lp-pos80-1"
+
+SUBSYSTEM=="usb", KERNEL=="lp[0-9]*", ENV{LP_ALIAS}!="", SYMLINK+="usb/%E{LP_ALIAS}"
