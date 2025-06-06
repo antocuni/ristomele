@@ -147,6 +147,7 @@ class Order(db.Model):
 
         if config.MODE == 'sagra':
             w(escpos.big() + 'Ordine: %s %s' % (num, date))
+            w(escpos.reset())
         else:
             w(escpos.big() + self.waiter)
             w(escpos.reset() + 'Ordine: %s %s' % (num, date))
