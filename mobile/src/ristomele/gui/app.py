@@ -27,6 +27,9 @@ from ristomele.gui.order import OrderListScreen, NewOrderScreen, ShowOrderScreen
 class MainScreen(MyScreen):
     pass
 
+class AdvancedOptionsScreen(MyScreen):
+    pass
+
 class RistoMeleApp(App):
     from kivy.uix.settings import SettingsWithTabbedPanel as settings_cls
 
@@ -121,6 +124,10 @@ class RistoMeleApp(App):
     def on_stop(self):
         self.print_service.stop()
         pass
+
+    def show_advanced_options(self):
+        screen = AdvancedOptionsScreen()
+        self.root.open(screen)
 
     def show_orders(self):
         url = self.url('orders/')
@@ -234,8 +241,15 @@ class RistoMeleApp(App):
         self.print_service.submit(printer_name, s)
 
     def bluetooth_info(self):
-        from ristomele.gui import printer
-        printer.print_all_paired_devices()
+        from kivy.utils import platform
+        if platform == 'android':
+            from ristomele.gui import printer
+            printer.print_all_paired_devices()
+        else:
+            box = MessageBox(title='Errore',
+                             message="Solo per android")
+            box.open()
+
 
 def main():
     iconfonts.init()

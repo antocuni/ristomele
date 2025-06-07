@@ -99,18 +99,37 @@
                     on_release: app.font_size -= 1
                     show_border: True
 
-                IconButton:
-                    icon: 'fa-clock-o'
-                    size_hint: 1, 0.33
-                    on_release: app.set_timestamp()
-                    show_border: True
+        BoxLayout:
+            orientation: 'horizontal'
+            FlatButton:
+                text: "Opzioni avanzate"
+                on_release: app.show_advanced_options()
 
 
-        # FlatButton:
-        #     text: "Bluetooth info"
-        #     on_release: app.bluetooth_info()
-        #     size_hint_y: None
-        #     height: app.std_height
+# =====================================================================
+# Advanced options
+# =====================================================================
+
+<AdvancedOptionsScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+
+        Header:
+            text: "Opzioni avanzate"
+
+        FlatButton:
+            text: 'Imposta ora sul server'
+            on_release: app.set_timestamp()
+
+        FlatButton:
+            text: "Bluetooth info"
+            on_release: app.bluetooth_info()
+
+        FlatButton:
+            text: "Indietro"
+            on_release: app.root.go_back()
+            size_hint_y: None
+            height: app.std_height
 
 
 # =====================================================================
