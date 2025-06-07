@@ -89,7 +89,7 @@ class ShowOrderScreen(MyScreen):
             # order, what we really want is to go back to the tables
             # screen. Actually, this opens a NEW screen, which is good because
             # it means that the names of waiters are reloaded
-            app.show_tables()
+            app.new_order_or_show_tables()
         else:
             app.root.go_back()
 
