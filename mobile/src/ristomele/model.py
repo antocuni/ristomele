@@ -142,7 +142,7 @@ class Order(EventDispatcher):
         if app.is_sagra:
             fila = u'Fila A' if self.is_fila_A() else u'Fila B'
             if use_escpos:
-                w(escpos.big() + fila)
+                w(escpos.big() + '%s / %s' % (fila, num))
                 w(escpos.reset())
             else:
                 w(fila)
