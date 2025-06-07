@@ -226,7 +226,8 @@ def stats():
     by_item = defaultdict(Counter)
     orders = model.Order.query.all()
     for order in orders:
-        dt = order.date.date()
+        #dt = order.date.date()
+        dt = order.date_dwim
         total_orders[dt] += 1
         total_money[dt] += order.get_total()
         by_cashier[dt][order.cashier] += 1

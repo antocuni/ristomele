@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 from flask_sqlalchemy import SQLAlchemy
 from server import escpos
@@ -46,6 +46,23 @@ class Order(db.Model):
         except ValueError:
             # json decoding error
             return None
+
+    @property
+    def date_dwim(self):
+        """
+        Get the date, "Do What I mean".
+
+        The date of the order, but "smarter": if you are past midnight, it
+        still counts as the day before (e.g. 14/08 01:00 should be counted as
+        an order of the eveneing of 13/08).
+
+        The easiest way is to substract 3 hours from the datetime, and then
+        keep the date. This counts all order placed between 13/08 03:00AM and
+        14/08 03:00AM as 13/08.
+        """
+        newdt = self.date - timedelta(hours=3)
+        return newdt.date()
+
 
     def as_dict(self):
         d = self.as_dict_light()
