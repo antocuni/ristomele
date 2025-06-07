@@ -2,15 +2,54 @@
   <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/static/bootstrap.min.css">
+
+    <script>
+      function updateMinOrder() {
+          const newMinOrder = document.getElementById("minOrderInput").value;
+          const url = new URL(window.location.href);
+          url.searchParams.set("min_order", newMinOrder);
+          window.location.href = url.toString();
+      }
+    </script>
   </head>
 
   <body>
     <div class="container">
       <h1>Statistiche</h1>
 
-        {% if show_money %}
-            <a href="/stats/?hide_money">Nascondi €</a>
+      {% if show_money %}
+        <a href="/stats/?hide_money">Nascondi €</a>
+      {% endif %}
+
+      <h3>
+        Ordini a partire da:
+        <input type="number" id="minOrderInput" value="{{ min_order }}" style="width: 70px;">
+        <button onclick="updateMinOrder()">OK</button>
+      </h3>
+
+    {% for date, counter in sorted(by_item.items(), reverse=True) %}
+    <div class="row">
+      <div class="col-lg-6">
+      <h2>{{date.strftime("%d/%m/%Y")}}</h2>
+
+      <table class="table">
+        <tr>
+          <td><b>Ordini da fare</b></td>
+          <td>{{total_orders[date]}}</td>
+        </tr>
+        {% if total_foc[date] %}
+        <tr>
+          <td><b>Focaccini da fare</b></td>
+          <td>{{total_foc[date]}}</td>
+        </tr>
         {% endif %}
+      </table>
+      </div>
+    </div>
+
+        {% endfor %}
+
+      <h2>Statistiche complete</h2>
 
       {% for date, counter in sorted(by_item.items(), reverse=True) %}
       <div class="row">

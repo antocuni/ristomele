@@ -218,6 +218,8 @@ def stats():
     from server import model
     hide_money = 'hide_money' in flask.request.args
     show_money = not hide_money
+    min_order = flask.request.args.get('min_order', '0')
+    min_order = int(min_order)
     #
     total_money = Counter()
     total_orders = Counter()
@@ -226,6 +228,9 @@ def stats():
     by_item = defaultdict(Counter)
     orders = model.Order.query.all()
     for order in orders:
+        if order.id < min_order:
+            continue
+
         #dt = order.date.date()
         dt = order.date_dwim
         total_orders[dt] += 1
@@ -243,6 +248,7 @@ def stats():
                 total_foc[dt] += item['count']
     #
     return flask.render_template('stats.html',
+                                 min_order=min_order,
                                  sorted=sorted,
                                  show_money=show_money,
                                  by_item=by_item,
