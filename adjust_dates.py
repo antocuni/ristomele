@@ -54,7 +54,7 @@ def parse_datetime_input(date_str):
 def list_orders(dbpath):
     conn = sqlite3.connect(dbpath)
     cursor = conn.cursor()
-    cursor.execute("SELECT id, date FROM 'order' WHERE date IS NOT NULL ORDER BY datetime(date)")
+    cursor.execute("SELECT id, date FROM 'order' WHERE date IS NOT NULL ORDER BY id")
     rows = cursor.fetchall()
     prev_dt = None
 
@@ -77,7 +77,7 @@ def list_orders(dbpath):
 
 
 def adjust_dates(dbpath, date_from, date_to, dateref, write):
-    fmt = '%Y-%m-%d %H:%M'
+    fmt = "%Y-%m-%d %H:%M:%S.%f"
 
     from_dt = parse_datetime_input(date_from)
     to_dt = parse_datetime_input(date_to)
@@ -87,7 +87,7 @@ def adjust_dates(dbpath, date_from, date_to, dateref, write):
     conn = sqlite3.connect(dbpath)
     cursor = conn.cursor()
 
-    query = "SELECT id, date FROM 'order' WHERE datetime(date) BETWEEN ? AND ?"
+    query = "SELECT id, date FROM 'order' WHERE datetime(date) BETWEEN ? AND ? ORDER BY ID"
     cursor.execute(query, (date_from, date_to))
     rows = cursor.fetchall()
 
