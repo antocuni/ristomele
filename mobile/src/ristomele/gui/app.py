@@ -240,6 +240,11 @@ class RistoMeleApp(App):
 
         self.print_service.submit(printer_name, s)
 
+    def open_stats(self):
+        import webbrowser
+        url = self.url('stats/')
+        webbrowser.open(url)
+
     def bluetooth_info(self):
         from kivy.utils import platform
         if platform == 'android':
