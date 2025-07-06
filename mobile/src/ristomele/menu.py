@@ -1,6 +1,6 @@
 from ristomele import model
 
-Item = model.MenuItem
+Item = lambda name, price: model.MenuItem(name=name, price=price)
 Drink = lambda name, price: model.MenuItem(name=name, price=price, is_drink=True)
 Foc = lambda name, price: model.MenuItem(name='Foc. '+ name, price=price)
 Sep = lambda name: model.MenuItem(kind='separator', name=name)
@@ -10,7 +10,65 @@ def get_menu():
     #
     #return menu_13_agosto()
     #return menu_14_agosto()
-    return menu_sagra()
+    #return menu_sagra()
+    return menu_croce()
+
+def menu_croce():
+    return [
+        Item('Coperto', 1.5),
+        Sep('Primi'),
+        Item('Pansoti salsa di noci', 7),
+        Item('Pansoti burro e salvia', 6),
+        Item('Trenette al pesto', 6),
+        Sep('Secondi'),
+        Item('Arrosticini maiale', 5),
+        Item('Arrosticini pollo', 5),
+        Item('Arrosticini pecora', 6),
+        Item('Arrosticini misti', 5),
+        Item('Salsiccia', 5),
+        Item('Coppa', 4),
+        Item('Tondini Bosc.', 7),
+
+        Sep('Contorni'),
+        Item('Patatine', 2.5),
+        Item('Pomodori', 1.5),
+        Item('Frisceu', 2),
+
+        Sep('Dolci'),
+        Item('Crepes nutella', 3.5),
+        Item('Crepes marmellata', 3.5),
+        Item('Dolci misti', 2.5),
+
+        Sep('Bibite'),
+        Drink('Acqua Nat.', 1),
+        Drink('Acqua Friz.', 1),
+        Drink('Coca cola', 2),
+        Drink('Coca Zero', 2),
+        Drink('Fanta', 2),
+        Drink('Sprite', 2),
+        Drink('Estathe Limone', 2),
+        Drink('Estathe Pesca', 2),
+
+        Sep('Vino'),
+        Drink('Barbera', 6),
+        Drink('Bonarda', 5),
+        Drink('Dolcetto', 5),
+        Drink('Chardonney Fermo', 5),
+        Drink('Chardonney Frizz', 5),
+        Drink('Sangria', 4),
+        Drink('Bicch. Vino', 1),
+
+        Sep('Birre'),
+        Drink('Birra IPA rossa', 4.5),
+        Drink('Birra PILS', 4.5),
+
+        Sep('Altro'),
+        Item('Caffe', 1),
+        Item('Crema caffe', 2.5),
+        Item('Camatti', 2),
+        Item('Granite', 2.5),
+        Item('Sorbetto limone', 2.5),
+    ]
 
 def menu_sagra():
     return [
