@@ -16,6 +16,12 @@
       "section": "ristomele",
       "key": "is_sagra"
     },
+    { "title": "Modalità Croce Verde",
+      "descr": "Copia cameriere, no mappa tavoli",
+      "type": "bool",
+      "section": "ristomele",
+      "key": "is_croce"
+    },
 
     { "title": "Dimensione carattere",
       "type": "numeric",

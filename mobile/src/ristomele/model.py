@@ -149,6 +149,12 @@ class Order(EventDispatcher):
             w(u'Numero ordine: %s %s' % (num, date))
             w(u'Cassiere: %s' % (self.cashier))
             w(u'Cliente: %s' % self.customer)
+        elif app.is_croce:
+            w(u'Numero ordine: %s %s' % (num, date))
+            w(u'Cassiere: %s' % (self.cashier))
+            w(u'Cliente: %s' % self.customer)
+            w(escpos.big() + 'Tavolo:')
+            w(escpos.reset())
         else:
             w(u'Numero ordine: %s %s' % (num, date))
             w(u'Tavolo: %s [%s]' % (self.table.name, self.table.waiter))

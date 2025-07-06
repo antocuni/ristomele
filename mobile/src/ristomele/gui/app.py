@@ -50,6 +50,10 @@ class RistoMeleApp(App):
     is_sagra = ConfigParserProperty(1, 'ristomele', 'is_sagra', 'app',
                                     val_type=int)
 
+    is_croce = ConfigParserProperty(1, 'ristomele', 'is_croce', 'app',
+                                    val_type=int)
+
+
     def get_application_config(self):
         root = pypath.local(ristomele.__file__).dirpath().dirpath().dirpath()
         ini = root.join('ristomele.ini')
@@ -72,6 +76,7 @@ class RistoMeleApp(App):
             'cashier': '',
             'printer': '',
             'is_sagra': 1,
+            'is_croce': 1,
             'columns': 1,
         })
 
@@ -143,7 +148,7 @@ class RistoMeleApp(App):
         # make sure that the tables screen is immediately above the main.
         self.root.unwind('main')
 
-        if self.is_sagra:
+        if self.is_sagra or self.is_croce:
             table = model.Table(name="N/A", waiter="N/A")
             self.new_order(table)
         else:
@@ -230,7 +235,7 @@ class RistoMeleApp(App):
                 message="Nessuna stampante configurata",
                 description="Selezionarne una nella schermata opzioni")
 
-        if self.is_sagra:
+        if self.is_sagra and not self.is_croce:
             s = order.as_textual_receipt(self)
             s += '\n.\n.\n.' # leave some space for easier cutting
         else:
