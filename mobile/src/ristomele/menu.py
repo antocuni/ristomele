@@ -144,7 +144,7 @@ def menu_sagra():
         Drink('THE Limone **', 2),
         Drink('THE Pesca **', 2),
         Drink('Amaro Camatti', 3),
-        Drink('Liquore Liquirizzia', 3),
+        Drink('Liquore Liquirizia', 3),
         Drink('Caffe', 1),
     ]
 
@@ -157,7 +157,7 @@ def menu_13_agosto():
     return [
         Sep(name='Focaccini'),
         Foc(name='Zeneize de Me', price=2),
-        Foc(name='Zeneize + zucchero ', price=2),
+        Foc(name='Zeneize + zucchero', price=2),
         Foc(name='Boscaiolo + cotto', price=5.5),
         Foc(name='Boscaiolo + crudo', price=5.5),
         Foc(name='Cotto', price=4),
@@ -169,52 +169,60 @@ def menu_13_agosto():
         Foc(name='Carciofi + cotto', price=5),
         Foc(name='Carciofi + crudo', price=5),
         Foc(name='Carciofi + salame', price=5),
+        Foc(name='Carciofi + salam picc', price=5),
 
         Foc(name='Crudo', price=4),
         Foc(name='Crudo + pistacchio', price=5),
         Foc(name='Crudo + stracchino', price=5),
         Foc(name='Crudo + stra + pist', price=6),
 
+        Foc(name='Tacchino + tonnata', price=6),
         Foc(name='Porchetta', price=5),
         Foc(name='Porchetta + pistacchio', price=6),
+
         Foc(name='Salame', price=4),
+        Foc(name='Salame + stracchino', price=5),
+        Foc(name='Salam picc', price=4),
+        Foc(name='Salam picc + stracchino', price=5),
+
         Foc(name='Salsiccia', price=5),
         Foc(name='Stracchino', price=4),
         Foc(name='Stracchino + pistacchio', price=5),
-        Foc(name='Pistacchio dolce', price=4),
+        Foc(name='Pistacchio dolce', price=5),
         Foc(name='Nutella', price=4),
 
         Sep(name='Alla piastra'),
-        Item(name='Salsiccia', price=4),
-        Item(name='Salsiccia + patatine', price=5),
-        Item(name='Porchetta', price=4),
-        Item(name='Porchetta + patatine', price=5),
+        Item(name='Salsiccia piastra', price=4.5),
+        Item(name='Salsiccia + patatine', price=5.5),
+        Item(name='Porchetta piastra', price=4.5),
+        Item(name='Porchetta + patatine', price=5.5),
         Item(name='Patatine fritte', price=3),
 
         Sep(name='Vino'),
-        Drink(name='Bicchiere piccolo rosso ', price=1.5),
-        Drink(name='Bicchiere piccolo bianco ', price=1.5),
-        Drink(name='Bicchiere grande rosso ', price=3),
-        Drink(name='Bicchiere grande bianco ', price=3),
-        Drink(name='Sangria', price=5),
+        Drink(name='Bicchiere piccolo rosso', price=1.5),
+        Drink(name='Bicchiere piccolo bianco', price=1.5),
+        Drink(name='Bicchiere grande rosso', price=3),
+        Drink(name='Bicchiere grande bianco', price=3),
 
         Sep(name='Altre bevande'),
+        Drink(name='Sangria', price=5),
+        Drink(name='Spritz', price=5),
         Drink(name='Birra PILS', price=5),
         Drink(name='Birra WEISS', price=5),
         Drink(name='Coca Cola', price=2),
-        Drink(name='Aranciata', price=2),
+        Drink(name='Fanta', price=2),
         Drink(name='Gazzosa', price=2),
         Drink(name='The Limone', price=2),
         Drink(name='The Pesca', price=2),
-
         Drink(name='Acqua naturale 0.5L', price=1),
         Drink(name='Acqua frizzante 0.5L', price=1),
-        ## Drink(name='Bicchiere Spuma', price=0.5),
-        ## Drink(name='Bottiglia Spuma', price=3),
         Drink(name='Amaro camatti', price=3),
         Drink(name='Liquore liquirizia', price=3),
         Drink(name='Caffe', price=1),
     ]
+
+
+
 
 def menu_14_agosto():
     """
