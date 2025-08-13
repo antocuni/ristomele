@@ -8,10 +8,10 @@ Sep = lambda name: model.MenuItem(kind='separator', name=name)
 def get_menu():
     # REMEMBER TO CHANGE config.mode between 'sagra' and 'ristorante'
     #
-    #return menu_13_agosto()
+    return menu_13_agosto()
     #return menu_14_agosto()
     #return menu_sagra()
-    return menu_croce()
+    #return menu_croce()
 
 def menu_croce():
     return [
@@ -222,60 +222,57 @@ def menu_13_agosto():
     ]
 
 
-
-
 def menu_14_agosto():
     """
     14/15 agosto, ristorante
     """
     return [
         Item(name='Coperto', price=1.5),
+
         Sep(name='Primi'),
         Item(name='Ravioli au Tuccu', price=8),
         Item(name='Trenette al pesto', price=6.5),
 
         Sep(name='Secondi'),
-        Item(name='Salsiccia', price=4),
-        Item(name='Salsiccia + patatine', price=5),
-        Item(name='Salsiccia + pomodori', price=5),
-
-        Item(name='Porchetta', price=4),
-        Item(name='Porchetta + patatine', price=5),
-        Item(name='Porchetta + pomodori', price=5),
-
+        Item(name='Salsiccia', price=4.5),
+        Item(name='Salsiccia + patatine', price=5.5),
+        Item(name='Salsiccia + insalata', price=5.5),
+        Item(name='Salsiccia + pomodori', price=5.5),
+        Item(name='Porchetta', price=4.5),
+        Item(name='Porchetta + patatine', price=5.5),
+        Item(name='Porchetta + insalata', price=5.5),
+        Item(name='Porchetta + pomodori', price=5.5),
         Item(name='Arrosto', price=5),
         Item(name='Arrosto + patatine', price=6),
+        Item(name='Arrosto + insalata', price=6),
         Item(name='Arrosto + pomodori', price=6),
 
         Sep(name='Contorni'),
         Item(name='Patatine fritte', price=3),
+        Item(name='Insalata di peperoni', price=3),
         Item(name='Pomodori', price=2),
 
         Sep(name='Dolci'),
         Item(name='Panna cotta caramello', price=3),
         Item(name='Panna cotta cioccolato', price=3),
         Item(name='Panna cotta frutti di bosco', price=3),
-        Item(name='Sorbetto limone', price=3),
+        Item(name='Sorbetto al limone', price=3),
         Item(name='Tartufo bianco', price=3),
         Item(name='Tartufo cioccolato', price=3),
-        Item(name='Torte miste', price=3),
 
         Sep(name='Vino'),
-        Drink(name='Sangria', price=5),
-        Drink(name='Bottiglia Barbera ', price=8),
-        Drink(name='Bottiglia Bonarda ', price=8),
-        Drink(name='Bottiglia bianco ', price=8),
-        Drink(name='Bicchiere piccolo Barbera ', price=1.5),
-        Drink(name='Bicchiere piccolo Bonarda ', price=1.5),
-        Drink(name='Bicchiere piccolo bianco ', price=1.5),
-        Drink(name='Bicchiere grande Barbera ', price=3),
-        Drink(name='Bicchiere grande Bonarda ', price=3),
-        Drink(name='Bicchiere grande bianco ', price=3),
+        Drink(name='Bottiglia vino rosso', price=8),
+        Drink(name='Bottiglia vino bianco', price=8),
+        Drink(name='Bicchiere grande rosso', price=3),
+        Drink(name='Bicchiere grande bianco', price=3),
+        Drink(name='Bicchiere piccolo rosso', price=1.5),
+        Drink(name='Bicchiere piccolo bianco', price=1.5),
 
         Sep(name='Altre bevande'),
+        Drink(name='Sangria', price=5),
+        Drink(name='Spritz', price=5),
         Drink(name='Birra alla spina PILS', price=5),
         Drink(name='Birra alla spina WEISS', price=5),
-        Drink(name='Bicchiere Spuma', price=0.5),
         Drink(name='Coca Cola', price=2),
         Drink(name='Aranciata', price=2),
         Drink(name='Gazzosa', price=2),
@@ -283,7 +280,7 @@ def menu_14_agosto():
         Drink(name='The Pesca', price=2),
         Drink(name='Acqua naturale 0.5L', price=1),
         Drink(name='Acqua frizzante 0.5L', price=1),
-        Item(name='Amaro camatti', price=3),
-        Item(name='Liquore liquirizia', price=3),
-        Item(name='Caffe', price=1),
+        Drink(name='Amaro camatti', price=3),
+        Drink(name='Liquore liquirizia', price=3),
+        Drink(name='Caffe', price=1),
     ]
