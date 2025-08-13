@@ -25,6 +25,9 @@ def big(**kwargs):
 def reset():
     return ESC + '@'
 
+def feed(n):
+    return '\n.' * n
+
 def magic_encode(s):
     """
     If given an unicode string, encode it using a suitable codepage and

@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python -m server.printers "$@"
+/home/sta/ristomele/venv/bin/python -m server.spooler "$@"

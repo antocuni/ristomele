@@ -1,10 +1,14 @@
 """
 Usage: spooler SPOOLDIR [options]
+       spooler show
+       spooler test
+
+Commands:
+  show         Show detected printers and ristomele config
+  test         Write test files in /tmp/spooldir/ and exit
 
 Options:
-
   --dev        Development mode
-  --show       Show detected printers
   -h --help    Show help
 """
 
@@ -31,6 +35,15 @@ LOGFILE = config.ROOT.join('log', 'spooler.log')
 # There are some ports which are labeled as "food printers" and others as
 # "drink printers".
 
+# Layout of USB ports on "Raspberry Pi 4 Model B Rev 1.5"
+#
+#        DRINK           FOOD
+#  +----------------+---------------+
+#  | 1-1.3 (black)  |  1-1.1 (blue) |
+#  +----------------+---------------+
+#  | 1-1.4 (black)  |  1-1.2 (blue) |
+#  +----------------+---------------+
+
 def get_ristomele_printers(dev):
     """
     Return a dictionary in this form:
@@ -47,8 +60,8 @@ def get_ristomele_printers(dev):
             'drinks': '/dev/tty',
         }
 
-    food_ports = ['1-1', '2-1']
-    drinks_ports = ['1-2', '2-2']
+    food_ports =   ['1-1.1', '1-1.2']
+    drinks_ports = ['1-1.3', '1-1.4']
     printers = get_all_printers()
     res = {
         'food': None,
@@ -126,16 +139,31 @@ def setup_logging():
         h.setFormatter(formatter)
         logging.root.addHandler(h)
 
+def write_test_files():
+    from server import escpos
+    spooldir = py.path.local('/tmp/spooldir')
+    drinks_dir = spooldir.join('drinks').ensure(dir=True)
+    food_dir = spooldir.join('food').ensure(dir=True)
+
+    txt = 'drinks'+ escpos.feed(10)
+    drinks_dir.join('test-drinks.txt').write(txt)
+
+    txt = 'food' + escpos.feed(5)
+    food_dir.join('test-food.txt').write(txt)
+
 def main():
     setup_logging()
     args = docopt.docopt(__doc__)
+    if args['SPOOLDIR'] == 'show':
+        show_all_printers()
+        return 0
+
+    if args['SPOOLDIR'] == 'test':
+        write_test_files()
+        return 0
+
     spooldir = py.path.local(args['SPOOLDIR'])
     dev = args['--dev']
-    if '--show' in args:
-        show_all_printers()
-        return
-
-    #
     logging.info('Spooler starting')
     logging.info('spooldir: %s', spooldir)
     drinks_dir = spooldir.join('drinks').ensure(dir=True)
