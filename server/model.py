@@ -115,10 +115,7 @@ class Order(db.Model):
                 w('%2d %s' % (item['count'], item['name']))
                 has_drinks = True
         w('')
-        w('')
-        w('')
-        w('')
-        w('')
+        w(escpos.feed(10))
         if has_drinks:
             return '\n'.join(lines)
         else:
