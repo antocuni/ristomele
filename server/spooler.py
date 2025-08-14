@@ -7,6 +7,9 @@ Options:
   -h --help    Show help
 """
 
+# Printing HTML/PDF/laserjet order: last commit which had the code was 2e72fd2.
+
+
 # XXX: I don't know what happens if we disconnect/reconnect an LP while the
 # spooler is running
 
@@ -101,7 +104,6 @@ def main():
     logging.info('Spooler starting')
     logging.info('spooldir: %s', spooldir)
     logging.info('LP_CONFIG: %s', LP_CONFIG)
-    html_orders_dir = spooldir.join('orders').ensure(dir=True)
     drinks_dir = spooldir.join('drinks').ensure(dir=True)
     food_dir = spooldir.join('food').ensure(dir=True)
     i = 0
@@ -109,42 +111,10 @@ def main():
         i += 1
         if i % 600 == 0:
             logging.info('I am still alive :)')
-        print_html_orders(html_orders_dir, keep_pdf)
         print_receipt(drinks_dir, LP_CONFIG['drinks'])
         print_receipt(food_dir, LP_CONFIG['food'])
         time.sleep(1)
 
-def exec_cmd(cmdline):
-    logging.info('EXEC: %s', cmdline)
-    ret = os.system(cmdline)
-    if ret != 0:
-        logging.error('return value: %s', ret)
-        return False
-    return True
-
-def print_html_orders(orders_dir, keep_pdf):
-    print_cmd = 'lp'
-    ## if show_pdf:
-    ##     print_cmd = 'okular'
-    try:
-        for html in orders_dir.listdir('*.html'):
-            logging.info('Found HTML: %s', html.basename)
-            pdf = html.new(ext='pdf')
-            if not exec_cmd('wkhtmltopdf --enable-local-file-access --page-size A5 "%s" "%s"' % (html, pdf)):
-                continue
-            if keep_pdf:
-                keep_dir = py.path.local('/tmp/printed_orders').ensure(dir=True)
-                pdf.copy(keep_dir)
-                html.remove()
-                pdf.remove()
-            else:
-                if not exec_cmd('%s "%s"' % (print_cmd, pdf)):
-                    continue
-                logging.info('Removing %s and %s', html.basename, pdf.basename)
-                html.remove()
-                pdf.remove()
-    except:
-        logging.exception('ERROR!')
 
 def print_receipt(d, printer):
     try:
