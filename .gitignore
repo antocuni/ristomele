@@ -1,5 +1,5 @@
 venv
-db.sqlite
+db.sqlite*
 mobile/play
 mobile/ristomele.ini
 mobile/src.zip
