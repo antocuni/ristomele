@@ -30,6 +30,7 @@ def create_app(dbpath=DB):
 
 def create_logged_app():
     from requestlogger import WSGILogger, ApacheFormatter
+    from server import config
     handler = logging.FileHandler(str(LOGFILE))
     handler.setLevel(logging.INFO)
     logging.root.addHandler(handler)

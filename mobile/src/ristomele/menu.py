@@ -7,9 +7,10 @@ Sep = lambda name: model.MenuItem(kind='separator', name=name)
 
 def get_menu():
     # REMEMBER TO CHANGE config.mode between 'sagra' and 'ristorante'
+    # in server/ristomele/config.py
     #
-    return menu_13_agosto()
-    #return menu_14_agosto()
+    #return menu_13_agosto()
+    return menu_14_agosto()
     #return menu_sagra()
     #return menu_croce()
 
