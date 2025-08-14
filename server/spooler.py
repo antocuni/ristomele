@@ -4,14 +4,12 @@ Usage: spooler SPOOLDIR [options]
 Options:
 
   --dev        Development mode
+  --show       Show detected printers
   -h --help    Show help
 """
 
 # Printing HTML/PDF/laserjet order: last commit which had the code was 2e72fd2.
 
-
-# XXX: I don't know what happens if we disconnect/reconnect an LP while the
-# spooler is running
 
 import sys
 import os
@@ -20,63 +18,100 @@ import traceback
 import py
 import docopt
 import logging
+import pyudev
+import glob
+
 from server import config
-from server.printers import LPrinter, LPMatch
 LOGFILE = config.ROOT.join('log', 'spooler.log')
 
-LP_CONFIG = {}
-LP_PREFERENCE = {
-    'food': [
-        LPMatch(serial="Aclass-8888-12340"),
-    ],
-    'drinks': [
-        LPMatch(vendor="STMicroelectronics", serial="Printer")
-    ]
-}
 
-def init_LP_CONFIG():
-    global LP_CONFIG
-    LP_CONFIG = {}
-    role_to_printer = find_best_printers(LPrinter.all(), LP_PREFERENCE)
-    for role in LP_PREFERENCE:
-        lp = role_to_printer.get(role)
-        LP_CONFIG[role] = lp.path if lp is not None else None
+# ================ printer detection logic ================
 
+# Printers are selected by PHYSICAL PORT.
+# There are some ports which are labeled as "food printers" and others as
+# "drink printers".
 
-def find_best_printers(available_printers, role_preferences):
+def get_ristomele_printers(dev):
     """
-    Returns a dict mapping role name to the best available printer,
-    ensuring no printer is assigned to more than one role.
+    Return a dictionary in this form:
+        {
+            'food': '/dev/usb/lp0',
+            'drinks': /dev/usb/lp1'
+        }
+
+    If no printer is found for either 'food' or 'drinks', use None.
     """
-    assigned_printers = set()
-    role_to_printer = {}
+    if dev:
+        return {
+            'food': '/dev/tty',
+            'drinks': '/dev/tty',
+        }
 
-    for role, preferences in role_preferences.items():
-        # Try preferred matches first
-        for pref in preferences:
-            for printer in available_printers:
-                if printer in assigned_printers:
-                    continue
-                if pref == printer:
-                    role_to_printer[role] = printer
-                    assigned_printers.add(printer)
-                    break
-            if role in role_to_printer:
-                break
+    food_ports = ['1-1', '2-1']
+    drinks_ports = ['1-2', '2-2']
+    printers = get_all_printers()
+    res = {
+        'food': None,
+        'drinks': None,
+    }
+    for port in food_ports:
+        if port in printers:
+            res['food'] = printers[port]['lp']
+            break
 
-    # Fallback: assign first unassigned printer
-    for role in role_preferences:
-        if role not in role_to_printer:
-            for printer in available_printers:
-                if printer not in assigned_printers:
-                    role_to_printer[role] = printer
-                    assigned_printers.add(printer)
-                    break
+    for port in drinks_ports:
+        if port in printers:
+            res['drinks'] = printers[port]['lp']
+            break
 
-    return role_to_printer
+    return res
 
+def get_description(device):
+    """Return a human-readable USB description."""
+    vendor = device.get('ID_VENDOR_FROM_DATABASE') or device.get('ID_VENDOR') or ''
+    model = device.get('ID_MODEL_FROM_DATABASE') or device.get('ID_MODEL') or ''
+    return '{} {}'.format(vendor, model).strip()
 
+def get_all_printers():
+    """Return a dict {usb_topo_path: lp_path} for /dev/usb/lp* printers"""
+    context = pyudev.Context()
+    printers = {}
 
+    for lp_path in glob.glob('/dev/usb/lp*'):
+        # Get udev device for this node
+        try:
+            device = pyudev.Device.from_device_file(context, lp_path)
+        except Exception:
+            continue  # Skip if we can't get a device
+
+        # Walk up to find the usb_device parent
+        parent = device
+        while parent and not (parent.subsystem == 'usb' and parent.device_type == 'usb_device'):
+            parent = parent.parent
+
+        if parent:
+            topo_path = parent.sys_name  # e.g., '1-1'
+            if topo_path not in printers:
+                printers[topo_path] = {
+                    'lp': lp_path,
+                    'description': get_description(parent)
+                }
+    return printers
+
+def show_all_printers():
+    print('All printers:')
+    printers = get_all_printers()
+    for topo_path in sorted(printers.keys()):
+        info = printers[topo_path]
+        print('  {}: {} {}'.format(topo_path, info['lp'], info['description']))
+
+    print
+    print('Ristomele:')
+    config = get_ristomele_printers(dev=False)
+    for key, value in config.items():
+        print('  {}: {}'.format(key, value))
+
+# ============================= main logic ==================================
 
 def setup_logging():
     formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s',
@@ -93,30 +128,39 @@ def setup_logging():
 
 def main():
     setup_logging()
-    init_LP_CONFIG()
     args = docopt.docopt(__doc__)
     spooldir = py.path.local(args['SPOOLDIR'])
-    keep_pdf = args['--dev']
-    if args['--dev']:
-        for key in LP_CONFIG:
-            LP_CONFIG[key] = '/dev/tty'
+    dev = args['--dev']
+    if '--show' in args:
+        show_all_printers()
+        return
+
     #
     logging.info('Spooler starting')
     logging.info('spooldir: %s', spooldir)
-    logging.info('LP_CONFIG: %s', LP_CONFIG)
     drinks_dir = spooldir.join('drinks').ensure(dir=True)
     food_dir = spooldir.join('food').ensure(dir=True)
     i = 0
+
+    lp_config = None
     while True:
         i += 1
         if i % 600 == 0:
             logging.info('I am still alive :)')
-        print_receipt(drinks_dir, LP_CONFIG['drinks'])
-        print_receipt(food_dir, LP_CONFIG['food'])
+        new_lp_config = get_ristomele_printers(dev)
+        if new_lp_config != lp_config:
+            logging.info('New LP config detected: %s' % new_lp_config)
+            lp_config = new_lp_config
+
+        print_receipt(drinks_dir, lp_config['drinks'])
+        print_receipt(food_dir, lp_config['food'])
         time.sleep(1)
 
 
 def print_receipt(d, printer):
+    if printer is None:
+        return
+
     try:
         for txt in d.listdir('*.txt'):
             logging.info('Printing %s/%s', d.basename, txt.basename)
