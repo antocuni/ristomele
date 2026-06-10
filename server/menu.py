@@ -1,6 +1,5 @@
 """
-Standalone server-side menu definitions (no Kivy dependency).
-Keep in sync with mobile/src/ristomele/menu.py.
+Standalone server-side menu definitions
 """
 
 
@@ -25,8 +24,8 @@ def get_menu():
     # in server/config.py
     #
     #return menu_13_agosto()
-    return menu_14_agosto()
-    #return menu_sagra()
+    #return menu_14_agosto()
+    return menu_sagra()
     #return menu_croce()
 
 
