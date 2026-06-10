@@ -269,16 +269,18 @@ async function screenMain() {
 
     var isRist = !cfg.is_sagra && !cfg.is_croce;
     var newOrderBtn = (cfg.is_sagra || cfg.is_croce)
-        ? '<a href="#/order/new" class="btn-menu">Nuovo ordine</a>'
-        : '<a href="#/tables"    class="btn-menu">Mappa tavoli</a>';
+        ? '<a href="#/order/new" class="list-group-item main-item">Nuovo ordine <span class="main-chevron">›</span></a>'
+        : '<a href="#/tables"    class="list-group-item main-item">Mappa tavoli <span class="main-chevron">›</span></a>';
 
     setContent(
-        '<div class="list-menu">' +
-            newOrderBtn +
-            '<a href="#/orders"      class="btn-menu">Lista ordini</a>' +
-            (isRist ? '<a href="#/tables/edit" class="btn-menu">Configura tavoli</a>' : '') +
-            '<a href="#/settings"    class="btn-menu">Impostazioni</a>' +
-            '<a href="/stats/" target="_blank" class="btn-menu">Statistiche</a>' +
+        '<div class="container-fluid" style="padding-top:12px">' +
+            '<div class="list-group">' +
+                newOrderBtn +
+                '<a href="#/orders"      class="list-group-item main-item">Lista ordini <span class="main-chevron">›</span></a>' +
+                (isRist ? '<a href="#/tables/edit" class="list-group-item main-item">Configura tavoli <span class="main-chevron">›</span></a>' : '') +
+                '<a href="#/settings"    class="list-group-item main-item">Impostazioni <span class="main-chevron">›</span></a>' +
+                '<a href="/stats/" target="_blank" class="list-group-item main-item">Statistiche <span class="main-chevron">›</span></a>' +
+            '</div>' +
         '</div>'
     );
 }
@@ -302,14 +304,18 @@ async function screenSettings() {
             '</div>' +
             '<div class="form-group">' +
                 '<label>Stampante BLE</label>' +
-                '<div class="input-row">' +
-                    '<span id="ble-name">' + esc(bleDevice) + '</span>' +
-                    '<button id="btn-ble" class="btn btn-default btn-sm">Seleziona stampante</button>' +
+                '<div class="input-group">' +
+                    '<span class="input-group-addon" id="ble-name">' + esc(bleDevice) + '</span>' +
+                    '<span class="input-group-btn">' +
+                        '<button id="btn-ble" class="btn btn-default" type="button">Seleziona</button>' +
+                    '</span>' +
                 '</div>' +
             '</div>' +
             '<div class="form-group">' +
-                '<label><input type="checkbox" id="chk-dev" ' + (devMode ? 'checked' : '') + '> ' +
-                'Modalità sviluppo (stampa in console)</label>' +
+                '<div class="checkbox"><label>' +
+                    '<input type="checkbox" id="chk-dev" ' + (devMode ? 'checked' : '') + '> ' +
+                    'Modalità sviluppo (stampa in console)' +
+                '</label></div>' +
             '</div>' +
             '<hr>' +
             '<div class="form-group">' +
@@ -387,26 +393,28 @@ async function screenNewOrder() {
                 return '<div class="sep-row"><strong>' + esc(item.name) + '</strong></div>';
             }
             return '<div class="item-row' + (item.count > 0 ? ' row-active' : '') + '" id="irow-' + i + '">' +
-                '<button class="count-btn minus" data-i="' + i + '">−</button>' +
-                '<span class="count-val" id="cnt-' + i + '">' + item.count + '</span>' +
-                '<button class="count-btn plus" data-i="' + i + '">+</button>' +
+                '<div class="btn-group btn-group-sm">' +
+                    '<button class="btn btn-danger minus" data-i="' + i + '">−</button>' +
+                    '<button class="btn btn-default count-display" id="cnt-' + i + '" disabled>' + item.count + '</button>' +
+                    '<button class="btn btn-success plus" data-i="' + i + '">+</button>' +
+                '</div>' +
                 '<span class="item-name">' + esc(item.name) + '</span>' +
-                (item.price > 0 ? '<span class="item-price">' + item.price.toFixed(2) + '</span>' : '') +
+                (item.price > 0 ? '<span class="item-price">€ ' + item.price.toFixed(2) + '</span>' : '') +
                 '</div>';
         }).join('');
     }
 
     setContent(
         '<div class="new-order">' +
-            '<div class="order-inputs">' +
+            '<div class="top-inputs">' +
                 '<input type="text" id="inp-customer" class="form-control" placeholder="Nome cliente">' +
                 '<input type="text" id="inp-notes"    class="form-control" placeholder="Note">' +
             '</div>' +
             '<div id="item-list">' + itemsHtml() + '</div>' +
         '</div>' +
         '<div class="bottom-bar">' +
-            '<button id="btn-ok"   class="btn btn-primary flex1">OK</button>' +
-            '<button id="btn-back" class="btn btn-default flex1">Indietro</button>' +
+            '<button id="btn-ok"   class="btn btn-primary">OK</button>' +
+            '<button id="btn-back" class="btn btn-default">Indietro</button>' +
         '</div>'
     );
 
@@ -477,31 +485,33 @@ async function screenShowOrder(orderId) {
     var filaHtml = '';
     if (cfg.is_sagra) {
         var fa = isFilaA(order.menu);
-        filaHtml = '<span class="fila-badge ' + (fa ? 'fila-a' : 'fila-b') + '">' + (fa ? 'Fila A' : 'Fila B') + '</span>';
+        filaHtml = '<span class="label ' + (fa ? 'label-info' : 'label-warning') + '" style="font-size:14px;padding:5px 10px">' + (fa ? 'Fila A' : 'Fila B') + '</span>';
     }
 
     var statusHtml = isSaved
-        ? '<div class="status-saved">Ordine #' + order.id + ' salvato</div>'
-        : '<div class="status-unsaved">Non ancora inviato</div>';
+        ? '<div class="alert alert-success" style="margin-top:10px;padding:8px 12px">Ordine #' + order.id + ' salvato</div>'
+        : '<div class="alert alert-warning" style="margin-top:10px;padding:8px 12px">Non ancora inviato</div>';
 
     setContent(
         '<div class="show-order">' +
-            '<div class="total-row">' +
-                filaHtml +
-                '<span class="total-label">Totale: <strong>' + total.toFixed(2) + ' €</strong></span>' +
+            '<div class="row" style="margin-bottom:10px;align-items:center">' +
+                '<div class="col-xs-5">' + filaHtml + '</div>' +
+                '<div class="col-xs-7 text-right"><strong class="h4" style="margin:0">Totale:&nbsp;' + total.toFixed(2) + '&nbsp;€</strong></div>' +
             '</div>' +
-            '<div class="cash-row">' +
+            '<div class="input-group" style="margin-bottom:12px">' +
                 '<input type="number" id="inp-cash" class="form-control" placeholder="Denaro ricevuto" step="0.50" min="0">' +
-                '<span id="lbl-rest">Resto: 0.00</span>' +
+                '<span class="input-group-addon" id="lbl-rest">Resto: 0.00</span>' +
             '</div>' +
-            '<pre class="receipt">' + esc(receiptText) + '</pre>' +
+            '<div class="panel panel-default" style="margin-bottom:0">' +
+                '<div class="panel-body" style="padding:0"><pre class="receipt">' + esc(receiptText) + '</pre></div>' +
+            '</div>' +
             statusHtml +
         '</div>' +
         '<div class="bottom-bar">' +
-            '<button id="btn-save"    class="btn ' + (isSaved ? 'btn-default' : 'btn-success') + ' flex1">' + (isSaved ? 'Cibo' : 'Salva') + '</button>' +
-            '<button id="btn-bar"     class="btn btn-default flex1"' + (isSaved ? '' : ' disabled') + '>Bar</button>' +
-            '<button id="btn-receipt" class="btn btn-default flex1">Ricevuta</button>' +
-            '<button id="btn-back"    class="btn btn-default flex1">Indietro</button>' +
+            '<button id="btn-save"    class="btn ' + (isSaved ? 'btn-default' : 'btn-success') + '">' + (isSaved ? 'Cibo' : 'Salva') + '</button>' +
+            '<button id="btn-bar"     class="btn btn-default"' + (isSaved ? '' : ' disabled') + '>Bar</button>' +
+            '<button id="btn-receipt" class="btn btn-default">Ricevuta</button>' +
+            '<button id="btn-back"    class="btn btn-default">Indietro</button>' +
         '</div>'
     );
 
@@ -574,23 +584,22 @@ async function screenOrderList() {
     var orders = await api.get('/orders/');
 
     if (!orders.length) {
-        setContent('<p class="empty-msg">Nessun ordine</p><div class="bottom-bar"><a href="#/" class="btn btn-default flex1">Indietro</a></div>');
+        setContent('<p class="empty-msg">Nessun ordine</p><div class="bottom-bar"><a href="#/" class="btn btn-default">Indietro</a></div>');
         return;
     }
 
     var rows = orders.map(function(o) {
         var date = o.date ? formatDateShort(o.date) : '';
-        return '<a href="#/order/' + o.id + '" class="order-row" onclick="sessionStorage.setItem(\'show_order_back\',\'#/orders\')">' +
-            '<span class="order-id">' + o.id + '</span>' +
-            '<span class="order-date">[' + esc(date) + ']</span>' +
-            '<span class="order-table">' + esc(o.table || '') + '</span>' +
-            '<span class="order-customer">' + esc(o.customer || '') + '</span>' +
+        return '<a href="#/order/' + o.id + '" class="list-group-item order-item" onclick="sessionStorage.setItem(\'show_order_back\',\'#/orders\')">' +
+            '<span class="badge">' + o.id + '</span>' +
+            '<strong>' + esc(o.customer || '—') + '</strong> ' +
+            '<small class="text-muted">' + esc(o.table || '') + ' [' + esc(date) + ']</small>' +
             '</a>';
     }).join('');
 
     setContent(
-        '<div class="order-list">' + rows + '</div>' +
-        '<div class="bottom-bar"><a href="#/" class="btn btn-default flex1">Indietro</a></div>'
+        '<div class="list-group" style="margin-bottom:0">' + rows + '</div>' +
+        '<div class="bottom-bar"><a href="#/" class="btn btn-default">Indietro</a></div>'
     );
 }
 
@@ -618,7 +627,7 @@ async function screenTables() {
         }
     }
     html += '</div>' +
-        '<div class="bottom-bar"><a href="#/" class="btn btn-default flex1">Indietro</a></div>';
+        '<div class="bottom-bar"><a href="#/" class="btn btn-default">Indietro</a></div>';
     setContent(html);
 
     document.querySelectorAll('.table-cell').forEach(function(cell) {
@@ -663,8 +672,8 @@ async function screenEditTables() {
             gridHtml +
         '</div>' +
         '<div class="bottom-bar">' +
-            '<button id="btn-save-t" class="btn btn-primary flex1">Salva</button>' +
-            '<a href="#/" class="btn btn-default flex1">Annulla</a>' +
+            '<button id="btn-save-t" class="btn btn-primary">Salva</button>' +
+            '<a href="#/" class="btn btn-default">Annulla</a>' +
         '</div>'
     );
 
