@@ -20,6 +20,10 @@ ristomele-spooler reads those directories and do the actual print accordingly:
   - drinks/*.txt are directly sent to the thermal printer, by default
     /dev/usb/lp-thermal (see below)
 
+
+XXX: I think that as of 2026 we no longer use the wkhtmltopdf approach and laser
+printers. Everything is printed with thermal printers. DOUBLE CHECK THIS!
+
 The DB is stored in ~/ristomele/db.sqlite. It should be manually backed up and
 removed every year.
 
