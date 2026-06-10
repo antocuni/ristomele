@@ -779,6 +779,14 @@ async function route() {
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
 window.addEventListener('hashchange', route);
+window.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' || e.keyCode === 27) {
+        var top = $id('back-btn');
+        if (top && top.style.display !== 'none' && top.onclick) { top.onclick(); return; }
+        var bot = $id('btn-back');
+        if (bot && bot.onclick) bot.onclick();
+    }
+});
 window.addEventListener('DOMContentLoaded', function() {
     updateDevBadge();
     route();
