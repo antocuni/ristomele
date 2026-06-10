@@ -14,6 +14,7 @@ async function apiFetch(path, opts) {
     try {
         var resp = await fetch(path, Object.assign({}, opts, { signal: controller.signal }));
         clearTimeout(tid);
+        hideOfflineBanner();
         if (!resp.ok) {
             var body = '';
             try { body = await resp.text(); } catch (_) {}
@@ -22,7 +23,10 @@ async function apiFetch(path, opts) {
         return resp.json();
     } catch (e) {
         clearTimeout(tid);
-        if (e.name === 'AbortError') throw new Error('Server non raggiungibile (timeout)');
+        if (e.name === 'AbortError' || e instanceof TypeError) {
+            showOfflineBanner();
+            throw new Error('Server non raggiungibile');
+        }
         throw e;
     }
 }
@@ -218,6 +222,26 @@ function esc(s) {
         .replace(/"/g, '&quot;');
 }
 
+var _offlineTimer = null;
+
+function showOfflineBanner() {
+    $id('offline-bar').style.display = '';
+    document.body.classList.add('offline-mode');
+    if (_offlineTimer) return;
+    _offlineTimer = setInterval(async function() {
+        try {
+            await fetch('/timestamp/', { signal: AbortSignal.timeout(3000) });
+            hideOfflineBanner();
+        } catch (_) {}
+    }, 5000);
+}
+
+function hideOfflineBanner() {
+    $id('offline-bar').style.display = 'none';
+    document.body.classList.remove('offline-mode');
+    if (_offlineTimer) { clearInterval(_offlineTimer); _offlineTimer = null; }
+}
+
 function showError(msg) {
     var bar = document.getElementById('error-bar');
     document.getElementById('error-msg').textContent = msg;
@@ -293,6 +317,7 @@ async function screenSettings() {
     var cashier = gs('cashier');
     var devMode = gs('dev_mode') === '1';
     var bleDevice = gs('ble_device_name') || '(nessuna)';
+    var cols = gs('columns', '1');
 
     var serverTimeHtml = '<em>caricamento...</em>';
 
@@ -310,6 +335,14 @@ async function screenSettings() {
                         '<button id="btn-ble" class="btn btn-default" type="button">Seleziona</button>' +
                     '</span>' +
                 '</div>' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label>Colonne menu</label>' +
+                '<select id="sel-columns" class="form-control">' +
+                    '<option value="1"' + (cols === '1' ? ' selected' : '') + '>1 colonna</option>' +
+                    '<option value="2"' + (cols === '2' ? ' selected' : '') + '>2 colonne</option>' +
+                    '<option value="3"' + (cols === '3' ? ' selected' : '') + '>3 colonne</option>' +
+                '</select>' +
             '</div>' +
             '<div class="form-group">' +
                 '<div class="checkbox"><label>' +
@@ -339,6 +372,7 @@ async function screenSettings() {
 
     $id('btn-save').onclick = function() {
         ss('cashier', $id('inp-cashier').value.trim());
+        ss('columns', $id('sel-columns').value);
         ss('dev_mode', $id('chk-dev').checked ? '1' : '0');
         updateDevBadge();
         navigate('#/');
@@ -387,10 +421,12 @@ async function screenNewOrder() {
 
     _orderItems = cfg.items.map(function(it) { return Object.assign({}, it, { count: 0 }); });
 
+    var numCols = parseInt(gs('columns', '1'), 10) || 1;
+
     function itemsHtml() {
         return _orderItems.map(function(item, i) {
             if (item.kind === 'separator') {
-                return '<div class="sep-row"><strong>' + esc(item.name) + '</strong></div>';
+                return '<div class="sep-row col-all"><strong>' + esc(item.name) + '</strong></div>';
             }
             return '<div class="item-row' + (item.count > 0 ? ' row-active' : '') + '" id="irow-' + i + '">' +
                 '<div class="btn-group btn-group-sm">' +
@@ -410,7 +446,7 @@ async function screenNewOrder() {
                 '<input type="text" id="inp-customer" class="form-control" placeholder="Nome cliente">' +
                 '<input type="text" id="inp-notes"    class="form-control" placeholder="Note">' +
             '</div>' +
-            '<div id="item-list">' + itemsHtml() + '</div>' +
+            '<div id="item-list" style="display:grid;grid-template-columns:repeat(' + numCols + ',1fr);gap:1px 2px">' + itemsHtml() + '</div>' +
         '</div>' +
         '<div class="bottom-bar">' +
             '<button id="btn-ok"   class="btn btn-primary">OK</button>' +

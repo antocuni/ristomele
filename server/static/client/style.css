@@ -42,6 +42,24 @@ body {
     font-weight: bold;
 }
 
+/* ── Offline bar ──────────────────────────────────────────────────────────── */
+
+#offline-bar {
+    position: fixed;
+    top: 50px;
+    left: 0;
+    right: 0;
+    z-index: 2500;
+    background: #fcf8e3;
+    color: #8a6d3b;
+    border-bottom: 1px solid #faebcc;
+    padding: 8px 15px;
+    text-align: center;
+    font-size: 14px;
+}
+
+body.offline-mode { padding-top: 88px; }
+
 /* ── Error bar ────────────────────────────────────────────────────────────── */
 
 #error-bar {
@@ -127,6 +145,8 @@ body {
 }
 
 .top-inputs .form-control:last-child { margin-bottom: 0; }
+
+.col-all { grid-column: 1 / -1; }
 
 .item-row {
     display: flex;
