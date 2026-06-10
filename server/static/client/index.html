@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>RistoMele</title>
+  <link rel="stylesheet" href="/static/bootstrap.min.css">
+  <link rel="stylesheet" href="/client/style.css">
+</head>
+<body>
+
+  <nav id="topbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="navbar-inner-row">
+      <span id="back-btn" style="display:none">&#8249;</span>
+      <span id="screen-title" class="navbar-brand-text">RistoMele</span>
+      <span id="dev-badge" style="display:none">DEV</span>
+    </div>
+  </nav>
+
+  <div id="error-bar" style="display:none">
+    <span id="error-msg"></span>
+    <button onclick="hideError()">&#x2715;</button>
+  </div>
+
+  <div id="app"></div>
+
+  <script src="/client/app.js"></script>
+</body>
+</html>

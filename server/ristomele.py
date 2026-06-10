@@ -261,3 +261,26 @@ def stats():
 def send_static():
     css = config.ROOT.join('server', 'static', 'bootstrap.min.css')
     return flask.send_file(str(css))
+
+
+@ristomele.route('/')
+def index():
+    return flask.redirect('/client/')
+
+
+@ristomele.route('/menu/', methods=['GET'])
+def get_menu():
+    from server import menu as server_menu
+    items = server_menu.get_menu()
+    return flask.jsonify(
+        is_sagra=(config.MODE == 'sagra'),
+        is_croce=(config.MODE == 'croce'),
+        items=items,
+    )
+
+
+@ristomele.route('/client/')
+@ristomele.route('/client/<path:filename>')
+def serve_client(filename='index.html'):
+    client_dir = config.ROOT.join('server', 'static', 'client')
+    return flask.send_from_directory(str(client_dir), filename)
