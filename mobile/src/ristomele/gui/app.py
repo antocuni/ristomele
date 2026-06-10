@@ -11,7 +11,6 @@ from kivy.metrics import dp
 from kivy.core.window import Window
 import ristomele
 from ristomele import model
-from ristomele.menu import get_menu
 import ristomele.gui.uix # side effects
 from ristomele.gui.uix import MyScreen, MessageBox
 from ristomele.gui import iconfonts
@@ -161,7 +160,9 @@ class RistoMeleApp(App):
         self.root.open(screen)
 
     def new_order(self, table):
-        items = get_menu()
+        url = self.url('menu/')
+        resp = self.requests.get(url, error="Impossibile caricare il menu dal server")
+        items = [model.MenuItem.from_dict(d) for d in resp.json()['items']]
         order = model.Order(table=table, menu=items,
                             cashier=self.get_cashier())
         screen = NewOrderScreen(name='new_order', order=order)
