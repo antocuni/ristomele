@@ -232,16 +232,29 @@ async function bleGetConnection() {
     return _bleChr;
 }
 
+function encodeWPC1252(text) {
+    // WPC1252 is identical to Latin-1 for 0x00–0x7F and 0xA0–0xFF.
+    // The only receipt character outside that range is €, which sits at 0x80.
+    var bytes = new Uint8Array(text.length);
+    for (var i = 0; i < text.length; i++) {
+        var c = text.charCodeAt(i);
+        if (c === 0x20AC) { bytes[i] = 0x80; }  // €
+        else if (c <= 0xFF) { bytes[i] = c; }
+        else { bytes[i] = 0x3F; }               // ? for anything else
+    }
+    return bytes;
+}
+
 async function blePrintText(text) {
     if (!navigator.bluetooth) throw new Error('Web Bluetooth non supportato. Usa Chrome/Edge su Android o desktop.');
     var deviceName = gs('ble_device_name');
     if (!deviceName) throw new Error('Nessuna stampante configurata. Vai in Impostazioni e seleziona una stampante.');
 
     var chr = await bleGetConnection();
-    var enc = new TextEncoder();
-    await chr.writeValue(new Uint8Array([0x1B, 0x40])); // ESC @ init
-    await bleWriteChunked(chr, enc.encode(text));
-    await chr.writeValue(new Uint8Array([0x1B, 0x64, 0x03])); // ESC d 3 — feed 3 lines
+    await chr.writeValue(new Uint8Array([0x1B, 0x40]));        // ESC @      — init
+    await chr.writeValue(new Uint8Array([0x1B, 0x74, 0x10])); // ESC t 16  — WPC1252
+    await bleWriteChunked(chr, encodeWPC1252(text));
+    await chr.writeValue(new Uint8Array([0x1B, 0x64, 0x03])); // ESC d 3   — feed 3 lines
     // Leave connection open for next print.
 }
 
