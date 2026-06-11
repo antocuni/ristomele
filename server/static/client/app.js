@@ -139,6 +139,11 @@ function renderReceiptText(order, cfg, title) {
 
 // ─── BLE printing ────────────────────────────────────────────────────────────
 
+// Cached BLE state — survives within the same tab session.
+var _bleDevice = null;   // BluetoothDevice
+var _bleServer = null;   // BluetoothRemoteGATTServer (may be disconnected)
+var _bleChr    = null;   // cached write characteristic
+
 var PRINTER_SERVICES = [
     'e7810a71-73ae-499d-8c15-faa9aef0c3f2',
     '000018f0-0000-1000-8000-00805f9b34fb',
@@ -181,25 +186,63 @@ async function bleWriteChunked(chr, data) {
     }
 }
 
+async function bleGetDevice(deviceName) {
+    // 1. If we already have a cached device with the right name, reuse it.
+    if (_bleDevice && _bleDevice.name === deviceName) return _bleDevice;
+
+    // 2. Try getDevices() — returns previously-granted devices without picker.
+    if (navigator.bluetooth.getDevices) {
+        var granted = await navigator.bluetooth.getDevices();
+        var found = null;
+        for (var i = 0; i < granted.length; i++) {
+            if (granted[i].name === deviceName) { found = granted[i]; break; }
+        }
+        if (found) { _bleDevice = found; return _bleDevice; }
+    }
+
+    // 3. Fall back to the picker (first use only).
+    _bleDevice = await navigator.bluetooth.requestDevice({
+        filters: [{ name: deviceName }],
+        optionalServices: PRINTER_SERVICES,
+    });
+    return _bleDevice;
+}
+
+async function bleGetConnection() {
+    var deviceName = gs('ble_device_name');
+    // If the user picked a different printer in Settings, drop the old connection.
+    if (_bleDevice && _bleDevice.name !== deviceName) {
+        if (_bleServer && _bleServer.connected) try { _bleServer.disconnect(); } catch (_) {}
+        _bleDevice = null; _bleServer = null; _bleChr = null;
+    }
+    // Reuse existing connected server+characteristic if possible.
+    if (_bleServer && _bleServer.connected && _bleChr) return _bleChr;
+
+    _bleChr = null;
+    if (_bleServer && !_bleServer.connected) {
+        // Reconnect silently — no picker.
+        try { await _bleServer.connect(); } catch (_) { _bleServer = null; }
+    }
+    if (!_bleServer || !_bleServer.connected) {
+        var device = await bleGetDevice(deviceName);
+        _bleServer = await device.gatt.connect();
+    }
+    _bleChr = await findPrintChar(_bleServer);
+    if (!_bleChr) { _bleServer.disconnect(); _bleServer = null; throw new Error('Caratteristica di stampa non trovata sulla stampante.'); }
+    return _bleChr;
+}
+
 async function blePrintText(text) {
     if (!navigator.bluetooth) throw new Error('Web Bluetooth non supportato. Usa Chrome/Edge su Android o desktop.');
     var deviceName = gs('ble_device_name');
     if (!deviceName) throw new Error('Nessuna stampante configurata. Vai in Impostazioni e seleziona una stampante.');
 
-    var device = await navigator.bluetooth.requestDevice({
-        filters: [{ name: deviceName }],
-        optionalServices: PRINTER_SERVICES,
-    });
-    var server = await device.gatt.connect();
-    var chr = await findPrintChar(server);
-    if (!chr) { server.disconnect(); throw new Error('Caratteristica di stampa non trovata sulla stampante.'); }
-
+    var chr = await bleGetConnection();
     var enc = new TextEncoder();
     await chr.writeValue(new Uint8Array([0x1B, 0x40])); // ESC @ init
     await bleWriteChunked(chr, enc.encode(text));
-    await chr.writeValue(new Uint8Array([0x0A, 0x0A, 0x0A, 0x0A, 0x0A])); // feed
-    try { await chr.writeValue(new Uint8Array([0x1D, 0x56, 0x00])); } catch (_) {} // cut
-    server.disconnect();
+    await chr.writeValue(new Uint8Array([0x1B, 0x64, 0x03])); // ESC d 3 — feed 3 lines
+    // Leave connection open for next print.
 }
 
 async function bleSelectPrinter() {
@@ -335,6 +378,7 @@ async function screenSettings() {
                         '<button id="btn-ble" class="btn btn-default" type="button">Seleziona</button>' +
                     '</span>' +
                 '</div>' +
+                '<button id="btn-test-print" class="btn btn-default btn-sm" style="margin-top:6px">Prova stampa</button>' +
             '</div>' +
             '<div class="form-group">' +
                 '<label>Colonne menu</label>' +
@@ -387,6 +431,17 @@ async function screenSettings() {
             showError(e.message);
         } finally {
             disableBtn('btn-ble', false);
+        }
+    };
+
+    $id('btn-test-print').onclick = async function() {
+        disableBtn('btn-test-print', true);
+        try {
+            await blePrintText('Prova stampa RistoMele\n');
+        } catch (e) {
+            showError(e.message);
+        } finally {
+            disableBtn('btn-test-print', false);
         }
     };
 
@@ -509,7 +564,7 @@ async function screenShowOrder(orderId) {
     var receiptText = renderReceiptText(order, cfg);
     var printText;
     if (cfg.is_sagra) {
-        printText = receiptText + '\n.\n.\n.';
+        printText = receiptText;
     } else {
         var sep = '\n\n\n' + '--------------------------------' + '\n\n\n';
         printText = renderReceiptText(order, cfg, 'COPIA CLIENTE') +

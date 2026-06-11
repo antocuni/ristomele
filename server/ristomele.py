@@ -283,4 +283,8 @@ def get_menu():
 @ristomele.route('/client/<path:filename>')
 def serve_client(filename='index.html'):
     client_dir = config.ROOT.join('server', 'static', 'client')
-    return flask.send_from_directory(str(client_dir), filename)
+    resp = flask.send_from_directory(str(client_dir), filename)
+    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    resp.headers['Pragma'] = 'no-cache'
+    resp.headers['Expires'] = '0'
+    return resp
