@@ -64,9 +64,26 @@ ristomele.log
 spooler.log
 uwsgi.log
 
-The web server runs on port 5000. To check that it works, visit the page
+The web server runs on HTTPS port 5000. To check that it works, visit the page
 (using the appropriate IP address, of course):
-   http://192.168.1.6:5000/orders/
+   https://192.168.1.6:5000/
+
+The browser will warn about a self-signed certificate — accept it once and the
+exception is remembered.
+
+TLS certificate (first-time setup)
+------------------------------------
+
+The uwsgi config expects a self-signed certificate in ~/ristomele/. Generate it
+once after cloning/pulling (must be run from the ristomele directory):
+
+  $ cd ~/ristomele
+  $ ./generate_cert.sh
+
+This creates ssl_cert.pem and ssl_key.pem. They are not committed to git (they
+are machine-specific). After generating, restart the service:
+
+  $ sudo service ristomele restart
 
 lp-thermal
 ===========
