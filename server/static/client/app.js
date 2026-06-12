@@ -186,32 +186,37 @@ async function bleWriteChunked(chr, data) {
     }
 }
 
-async function bleGetDevice(deviceName) {
-    // 1. If we already have a cached device with the right name, reuse it.
-    if (_bleDevice && _bleDevice.name === deviceName) return _bleDevice;
+async function bleGetDevice() {
+    var deviceId   = gs('ble_device_id');
+    var deviceName = gs('ble_device_name');
+
+    // 1. If we already have a cached device that matches by id, reuse it.
+    if (_bleDevice && _bleDevice.id === deviceId) return _bleDevice;
 
     // 2. Try getDevices() — returns previously-granted devices without picker.
     if (navigator.bluetooth.getDevices) {
         var granted = await navigator.bluetooth.getDevices();
         var found = null;
         for (var i = 0; i < granted.length; i++) {
-            if (granted[i].name === deviceName) { found = granted[i]; break; }
+            if (deviceId && granted[i].id === deviceId) { found = granted[i]; break; }
+            if (!deviceId && granted[i].name === deviceName) { found = granted[i]; break; }
         }
         if (found) { _bleDevice = found; return _bleDevice; }
     }
 
     // 3. Fall back to the picker (first use only).
-    _bleDevice = await navigator.bluetooth.requestDevice({
-        filters: [{ name: deviceName }],
-        optionalServices: PRINTER_SERVICES,
-    });
+    var filterOnly = gs('ble_filter_printers', '1') === '1';
+    var opts = filterOnly
+        ? { filters: PRINTER_SERVICES.map(function(s) { return { services: [s] }; }), optionalServices: PRINTER_SERVICES }
+        : { acceptAllDevices: true, optionalServices: PRINTER_SERVICES };
+    _bleDevice = await navigator.bluetooth.requestDevice(opts);
     return _bleDevice;
 }
 
 async function bleGetConnection() {
-    var deviceName = gs('ble_device_name');
+    var deviceId = gs('ble_device_id');
     // If the user picked a different printer in Settings, drop the old connection.
-    if (_bleDevice && _bleDevice.name !== deviceName) {
+    if (_bleDevice && _bleDevice.id !== deviceId) {
         if (_bleServer && _bleServer.connected) try { _bleServer.disconnect(); } catch (_) {}
         _bleDevice = null; _bleServer = null; _bleChr = null;
     }
@@ -224,7 +229,7 @@ async function bleGetConnection() {
         try { await _bleServer.connect(); } catch (_) { _bleServer = null; }
     }
     if (!_bleServer || !_bleServer.connected) {
-        var device = await bleGetDevice(deviceName);
+        var device = await bleGetDevice();
         _bleServer = await device.gatt.connect();
     }
     _bleChr = await findPrintChar(_bleServer);
@@ -260,12 +265,24 @@ async function blePrintText(text) {
 
 async function bleSelectPrinter() {
     if (!navigator.bluetooth) throw new Error('Web Bluetooth non supportato in questo browser.');
-    var device = await navigator.bluetooth.requestDevice({
-        acceptAllDevices: true,
-        optionalServices: PRINTER_SERVICES,
-    });
+    var filterOnly = gs('ble_filter_printers', '1') === '1';
+    var opts = filterOnly
+        ? { filters: PRINTER_SERVICES.map(function(s) { return { services: [s] }; }), optionalServices: PRINTER_SERVICES }
+        : { acceptAllDevices: true, optionalServices: PRINTER_SERVICES };
+    var device = await navigator.bluetooth.requestDevice(opts);
     ss('ble_device_name', device.name);
-    return device.name;
+    ss('ble_device_id',   device.id);
+    // Cache the device and eagerly connect so subsequent calls skip the picker.
+    _bleDevice = device;
+    _bleServer = null; _bleChr = null;
+    try {
+        _bleServer = await device.gatt.connect();
+        _bleChr = await findPrintChar(_bleServer);
+    } catch (_) {
+        // Connection attempt failed — will retry on first print, no picker needed.
+        _bleServer = null; _bleChr = null;
+    }
+    return device;
 }
 
 // ─── UI helpers ──────────────────────────────────────────────────────────────
@@ -370,10 +387,13 @@ async function screenSettings() {
     setTitle('Impostazioni');
     setBack('#/');
 
-    var cashier = gs('cashier');
-    var devMode = gs('dev_mode') === '1';
-    var bleDevice = gs('ble_device_name') || '(nessuna)';
-    var cols = gs('columns', '1');
+    var cashier        = gs('cashier');
+    var devMode        = gs('dev_mode') === '1';
+    var bleName        = gs('ble_device_name');
+    var bleId          = gs('ble_device_id');
+    var bleLabel       = bleName ? bleName + (bleId ? ' [' + bleId.slice(-8) + ']' : '') : '(nessuna)';
+    var bleFilterOnly  = gs('ble_filter_printers', '1') === '1';
+    var cols           = gs('columns', '1');
 
     var serverTimeHtml = '<em>caricamento...</em>';
 
@@ -386,12 +406,16 @@ async function screenSettings() {
             '<div class="form-group">' +
                 '<label>Stampante BLE</label>' +
                 '<div class="input-group">' +
-                    '<span class="input-group-addon" id="ble-name">' + esc(bleDevice) + '</span>' +
+                    '<span class="input-group-addon" id="ble-name">' + esc(bleLabel) + '</span>' +
                     '<span class="input-group-btn">' +
                         '<button id="btn-ble" class="btn btn-default" type="button">Seleziona</button>' +
                     '</span>' +
                 '</div>' +
                 '<button id="btn-test-print" class="btn btn-default btn-sm" style="margin-top:6px">Prova stampa</button>' +
+                '<div class="checkbox" style="margin-top:4px"><label>' +
+                    '<input type="checkbox" id="chk-ble-filter" ' + (bleFilterOnly ? 'checked' : '') + '> ' +
+                    'Mostra solo stampanti' +
+                '</label></div>' +
             '</div>' +
             '<div class="form-group">' +
                 '<label>Colonne menu</label>' +
@@ -428,9 +452,10 @@ async function screenSettings() {
     });
 
     $id('btn-save').onclick = function() {
-        ss('cashier', $id('inp-cashier').value.trim());
-        ss('columns', $id('sel-columns').value);
-        ss('dev_mode', $id('chk-dev').checked ? '1' : '0');
+        ss('cashier',             $id('inp-cashier').value.trim());
+        ss('columns',             $id('sel-columns').value);
+        ss('dev_mode',            $id('chk-dev').checked ? '1' : '0');
+        ss('ble_filter_printers', $id('chk-ble-filter').checked ? '1' : '0');
         updateDevBadge();
         navigate('#/');
     };
@@ -438,8 +463,9 @@ async function screenSettings() {
     $id('btn-ble').onclick = async function() {
         disableBtn('btn-ble', true);
         try {
-            var name = await bleSelectPrinter();
-            $id('ble-name').textContent = name;
+            var dev = await bleSelectPrinter();
+            var label = dev.name + (dev.id ? ' [' + dev.id.slice(-8) + ']' : '');
+            $id('ble-name').textContent = label;
         } catch (e) {
             showError(e.message);
         } finally {
