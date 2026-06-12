@@ -265,7 +265,7 @@ def send_static():
 
 @ristomele.route('/')
 def index():
-    return flask.Response(status=302, headers={'Location': '/client/'})
+    return flask.Response('<meta http-equiv="refresh" content="0;url=/client/">', content_type='text/html')
 
 
 @ristomele.route('/menu/', methods=['GET'])
