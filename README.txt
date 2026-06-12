@@ -1,3 +1,22 @@
+How to connect to Raspberry Pi and internet at the same time
+=============================================================
+
+The "ristomele" wifi doesn't have internet.
+
+The following instructions are to connect a laptop to both internet and the ristomele
+wifi at the same time:
+
+1. connect the laptop to the ristomele router via ethernet (you probably need an usb/ethernet dongle)
+
+2. connect the laptop to a mobile hotspot
+
+3. you might need `sudo route del default`: you must ensure that the default gw does
+   through the hotspot and not through ristomele
+
+4. profit
+
+
+
 Overview
 =========
 
