@@ -7,6 +7,9 @@ sudo ln -fs /etc/systemd/system/ristomele*.service /etc/systemd/system/multi-use
 
 sudo systemctl daemon-reload
 
-# install stunnel config for HTTPS on port 5001
+# install stunnel config for HTTPS on port 443
+# stunnel4 on Debian is disabled by default; set ENABLED=1 so the service starts
+sudo sed -i 's/^ENABLED=0/ENABLED=1/' /etc/default/stunnel4
 sudo cp ../stunnel.conf /etc/stunnel/ristomele.conf
-sudo service stunnel4 restart
+sudo systemctl enable stunnel4
+sudo systemctl restart stunnel4
