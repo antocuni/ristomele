@@ -10,12 +10,17 @@ wifi at the same time:
 
 2. connect the laptop to a mobile hotspot
 
-3. you might need `sudo route del default`: you must ensure that the default gw does
+3a. MANUAL MODE: you might need `sudo route del default`: you must ensure that the default gw does
    through the hotspot and not through ristomele
 
-4. profit
+3b. Network Manager MODE:
 
+    nmcli conneciton show   # find the connection name
 
+    # mark is as "never-default" to disable the default gw
+    nmcli connection modify "ristomele wired" ipv4.never-default yes
+    nmcli connection modify "ristomele wired" ipv6.never-default yes
+    nmcli connection up "ristomele wired"
 
 Overview
 =========
