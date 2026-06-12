@@ -180,9 +180,10 @@ async function findPrintChar(server) {
 }
 
 async function bleWriteChunked(chr, data) {
-    var CHUNK = 512;
+    var CHUNK = 100;
     for (var i = 0; i < data.length; i += CHUNK) {
         await chr.writeValue(data.slice(i, i + CHUNK));
+        await new Promise(function(r) { setTimeout(r, 20); });
     }
 }
 
