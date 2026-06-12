@@ -6,3 +6,7 @@ sudo cp *.service /etc/systemd/system/
 sudo ln -fs /etc/systemd/system/ristomele*.service /etc/systemd/system/multi-user.target.wants/
 
 sudo systemctl daemon-reload
+
+# install stunnel config for HTTPS on port 5001
+sudo cp ../stunnel.conf /etc/stunnel/ristomele.conf
+sudo service stunnel4 restart

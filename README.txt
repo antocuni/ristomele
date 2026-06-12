@@ -64,26 +64,38 @@ ristomele.log
 spooler.log
 uwsgi.log
 
-The web server runs on HTTPS port 5000. To check that it works, visit the page
-(using the appropriate IP address, of course):
-   https://192.168.1.6:5000/
+The web server runs on two ports:
+   http://192.168.1.6:5000/   (HTTP, served by uwsgi)
+   https://192.168.1.6/       (HTTPS on port 443, served by stunnel → uwsgi)
 
-The browser will warn about a self-signed certificate — accept it once and the
-exception is remembered.
+Port 443 is the standard HTTPS port, so no port number is needed in the URL.
+The browser will warn about the self-signed certificate on first visit —
+accept it once and the exception is remembered.
 
-TLS certificate (first-time setup)
-------------------------------------
+stunnel runs as root in order to bind to the privileged port 443, then
+forwards connections to uwsgi on localhost:5000 (which runs as user sta).
 
-The uwsgi config expects a self-signed certificate in ~/ristomele/. Generate it
-once after cloning/pulling (must be run from the ristomele directory):
+HTTPS via stunnel (first-time setup)
+--------------------------------------
+
+stunnel listens on port 443, terminates TLS, and forwards plain HTTP to
+uwsgi on port 5000. Install it and deploy the config:
+
+  $ sudo apt install stunnel4
+  $ sudo cp ~/ristomele/etc/stunnel.conf /etc/stunnel/ristomele.conf
+  $ sudo service stunnel4 restart
+
+(install.sh does this automatically.)
+
+Generate a self-signed certificate once after cloning/pulling:
 
   $ cd ~/ristomele
   $ ./generate_cert.sh
 
-This creates ssl_cert.pem and ssl_key.pem. They are not committed to git (they
-are machine-specific). After generating, restart the service:
+This creates ssl_cert.pem and ssl_key.pem. They are not committed to git
+(machine-specific). After generating, restart stunnel:
 
-  $ sudo service ristomele restart
+  $ sudo service stunnel4 restart
 
 lp-thermal
 ===========
