@@ -634,6 +634,16 @@ async function screenShowOrder(orderId) {
                 var result = await api.post('/orders/', order);
                 var saved = result.order;
                 sessionStorage.setItem('show_order_back', isRist ? '#/tables' : '#/');
+                // Auto-print receipt after saving, with the real order id/date.
+                var sep = '\n\n\n' + '--------------------------------' + '\n\n\n';
+                var savedPrintText = cfg.is_sagra
+                    ? renderReceiptText(saved, cfg)
+                    : renderReceiptText(saved, cfg, 'COPIA CLIENTE') + sep + renderReceiptText(saved, cfg, 'COPIA CAMERIERE');
+                if (gs('dev_mode') === '1') {
+                    console.log('=== RICEVUTA ===\n' + savedPrintText);
+                } else if (navigator.bluetooth) {
+                    try { await blePrintText(savedPrintText); } catch (pe) { showError(pe.message); }
+                }
                 navigate('#/order/' + saved.id);
             }
         } catch (e) {
