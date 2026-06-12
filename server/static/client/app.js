@@ -734,7 +734,7 @@ async function screenOrderList() {
         return '<a href="#/order/' + o.id + '" class="list-group-item order-item" onclick="sessionStorage.setItem(\'show_order_back\',\'#/orders\')">' +
             '<span class="badge">' + o.id + '</span>' +
             '<strong>' + esc(o.customer || '—') + '</strong> ' +
-            '<small class="text-muted">' + esc(o.table || '') + ' [' + esc(date) + ']</small>' +
+            '<small class="text-muted">' + esc(o.cashier || '') + ' ' + esc(o.table || '') + ' [' + esc(date) + ']</small>' +
             '</a>';
     }).join('');
 
