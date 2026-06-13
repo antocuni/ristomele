@@ -237,12 +237,26 @@ async function bleGetDevice() {
 }
 
 function bleConnectWithTimeout(gatt, ms) {
-    return Promise.race([
-        gatt.connect(),
-        new Promise(function(_, reject) {
-            setTimeout(function() { reject(new Error('Stampante BLE non raggiungibile (timeout).')); }, ms);
-        }),
-    ]);
+    return new Promise(function(resolve, reject) {
+        var settled = false;
+        var timer = setTimeout(function() {
+            if (settled) return;
+            settled = true;
+            try { gatt.disconnect(); } catch (_) {}
+            reject(new Error('Stampante BLE non raggiungibile (timeout).'));
+        }, ms);
+        gatt.connect().then(function(server) {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            resolve(server);
+        }, function(e) {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            reject(e);
+        });
+    });
 }
 
 async function bleGetConnection() {
