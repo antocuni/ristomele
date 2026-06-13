@@ -675,15 +675,32 @@ async function screenNewOrder() {
     hideError();
     var cfg = await getMenuConfig();
 
-    var table  = sessionStorage.getItem('new_order_table')  || 'N/A';
+    var tableFromSession = sessionStorage.getItem('new_order_table');
+    var table  = tableFromSession || 'N/A';
     var waiter = sessionStorage.getItem('new_order_waiter') || 'N/A';
     sessionStorage.removeItem('new_order_table');
     sessionStorage.removeItem('new_order_waiter');
+
+    // If we arrived via back-navigation (no fresh table pick), restore the draft.
+    var restoreOrder = null;
+    if (!tableFromSession) {
+        var _stored = sessionStorage.getItem('current_order');
+        if (_stored) { try { restoreOrder = JSON.parse(_stored); } catch (_) {} }
+    }
+    if (restoreOrder) {
+        table  = restoreOrder.table  || 'N/A';
+        waiter = restoreOrder.waiter || 'N/A';
+    }
 
     setTitle(table !== 'N/A' ? 'Tavolo: ' + table : 'Tavolo: N/A');
     setBack(null);
 
     _orderItems = cfg.items.map(function(it) { return Object.assign({}, it, { count: 0 }); });
+    if (restoreOrder) {
+        var _countMap = {};
+        for (var _j = 0; _j < restoreOrder.menu.length; _j++) _countMap[restoreOrder.menu[_j].name] = restoreOrder.menu[_j].count || 0;
+        for (var _k = 0; _k < _orderItems.length; _k++) { if (_countMap[_orderItems[_k].name]) _orderItems[_k].count = _countMap[_orderItems[_k].name]; }
+    }
 
     var numCols = parseInt(gs('columns', '1'), 10) || 1;
 
@@ -707,8 +724,8 @@ async function screenNewOrder() {
     setContent(
         '<div class="new-order">' +
             '<div class="top-inputs">' +
-                '<input type="text" id="inp-customer" class="form-control" placeholder="Nome cliente">' +
-                '<input type="text" id="inp-notes"    class="form-control" placeholder="Note">' +
+                '<input type="text" id="inp-customer" class="form-control" placeholder="Nome cliente" value="' + esc(restoreOrder ? restoreOrder.customer || '' : '') + '">' +
+                '<input type="text" id="inp-notes"    class="form-control" placeholder="Note"         value="' + esc(restoreOrder ? restoreOrder.notes    || '' : '') + '">' +
             '</div>' +
             '<div id="item-list" style="display:grid;grid-template-columns:repeat(' + numCols + ',1fr);gap:1px 2px">' + itemsHtml() + '</div>' +
         '</div>' +
@@ -829,6 +846,7 @@ async function screenShowOrder(orderId) {
             } else {
                 var result = await api.post('/orders/', order);
                 var saved = result.order;
+                sessionStorage.removeItem('current_order');
                 sessionStorage.setItem('show_order_back', isRist ? '#/tables' : '#/');
                 // Auto-print receipt after saving, with the real order id/date.
                 var sep = '\n\n\n' + '--------------------------------' + '\n\n\n';
