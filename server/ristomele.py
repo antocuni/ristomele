@@ -268,6 +268,29 @@ def index():
     return flask.Response('<meta http-equiv="refresh" content="0;url=/client/">', content_type='text/html')
 
 
+@ristomele.route('/deliveries/', methods=['POST'])
+def register_delivery():
+    from server import model
+    data = flask.request.json
+    if data is None:
+        return error('Expected JSON request', 400)
+    order_id = data.get('order_id')
+    if not order_id:
+        return error('order_id richiesto', 400)
+    myorder = model.Order.query.get(order_id)
+    if myorder is None:
+        return error('Ordine %s non trovato' % order_id)
+    delivery = model.Delivery(
+        order_id=order_id,
+        delivery_time=datetime.now(),
+    )
+    model.db.session.add(delivery)
+    model.db.session.commit()
+    waiting_seconds = (delivery.delivery_time - myorder.date).total_seconds()
+    return flask.jsonify(result='OK', delivery=delivery.as_dict(),
+                         waiting_seconds=waiting_seconds)
+
+
 @ristomele.route('/menu/', methods=['GET'])
 def get_menu():
     from server import menu as server_menu

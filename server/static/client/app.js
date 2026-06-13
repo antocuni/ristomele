@@ -538,6 +538,7 @@ async function screenMain() {
             '<div class="list-group">' +
                 newOrderBtn +
                 '<a href="#/orders"      class="list-group-item main-item">Lista ordini <span class="main-chevron">›</span></a>' +
+                '<a href="#/waiting"     class="list-group-item main-item">Tempi di attesa <span class="main-chevron">›</span></a>' +
                 (isRist ? '<a href="#/tables/edit" class="list-group-item main-item">Configura tavoli <span class="main-chevron">›</span></a>' : '') +
                 '<a href="#/settings"    class="list-group-item main-item">Impostazioni <span class="main-chevron">›</span></a>' +
                 '<a href="/stats/" target="_blank" class="list-group-item main-item">Statistiche <span class="main-chevron">›</span></a>' +
@@ -1063,6 +1064,50 @@ async function screenEditTables() {
     };
 }
 
+async function screenWaitingTimes() {
+    hideError();
+    setTitle('Tempi di attesa');
+    setBack('#/');
+
+    setContent(
+        '<div class="container-fluid" style="padding-top:12px">' +
+            '<div class="form-group">' +
+                '<label>Numero ordine</label>' +
+                '<input type="number" id="inp-order-id" class="form-control" placeholder="Num. ordine in consegna ADESSO" min="1" style="font-size:24px;height:50px">' +
+            '</div>' +
+            '<button id="btn-registra" class="btn btn-primary btn-block" style="height:50px;font-size:18px">Registra consegna</button>' +
+            '<div id="delivery-result" style="margin-top:20px"></div>' +
+        '</div>'
+    );
+
+    $id('btn-registra').onclick = async function() {
+        var orderId = parseInt($id('inp-order-id').value, 10);
+        if (!orderId || orderId < 1) { showError('Inserisci un numero ordine valido'); return; }
+        disableBtn('btn-registra', true);
+        try {
+            var result = await api.post('/deliveries/', { order_id: orderId });
+            var mins = Math.floor(result.waiting_seconds / 60);
+            var secs = Math.floor(result.waiting_seconds % 60);
+            var waitStr = mins + ' min ' + secs + ' sec';
+            $id('delivery-result').innerHTML =
+                '<div class="alert alert-success">' +
+                    '<strong>Ordine #' + orderId + ' consegnato!</strong><br>' +
+                    'Tempo di attesa: <strong>' + waitStr + '</strong>' +
+                '</div>';
+            $id('inp-order-id').value = '';
+            $id('inp-order-id').focus();
+        } catch (e) {
+            showError(e.message);
+        } finally {
+            disableBtn('btn-registra', false);
+        }
+    };
+
+    $id('inp-order-id').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.keyCode === 13) $id('btn-registra').click();
+    });
+}
+
 // ─── Router ──────────────────────────────────────────────────────────────────
 
 async function route() {
@@ -1091,6 +1136,8 @@ async function route() {
             await screenEditTables();
         } else if (parts[0] === 'tables') {
             await screenTables();
+        } else if (parts[0] === 'waiting') {
+            await screenWaitingTimes();
         } else {
             await screenMain();
         }
