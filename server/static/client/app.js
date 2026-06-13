@@ -442,13 +442,11 @@ function hideModal() {
 }
 
 function showError(msg) {
-    var bar = document.getElementById('error-bar');
-    document.getElementById('error-msg').textContent = msg;
-    bar.style.display = 'flex';
+    showModal('<p style="color:#a94442">' + esc(msg) + '</p>');
 }
 
 function hideError() {
-    document.getElementById('error-bar').style.display = 'none';
+    // Errors are now modals — dismissed explicitly by the user, not on navigation.
 }
 
 function setContent(html) { document.getElementById('app').innerHTML = html; }

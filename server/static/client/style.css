@@ -60,37 +60,6 @@ body {
 
 body.offline-mode { padding-top: 88px; }
 
-/* ── Error bar ────────────────────────────────────────────────────────────── */
-
-#error-bar {
-    position: fixed;
-    top: 50px;
-    left: 0;
-    right: 0;
-    z-index: 3000;
-    background: #f8d7da;
-    color: #721c24;
-    border-bottom: 1px solid #f5c6cb;
-    padding: 10px 15px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin: 0;
-    border-radius: 0;
-}
-
-#error-bar button {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    color: inherit;
-    flex-shrink: 0;
-    padding: 0;
-    line-height: 1;
-}
-
 /* ── Bottom bar ───────────────────────────────────────────────────────────── */
 
 .bottom-bar {
