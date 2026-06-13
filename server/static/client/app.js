@@ -144,6 +144,11 @@ var _bleDevice = null;   // BluetoothDevice
 var _bleServer = null;   // BluetoothRemoteGATTServer (may be disconnected)
 var _bleChr    = null;   // cached write characteristic
 
+// Cached USB state
+var _usbDevice   = null; // USBDevice
+var _usbEpNum    = null; // bulk-OUT endpoint number
+var _usbIfaceNum = null; // claimed interface number
+
 var PRINTER_SERVICES = [
     'e7810a71-73ae-499d-8c15-faa9aef0c3f2',
     '000018f0-0000-1000-8000-00805f9b34fb',
@@ -286,6 +291,108 @@ async function bleSelectPrinter() {
     return device;
 }
 
+// ─── USB printing ────────────────────────────────────────────────────────────
+
+function usbFindBulkOut(device) {
+    for (var ci = 0; ci < device.configurations.length; ci++) {
+        var cfg = device.configurations[ci];
+        for (var ii = 0; ii < cfg.interfaces.length; ii++) {
+            var iface = cfg.interfaces[ii];
+            for (var ai = 0; ai < iface.alternates.length; ai++) {
+                var alt = iface.alternates[ai];
+                for (var ei = 0; ei < alt.endpoints.length; ei++) {
+                    var ep = alt.endpoints[ei];
+                    if (ep.type === 'bulk' && ep.direction === 'out') {
+                        return { ifaceNum: iface.interfaceNumber, altSetting: alt.alternateSetting, epNum: ep.endpointNumber };
+                    }
+                }
+            }
+        }
+    }
+    return null;
+}
+
+async function usbSelectPrinter() {
+    if (!navigator.usb) throw new Error('WebUSB non supportato in questo browser.');
+    var device = await navigator.usb.requestDevice({ filters: [] });
+    var name = ((device.productName || device.manufacturerName || '').trim()) || ('USB #' + device.productId.toString(16));
+    ss('usb_device_name', name);
+    ss('usb_vendor_id',   String(device.vendorId));
+    ss('usb_product_id',  String(device.productId));
+    _usbDevice = device; _usbEpNum = null; _usbIfaceNum = null;
+    return device;
+}
+
+async function usbGetConnection() {
+    var vendorId  = parseInt(gs('usb_vendor_id'),  10);
+    var productId = parseInt(gs('usb_product_id'), 10);
+    if (!vendorId || !productId) throw new Error('Nessuna stampante USB configurata. Vai in Impostazioni e seleziona una stampante.');
+
+    if (_usbDevice && (_usbDevice.vendorId !== vendorId || _usbDevice.productId !== productId)) {
+        try { if (_usbDevice.opened) await _usbDevice.close(); } catch (_) {}
+        _usbDevice = null; _usbEpNum = null; _usbIfaceNum = null;
+    }
+
+    if (!_usbDevice || !_usbDevice.opened) {
+        if (!_usbDevice && navigator.usb.getDevices) {
+            var granted = await navigator.usb.getDevices();
+            for (var i = 0; i < granted.length; i++) {
+                if (granted[i].vendorId === vendorId && granted[i].productId === productId) { _usbDevice = granted[i]; break; }
+            }
+        }
+        if (!_usbDevice) throw new Error('Stampante USB non trovata. Collegala e riprova.');
+        _usbEpNum = null; _usbIfaceNum = null;
+        await _usbDevice.open();
+        if (_usbDevice.configuration === null) await _usbDevice.selectConfiguration(1);
+    }
+
+    if (_usbEpNum === null) {
+        var found = usbFindBulkOut(_usbDevice);
+        if (!found) { await _usbDevice.close(); _usbDevice = null; throw new Error('Endpoint di stampa USB non trovato sulla stampante.'); }
+        try {
+            await _usbDevice.claimInterface(found.ifaceNum);
+        } catch (e) {
+            _usbDevice = null; _usbEpNum = null;
+            var ce = new Error('usb_claim_failed');
+            ce.isUsbClaimError = true;
+            throw ce;
+        }
+        await _usbDevice.selectAlternateInterface(found.ifaceNum, found.altSetting);
+        _usbIfaceNum = found.ifaceNum;
+        _usbEpNum    = found.epNum;
+    }
+    return _usbEpNum;
+}
+
+async function usbPrintText(text) {
+    if (!navigator.usb) throw new Error('WebUSB non supportato. Usa Chrome/Edge su Android o desktop.');
+    if (!gs('usb_device_name')) throw new Error('Nessuna stampante USB configurata. Vai in Impostazioni e seleziona una stampante.');
+    var epNum = await usbGetConnection();
+    var CHUNK = 512;
+    async function send(bytes) { await _usbDevice.transferOut(epNum, bytes); }
+    await send(new Uint8Array([0x1B, 0x40]));        // ESC @      — init
+    await send(new Uint8Array([0x1B, 0x74, 0x10])); // ESC t 16  — WPC1252
+    var data = encodeWPC1252(text);
+    for (var i = 0; i < data.length; i += CHUNK) await send(data.slice(i, i + CHUNK));
+    await send(new Uint8Array([0x1B, 0x64, 0x03])); // ESC d 3   — feed 3 lines
+}
+
+// ─── Unified print ───────────────────────────────────────────────────────────
+
+async function printText(text) {
+    if (gs('print_via', 'ble') === 'dev') { console.log('=== RICEVUTA ===\n' + text); return; }
+    if (gs('print_via', 'ble') === 'usb') {
+        try {
+            await usbPrintText(text);
+        } catch (e) {
+            if (e.isUsbClaimError) { showUsbClaimModal(); } else { throw e; }
+        }
+        return;
+    } else {
+        await blePrintText(text);
+    }
+}
+
 // ─── UI helpers ──────────────────────────────────────────────────────────────
 
 function esc(s) {
@@ -316,6 +423,24 @@ function hideOfflineBanner() {
     if (_offlineTimer) { clearInterval(_offlineTimer); _offlineTimer = null; }
 }
 
+function showUsbClaimModal() {
+    showModal(
+        '<h4>Stampante USB non accessibile</h4>' +
+        '<p>Il sistema operativo ha già occupato l\'interfaccia USB della stampante e il browser non riesce ad accedervi.</p>' +
+        '<p>Su Linux, esegui questo comando e riprova:</p>' +
+        '<code>sudo modprobe -r usblp</code>'
+    );
+}
+
+function showModal(html) {
+    $id('modal-body').innerHTML = html;
+    $id('modal-overlay').style.display = 'flex';
+}
+
+function hideModal() {
+    $id('modal-overlay').style.display = 'none';
+}
+
 function showError(msg) {
     var bar = document.getElementById('error-bar');
     document.getElementById('error-msg').textContent = msg;
@@ -342,7 +467,7 @@ function setBack(hashOrFn) {
 }
 
 function updateDevBadge() {
-    document.getElementById('dev-badge').style.display = gs('dev_mode') === '1' ? '' : 'none';
+    document.getElementById('dev-badge').style.display = gs('print_via', 'ble') === 'dev' ? '' : 'none';
 }
 
 function navigate(hash) { location.hash = hash; }
@@ -389,12 +514,13 @@ async function screenSettings() {
     setBack('#/');
 
     var cashier        = gs('cashier');
-    var devMode        = gs('dev_mode') === '1';
     var bleName        = gs('ble_device_name');
     var bleId          = gs('ble_device_id');
     var bleLabel       = bleName ? bleName + (bleId ? ' [' + bleId.slice(-8) + ']' : '') : '(nessuna)';
     var bleFilterOnly  = gs('ble_filter_printers', '1') === '1';
     var cols           = gs('columns', '1');
+    var printVia       = gs('print_via', 'ble');
+    var usbLabel       = gs('usb_device_name') || '(nessuna)';
 
     var serverTimeHtml = '<em>caricamento...</em>';
 
@@ -405,6 +531,14 @@ async function screenSettings() {
                 '<input type="text" id="inp-cashier" class="form-control" value="' + esc(cashier) + '">' +
             '</div>' +
             '<div class="form-group">' +
+                '<label>Metodo di stampa</label>' +
+                '<select id="sel-print-via" class="form-control">' +
+                    '<option value="ble"' + (printVia === 'ble' ? ' selected' : '') + '>Bluetooth (BLE)</option>' +
+                    '<option value="usb"' + (printVia === 'usb' ? ' selected' : '') + '>USB</option>' +
+                    '<option value="dev"' + (printVia === 'dev' ? ' selected' : '') + '>Console (sviluppo)</option>' +
+                '</select>' +
+            '</div>' +
+            '<div id="sec-ble" class="form-group"' + (printVia !== 'ble' ? ' style="display:none"' : '') + '>' +
                 '<label>Stampante BLE</label>' +
                 '<div class="input-group">' +
                     '<span class="input-group-addon" id="ble-name">' + esc(bleLabel) + '</span>' +
@@ -418,6 +552,16 @@ async function screenSettings() {
                     'Mostra solo stampanti' +
                 '</label></div>' +
             '</div>' +
+            '<div id="sec-usb" class="form-group"' + (printVia !== 'usb' ? ' style="display:none"' : '') + '>' +
+                '<label>Stampante USB</label>' +
+                '<div class="input-group">' +
+                    '<span class="input-group-addon" id="usb-name">' + esc(usbLabel) + '</span>' +
+                    '<span class="input-group-btn">' +
+                        '<button id="btn-usb" class="btn btn-default" type="button">Seleziona</button>' +
+                    '</span>' +
+                '</div>' +
+                '<button id="btn-test-print-usb" class="btn btn-default btn-sm" style="margin-top:6px">Prova stampa</button>' +
+            '</div>' +
             '<div class="form-group">' +
                 '<label>Colonne menu</label>' +
                 '<select id="sel-columns" class="form-control">' +
@@ -425,12 +569,6 @@ async function screenSettings() {
                     '<option value="2"' + (cols === '2' ? ' selected' : '') + '>2 colonne</option>' +
                     '<option value="3"' + (cols === '3' ? ' selected' : '') + '>3 colonne</option>' +
                 '</select>' +
-            '</div>' +
-            '<div class="form-group">' +
-                '<div class="checkbox"><label>' +
-                    '<input type="checkbox" id="chk-dev" ' + (devMode ? 'checked' : '') + '> ' +
-                    'Modalità sviluppo (stampa in console)' +
-                '</label></div>' +
             '</div>' +
             '<hr>' +
             '<div class="form-group">' +
@@ -455,8 +593,8 @@ async function screenSettings() {
     $id('btn-save').onclick = function() {
         ss('cashier',             $id('inp-cashier').value.trim());
         ss('columns',             $id('sel-columns').value);
-        ss('dev_mode',            $id('chk-dev').checked ? '1' : '0');
         ss('ble_filter_printers', $id('chk-ble-filter').checked ? '1' : '0');
+        ss('print_via',           $id('sel-print-via').value);
         updateDevBadge();
         navigate('#/');
     };
@@ -482,6 +620,37 @@ async function screenSettings() {
             showError(e.message);
         } finally {
             disableBtn('btn-test-print', false);
+        }
+    };
+
+    $id('sel-print-via').onchange = function() {
+        var v = this.value;
+        $id('sec-ble').style.display = v === 'ble' ? '' : 'none';
+        $id('sec-usb').style.display = v === 'usb' ? '' : 'none';
+        updateDevBadge();
+    };
+
+    $id('btn-usb').onclick = async function() {
+        disableBtn('btn-usb', true);
+        try {
+            var dev = await usbSelectPrinter();
+            var label = ((dev.productName || dev.manufacturerName || '').trim()) || ('USB #' + dev.productId.toString(16));
+            $id('usb-name').textContent = label;
+        } catch (e) {
+            showError(e.message);
+        } finally {
+            disableBtn('btn-usb', false);
+        }
+    };
+
+    $id('btn-test-print-usb').onclick = async function() {
+        disableBtn('btn-test-print-usb', true);
+        try {
+            await usbPrintText('Prova stampa RistoMele\n');
+        } catch (e) {
+            if (e.isUsbClaimError) { showUsbClaimModal(); } else { showError(e.message); }
+        } finally {
+            disableBtn('btn-test-print-usb', false);
         }
     };
 
@@ -602,12 +771,12 @@ async function screenShowOrder(orderId) {
     setBack(backDest ? backDest : null);
 
     var receiptText = renderReceiptText(order, cfg);
-    var printText;
+    var receiptForPrint;
     if (cfg.is_sagra) {
-        printText = receiptText;
+        receiptForPrint = receiptText;
     } else {
         var sep = '\n\n\n' + '--------------------------------' + '\n\n\n';
-        printText = renderReceiptText(order, cfg, 'COPIA CLIENTE') +
+        receiptForPrint = renderReceiptText(order, cfg, 'COPIA CLIENTE') +
                     sep +
                     renderReceiptText(order, cfg, 'COPIA CAMERIERE');
     }
@@ -666,11 +835,7 @@ async function screenShowOrder(orderId) {
                 var savedPrintText = cfg.is_sagra
                     ? renderReceiptText(saved, cfg)
                     : renderReceiptText(saved, cfg, 'COPIA CLIENTE') + sep + renderReceiptText(saved, cfg, 'COPIA CAMERIERE');
-                if (gs('dev_mode') === '1') {
-                    console.log('=== RICEVUTA ===\n' + savedPrintText);
-                } else if (navigator.bluetooth) {
-                    try { await blePrintText(savedPrintText); } catch (pe) { showError(pe.message); }
-                }
+                try { await printText(savedPrintText); } catch (pe) { showError(pe.message); }
                 navigate('#/order/' + saved.id);
             }
         } catch (e) {
@@ -692,17 +857,9 @@ async function screenShowOrder(orderId) {
     };
 
     $id('btn-receipt').onclick = async function() {
-        if (gs('dev_mode') === '1') {
-            console.log('=== RICEVUTA ===\n' + printText);
-            return;
-        }
-        if (!navigator.bluetooth) {
-            showError('Web Bluetooth non supportato. Usa Chrome su Android o Chrome/Edge desktop.');
-            return;
-        }
         disableBtn('btn-receipt', true);
         try {
-            await blePrintText(printText);
+            await printText(receiptForPrint);
         } catch (e) {
             showError(e.message);
         } finally {
