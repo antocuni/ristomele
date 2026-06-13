@@ -1152,6 +1152,88 @@ function renderDeliveriesTable(deliveries) {
         '</table>';
 }
 
+function renderWaitPlot(deliveries) {
+    var points = deliveries
+        .filter(function(d) { return d.order_date && d.waiting_seconds != null; })
+        .slice()
+        .sort(function(a, b) { return a.order_id - b.order_id; });
+    if (points.length < 2) return '<p class="text-muted" style="text-align:center">Dati insufficienti per il grafico</p>';
+
+    var W = 560, H = 220;
+    var ml = 45, mr = 15, mt = 15, mb = 35;
+    var pw = W - ml - mr, ph = H - mt - mb;
+
+    function toMinutes(dateStr) {
+        var d = new Date(dateStr.replace(' ', 'T'));
+        return d.getHours() * 60 + d.getMinutes();
+    }
+
+    var xVals = points.map(function(d) { return toMinutes(d.order_date); });
+    var xMin = Math.min.apply(null, xVals);
+    var xMax = Math.max.apply(null, xVals);
+    var xPad = Math.max((xMax - xMin) * 0.05, 5);
+    xMin -= xPad; xMax += xPad;
+
+    var yMax = Math.ceil(Math.max.apply(null, points.map(function(d) { return d.waiting_seconds / 60; })) / 10) * 10 || 10;
+
+    function xp(min) { return ml + (min - xMin) / (xMax - xMin) * pw; }
+    function yp(m)   { return mt + ph * (1 - m / yMax); }
+
+    // X ticks — adaptive interval so there are always labels
+    var xRange = xMax - xMin;
+    var xTickStep = xRange < 20 ? 5 : xRange < 60 ? 10 : xRange < 120 ? 15 : xRange < 300 ? 30 : 60;
+    var xTicks = [];
+    for (var t = Math.ceil(xMin / xTickStep) * xTickStep; t <= xMax; t += xTickStep) {
+        var raw = ((t % 1440) + 1440) % 1440; // wrap to 0-1439
+        var hh = Math.floor(raw / 60);
+        var mm = raw % 60;
+        xTicks.push({ v: t, label: String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0') });
+    }
+
+    // Y ticks
+    var yStep = yMax <= 30 ? 5 : yMax <= 90 ? 10 : yMax <= 180 ? 30 : 60;
+    var yTicks = [];
+    for (var y = 0; y <= yMax; y += yStep) yTicks.push(y);
+
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;display:block;margin:8px 0" xmlns="http://www.w3.org/2000/svg">';
+
+    // Grid
+    s += '<g stroke="#eee" stroke-width="1">';
+    yTicks.forEach(function(y) { s += '<line x1="' + ml + '" y1="' + yp(y) + '" x2="' + (ml + pw) + '" y2="' + yp(y) + '"/>'; });
+    s += '</g>';
+
+    // Axes
+    s += '<line x1="' + ml + '" y1="' + mt + '" x2="' + ml + '" y2="' + (mt + ph) + '" stroke="#333" stroke-width="1.5"/>';
+    s += '<line x1="' + ml + '" y1="' + (mt + ph) + '" x2="' + (ml + pw) + '" y2="' + (mt + ph) + '" stroke="#333" stroke-width="1.5"/>';
+
+    // Y labels
+    s += '<g font-size="11" fill="#555" text-anchor="end">';
+    yTicks.forEach(function(y) {
+        s += '<line x1="' + (ml - 4) + '" y1="' + yp(y) + '" x2="' + ml + '" y2="' + yp(y) + '" stroke="#333"/>';
+        s += '<text x="' + (ml - 7) + '" y="' + (yp(y) + 4) + '">' + y + 'm</text>';
+    });
+    s += '</g>';
+
+    // X labels
+    s += '<g font-size="11" fill="#555" text-anchor="middle">';
+    xTicks.forEach(function(tick) {
+        s += '<line x1="' + xp(tick.v) + '" y1="' + (mt + ph) + '" x2="' + xp(tick.v) + '" y2="' + (mt + ph + 4) + '" stroke="#333"/>';
+        s += '<text x="' + xp(tick.v) + '" y="' + (mt + ph + 16) + '">' + tick.label + '</text>';
+    });
+    s += '</g>';
+
+    // Dots
+    s += '<g fill="#337ab7" stroke="white" stroke-width="1.5">';
+    points.forEach(function(d) {
+        s += '<circle cx="' + xp(toMinutes(d.order_date)).toFixed(1) + '" cy="' + yp(d.waiting_seconds / 60).toFixed(1) + '" r="5">' +
+             '<title>#' + d.order_id + ' — ' + fmtWait(d.waiting_seconds) + '</title></circle>';
+    });
+    s += '</g>';
+
+    s += '</svg>';
+    return s;
+}
+
 async function screenWaitingTimes() {
     hideError();
     setTitle('Tempi di attesa');
@@ -1165,13 +1247,16 @@ async function screenWaitingTimes() {
             '</div>' +
             '<button id="btn-registra" class="btn btn-primary btn-block" style="height:50px;font-size:18px">Registra consegna</button>' +
             '<div id="delivery-result" style="margin-top:12px"></div>' +
+            '<div id="delivery-plot"></div>' +
             '<div id="delivery-table">Caricamento...</div>' +
         '</div>'
     );
 
     async function refreshTable() {
         try {
-            var deliveries = await api.get('/deliveries/?limit=10');
+            var all = await api.get('/deliveries/?limit=500');
+            $id('delivery-plot').innerHTML = renderWaitPlot(all);
+            var deliveries = all.slice(0, 10);
             $id('delivery-table').innerHTML = renderDeliveriesTable(deliveries);
             $id('delivery-table').querySelectorAll('.btn-del-delivery').forEach(function(btn) {
                 btn.onclick = async function() {
