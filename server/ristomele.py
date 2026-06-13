@@ -287,6 +287,17 @@ def list_deliveries():
     return flask.jsonify(result)
 
 
+@ristomele.route('/deliveries/<int:delivery_id>/', methods=['DELETE'])
+def delete_delivery(delivery_id):
+    from server import model
+    delivery = model.Delivery.query.get(delivery_id)
+    if delivery is None:
+        return error('Consegna %s non trovata' % delivery_id)
+    model.db.session.delete(delivery)
+    model.db.session.commit()
+    return flask.jsonify(result='OK')
+
+
 @ristomele.route('/deliveries/', methods=['POST'])
 def register_delivery():
     from server import model

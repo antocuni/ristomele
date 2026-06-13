@@ -39,6 +39,9 @@ var api = {
     put: function(path, body) {
         return apiFetch(path, { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body) });
     },
+    delete: function(path) {
+        return apiFetch(path, { method: 'DELETE' });
+    },
 };
 
 // ─── Menu config (session cache) ─────────────────────────────────────────────
@@ -1125,6 +1128,7 @@ function renderDeliveriesTable(deliveries) {
             '<td>' + esc(fmtEmesso(d.order_date, d.delivery_time)) + '</td>' +
             '<td>' + esc(fmtConsegnato(d.order_date, d.delivery_time)) + '</td>' +
             '<td>' + fmtWait(d.waiting_seconds) + '</td>' +
+            '<td><button class="btn btn-danger btn-xs btn-del-delivery" data-id="' + d.id + '">✕</button></td>' +
             '</tr>';
     }).join('');
     function statRow(label, entry, waitSeconds) {
@@ -1169,6 +1173,19 @@ async function screenWaitingTimes() {
         try {
             var deliveries = await api.get('/deliveries/?limit=10');
             $id('delivery-table').innerHTML = renderDeliveriesTable(deliveries);
+            $id('delivery-table').querySelectorAll('.btn-del-delivery').forEach(function(btn) {
+                btn.onclick = async function() {
+                    var id = btn.getAttribute('data-id');
+                    btn.disabled = true;
+                    try {
+                        await api.delete('/deliveries/' + id + '/');
+                        await refreshTable();
+                    } catch (e) {
+                        showError(e.message);
+                        btn.disabled = false;
+                    }
+                };
+            });
         } catch (e) {
             $id('delivery-table').innerHTML = '<p class="text-danger">Errore caricamento dati</p>';
         }
