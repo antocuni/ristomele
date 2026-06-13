@@ -219,6 +219,15 @@ async function bleGetDevice() {
     return _bleDevice;
 }
 
+function bleConnectWithTimeout(gatt, ms) {
+    return Promise.race([
+        gatt.connect(),
+        new Promise(function(_, reject) {
+            setTimeout(function() { reject(new Error('Stampante BLE non raggiungibile (timeout).')); }, ms);
+        }),
+    ]);
+}
+
 async function bleGetConnection() {
     var deviceId = gs('ble_device_id');
     // If the user picked a different printer in Settings, drop the old connection.
@@ -232,11 +241,11 @@ async function bleGetConnection() {
     _bleChr = null;
     if (_bleServer && !_bleServer.connected) {
         // Reconnect silently — no picker.
-        try { await _bleServer.connect(); } catch (_) { _bleServer = null; }
+        try { await bleConnectWithTimeout(_bleServer, 8000); } catch (_) { _bleServer = null; }
     }
     if (!_bleServer || !_bleServer.connected) {
         var device = await bleGetDevice();
-        _bleServer = await device.gatt.connect();
+        _bleServer = await bleConnectWithTimeout(device.gatt, 8000);
     }
     _bleChr = await findPrintChar(_bleServer);
     if (!_bleChr) { _bleServer.disconnect(); _bleServer = null; throw new Error('Caratteristica di stampa non trovata sulla stampante.'); }
