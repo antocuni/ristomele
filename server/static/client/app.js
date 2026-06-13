@@ -1064,6 +1064,90 @@ async function screenEditTables() {
     };
 }
 
+function dwimDateKey(dateStr) {
+    var d = new Date(dateStr.replace(' ', 'T'));
+    d.setHours(d.getHours() - 3);
+    return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+}
+
+function formatTimeOnly(dateStr) {
+    var d = new Date(dateStr.replace(' ', 'T'));
+    return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+
+function fmtEmesso(orderDate, deliveryTime) {
+    if (!orderDate) return '—';
+    if (deliveryTime && dwimDateKey(orderDate) === dwimDateKey(deliveryTime)) return formatTimeOnly(orderDate);
+    return formatDateShort(orderDate);
+}
+
+function fmtConsegnato(orderDate, deliveryTime) {
+    if (!deliveryTime) return '—';
+    if (orderDate && dwimDateKey(orderDate) === dwimDateKey(deliveryTime)) return formatTimeOnly(deliveryTime);
+    return formatDateShort(deliveryTime);
+}
+
+function fmtWait(seconds) {
+    if (seconds == null) return '—';
+    var m = Math.floor(seconds / 60);
+    var h = Math.floor(m / 60);
+    var rm = m % 60;
+    return h > 0 ? h + 'h' + rm + 'm' : m + 'm';
+}
+
+function computeWaitStats(deliveries) {
+    var sorted = deliveries
+        .filter(function(d) { return d.waiting_seconds != null; })
+        .slice()
+        .sort(function(a, b) { return a.waiting_seconds - b.waiting_seconds; });
+    if (!sorted.length) return null;
+    var sum = sorted.reduce(function(a, d) { return a + d.waiting_seconds; }, 0);
+    var mid = Math.floor(sorted.length / 2);
+    var medianSeconds = sorted.length % 2 === 0
+        ? (sorted[mid - 1].waiting_seconds + sorted[mid].waiting_seconds) / 2
+        : sorted[mid].waiting_seconds;
+    var medianEntry = sorted.length % 2 !== 0 ? sorted[mid] : null;
+    return {
+        min: sorted[0],
+        max: sorted[sorted.length - 1],
+        avg: sum / sorted.length,
+        median: medianSeconds,
+        medianEntry: medianEntry,
+    };
+}
+
+function renderDeliveriesTable(deliveries) {
+    if (!deliveries.length) return '<p class="empty-msg">Nessuna consegna registrata</p>';
+    var stats = computeWaitStats(deliveries);
+    var rows = deliveries.map(function(d) {
+        return '<tr>' +
+            '<td>#' + d.order_id + '</td>' +
+            '<td>' + esc(fmtEmesso(d.order_date, d.delivery_time)) + '</td>' +
+            '<td>' + esc(fmtConsegnato(d.order_date, d.delivery_time)) + '</td>' +
+            '<td>' + fmtWait(d.waiting_seconds) + '</td>' +
+            '</tr>';
+    }).join('');
+    function statRow(label, entry, waitSeconds) {
+        var ordine = entry ? '#' + entry.order_id : '—';
+        var emesso = entry ? fmtEmesso(entry.order_date, entry.delivery_time) : '—';
+        var consegnato = entry ? fmtConsegnato(entry.order_date, entry.delivery_time) : '—';
+        return '<tr class="active"><td><strong>' + label + '</strong> ' + ordine + '</td>' +
+            '<td>' + esc(emesso) + '</td>' +
+            '<td>' + esc(consegnato) + '</td>' +
+            '<td>' + fmtWait(waitSeconds) + '</td></tr>';
+    }
+    var statsRows = stats
+        ? statRow('Min',     stats.min,         stats.min.waiting_seconds) +
+          statRow('Max',     stats.max,         stats.max.waiting_seconds) +
+          statRow('Media',   null,              stats.avg) +
+          statRow('Mediana', stats.medianEntry, stats.median)
+        : '';
+    return '<table class="table table-condensed table-striped" style="margin-top:12px">' +
+        '<thead><tr><th>Ordine</th><th>Emesso</th><th>Consegnato</th><th>Attesa</th></tr></thead>' +
+        '<tbody>' + rows + (statsRows ? '<tr><td colspan="4"><hr style="margin:4px 0"></td></tr>' + statsRows : '') + '</tbody>' +
+        '</table>';
+}
+
 async function screenWaitingTimes() {
     hideError();
     setTitle('Tempi di attesa');
@@ -1076,9 +1160,19 @@ async function screenWaitingTimes() {
                 '<input type="number" id="inp-order-id" class="form-control" placeholder="Num. ordine in consegna ADESSO" min="1" style="font-size:24px;height:50px">' +
             '</div>' +
             '<button id="btn-registra" class="btn btn-primary btn-block" style="height:50px;font-size:18px">Registra consegna</button>' +
-            '<div id="delivery-result" style="margin-top:20px"></div>' +
+            '<div id="delivery-result" style="margin-top:12px"></div>' +
+            '<div id="delivery-table">Caricamento...</div>' +
         '</div>'
     );
+
+    async function refreshTable() {
+        try {
+            var deliveries = await api.get('/deliveries/?limit=10');
+            $id('delivery-table').innerHTML = renderDeliveriesTable(deliveries);
+        } catch (e) {
+            $id('delivery-table').innerHTML = '<p class="text-danger">Errore caricamento dati</p>';
+        }
+    }
 
     $id('btn-registra').onclick = async function() {
         var orderId = parseInt($id('inp-order-id').value, 10);
@@ -1086,16 +1180,15 @@ async function screenWaitingTimes() {
         disableBtn('btn-registra', true);
         try {
             var result = await api.post('/deliveries/', { order_id: orderId });
-            var mins = Math.floor(result.waiting_seconds / 60);
-            var secs = Math.floor(result.waiting_seconds % 60);
-            var waitStr = mins + ' min ' + secs + ' sec';
+            var waitStr = fmtWait(result.waiting_seconds);
             $id('delivery-result').innerHTML =
-                '<div class="alert alert-success">' +
-                    '<strong>Ordine #' + orderId + ' consegnato!</strong><br>' +
-                    'Tempo di attesa: <strong>' + waitStr + '</strong>' +
+                '<div class="alert alert-success" style="margin-bottom:8px">' +
+                    '<strong>Ordine #' + orderId + ' consegnato!</strong> ' +
+                    'Attesa: <strong>' + waitStr + '</strong>' +
                 '</div>';
             $id('inp-order-id').value = '';
             $id('inp-order-id').focus();
+            await refreshTable();
         } catch (e) {
             showError(e.message);
         } finally {
@@ -1106,6 +1199,8 @@ async function screenWaitingTimes() {
     $id('inp-order-id').addEventListener('keydown', function(e) {
         if (e.key === 'Enter' || e.keyCode === 13) $id('btn-registra').click();
     });
+
+    await refreshTable();
 }
 
 // ─── Router ──────────────────────────────────────────────────────────────────

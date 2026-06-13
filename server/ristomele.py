@@ -268,6 +268,25 @@ def index():
     return flask.Response('<meta http-equiv="refresh" content="0;url=/client/">', content_type='text/html')
 
 
+@ristomele.route('/deliveries/', methods=['GET'])
+def list_deliveries():
+    from server import model
+    limit = int(flask.request.args.get('limit', 10))
+    deliveries = (model.Delivery.query
+                  .order_by(model.Delivery.id.desc())
+                  .limit(limit)
+                  .all())
+    result = []
+    for d in deliveries:
+        order = model.Order.query.get(d.order_id)
+        waiting_seconds = (d.delivery_time - order.date).total_seconds() if order else None
+        entry = d.as_dict()
+        entry['waiting_seconds'] = waiting_seconds
+        entry['order_date'] = order.date.strftime('%Y-%m-%d %H:%M:%S') if order else None
+        result.append(entry)
+    return flask.jsonify(result)
+
+
 @ristomele.route('/deliveries/', methods=['POST'])
 def register_delivery():
     from server import model
