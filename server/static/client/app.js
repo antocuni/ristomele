@@ -137,6 +137,23 @@ function renderReceiptText(order, cfg, title) {
     return lines.join('\n');
 }
 
+function buildTestPrintText(method, printerName, printerId) {
+    var W = RECEIPT_WIDTH;
+    var now = new Date().toLocaleString('it-IT');
+    var ruler = new Array(W + 1).join('-');
+    return [
+        'PROVA STAMPA RistoMele',
+        ruler,
+        'Metodo:   ' + method,
+        'Stampante: ' + printerName,
+        'ID:        ' + printerId,
+        'Cassiere:  ' + (gs('cashier') || '(non impostato)'),
+        'Data/ora:  ' + now,
+        ruler,
+        '',
+    ].join('\n');
+}
+
 // ─── BLE printing ────────────────────────────────────────────────────────────
 
 // Cached BLE state — survives within the same tab session.
@@ -622,7 +639,9 @@ async function screenSettings() {
     $id('btn-test-print').onclick = async function() {
         disableBtn('btn-test-print', true);
         try {
-            await blePrintText('Prova stampa RistoMele\n');
+            var printerName = gs('ble_device_name') || '(nessuna)';
+            var printerId   = gs('ble_device_id')   || '—';
+            await blePrintText(buildTestPrintText('BLE', printerName, printerId));
         } catch (e) {
             showError(e.message);
         } finally {
@@ -653,7 +672,11 @@ async function screenSettings() {
     $id('btn-test-print-usb').onclick = async function() {
         disableBtn('btn-test-print-usb', true);
         try {
-            await usbPrintText('Prova stampa RistoMele\n');
+            var printerName = gs('usb_device_name') || '(nessuna)';
+            var vendorId    = gs('usb_vendor_id')   || '—';
+            var productId   = gs('usb_product_id')  || '—';
+            var printerId   = vendorId !== '—' ? (parseInt(vendorId).toString(16) + ':' + parseInt(productId).toString(16)) : '—';
+            await usbPrintText(buildTestPrintText('USB', printerName, printerId));
         } catch (e) {
             if (e.isUsbClaimError) { showUsbClaimModal(); } else { showError(e.message); }
         } finally {
