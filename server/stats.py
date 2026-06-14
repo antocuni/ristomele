@@ -173,6 +173,7 @@ def compute_stats(orders, deliveries):
         'delivery_map': delivery_map,
         'total_orders': total_orders,
         'total_foc': total_foc,
+        '_orders_by_day': orders_by_day,
     }
 
 
@@ -180,6 +181,54 @@ def compute_stats(orders, deliveries):
 
 def _day_label(day):
     return '{dow} {date}'.format(dow=DAYS_IT[day.weekday()], date=day.strftime('%d/%m/%Y'))
+
+
+def _section_wait_scatter(day, stats, chart_id):
+    delivery_map = stats['delivery_map']
+    orders_for_day = stats.get('_orders_by_day', {}).get(day, [])
+    points = []
+    for order in orders_for_day:
+        if order['id'] not in delivery_map:
+            continue
+        o_dt = _parse_dt(order['date'])
+        d_dt = delivery_map[order['id']]
+        x = o_dt.hour * 60 + o_dt.minute
+        y = round((d_dt - o_dt).total_seconds() / 60.0, 1)
+        points.append({'x': x, 'y': y, 'label': '#{0} - {1}m'.format(order['id'], int(y))})
+    if len(points) < 2:
+        return '', ''
+
+    cid = 'chart-wait-{i}'.format(i=chart_id)
+    html = (
+        u'\n      <h3>Tempi di attesa (min)</h3>'
+        u'\n      <div class="chart-wrap chart-wrap-sm"><canvas id="{cid}"></canvas></div>'
+    ).format(cid=cid)
+
+    js = (
+        '\n    new Chart(document.getElementById({cid}), {{'
+        '\n      type: "scatter",'
+        '\n      data: {{ datasets: [{{ data: {points},'
+        '\n        backgroundColor: "rgba(51,122,183,0.7)", pointRadius: 5, pointHoverRadius: 7 }}] }},'
+        '\n      options: {{'
+        '\n        responsive: true, maintainAspectRatio: false,'
+        '\n        plugins: {{'
+        '\n          legend: {{ display: false }},'
+        '\n          tooltip: {{ callbacks: {{ label: function(ctx) {{ return ctx.raw.label; }} }} }}'
+        '\n        }},'
+        '\n        scales: {{'
+        '\n          x: {{ title: {{ display: true, text: "Orario" }},'
+        '\n            ticks: {{ callback: function(v) {{'
+        '\n              var w = ((v%1440)+1440)%1440;'
+        '\n              return String(Math.floor(w/60)).padStart(2,"0")+":"+String(w%60).padStart(2,"0");'
+        '\n            }} }} }},'
+        '\n          y: {{ beginAtZero: true, title: {{ display: true, text: "Attesa (min)" }},'
+        '\n            ticks: {{ callback: function(v) {{ return v+"m"; }} }} }}'
+        '\n        }}'
+        '\n      }}'
+        '\n    }});'
+    ).format(cid=json.dumps(cid), points=json.dumps(points))
+
+    return html, js
 
 
 def _section_orders_by_slot(day, day_slots, stats, chart_id):
@@ -365,6 +414,7 @@ def generate_html(db_path, cdn=False):
     queue_depth = stats['queue_depth']
 
     for i, day in enumerate(sorted(by_slot.keys(), reverse=True)):
+        html0, js0 = _section_wait_scatter(day, stats, i)
         html1, js1 = _section_orders_by_slot(day, by_slot[day], stats, i)
         html2, js2 = _section_foc_distribution(day, foc_dist[day], i)
         html3, js3 = _section_queue_depth(day, queue_depth.get(day, {}), i)
@@ -373,13 +423,14 @@ def generate_html(db_path, cdn=False):
         day_block = (
             '\n    <section class="day-section">'
             '\n      <h2>{day} &ndash; {n} ordini, {f} focaccini</h2>'
-            '{slot}{dist}{queue}'
+            '{wait}{slot}{dist}{queue}'
             '\n    </section>'
         ).format(
             day=_day_label(day), n=n_orders, f=n_foc,
-            slot=html1, dist=html2, queue=html3,
+            wait=html0, slot=html1, dist=html2, queue=html3,
         )
         sections.append(day_block)
+        chart_inits.append(js0)
         chart_inits.append(js1)
         chart_inits.append(js2)
         chart_inits.append(js3)
