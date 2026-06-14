@@ -45,12 +45,9 @@ def _slot_range(min_slot, max_slot):
 
 
 def _slot_labels(slots):
-    """Format slot datetimes for chart display.
-    If all slots share the same calendar date, use HH:MM; otherwise DD/MM HH:MM."""
-    dates = set(s.date() for s in slots)
-    if len(dates) <= 1:
-        return [s.strftime('%H:%M') for s in slots]
-    return [s.strftime('%d/%m %H:%M') for s in slots]
+    """Format slot datetimes as HH:MM for chart display.
+    Order is correct because slots are sorted datetimes; date is omitted for readability."""
+    return [s.strftime('%H:%M') for s in slots]
 
 
 def load_data(db_path):
