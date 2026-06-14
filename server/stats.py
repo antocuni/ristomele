@@ -114,9 +114,12 @@ def compute_stats(orders, deliveries):
         orders_by_day[day].append(order)
 
     # Build estimated delivery intervals per day using best-effort heuristic.
-    # Also track first *actual* delivery per day to clip the chart start.
+    # Also track first *actual* delivery per day to clip the chart start,
+    # and bucket focaccini by estimated delivery slot.
     intervals_by_day = {}
     first_actual_delivery_by_day = {}
+    # {day -> {slot_datetime -> foc_count}} bucketed by estimated delivery time
+    foc_delivered_by_slot = defaultdict(lambda: defaultdict(int))
     for day, day_orders in orders_by_day.items():
         estimated = _estimate_delivery_times(day_orders, delivery_map)
         intervals = []
@@ -127,6 +130,14 @@ def compute_stats(orders, deliveries):
             d_dt = estimated.get(order['id'])
             if d_dt is not None:
                 intervals.append((o_dt, d_dt))
+                menu = json.loads(order['menu'])
+                foc = sum(
+                    item['count'] for item in menu
+                    if item['kind'] == 'item'
+                    and not item['is_drink']
+                    and item['name'].startswith('Foc. ')
+                )
+                foc_delivered_by_slot[day][_slot(d_dt)] += foc
             if order['id'] in delivery_map:
                 actual = delivery_map[order['id']]
                 prev = first_actual_delivery_by_day.get(day)
@@ -155,6 +166,8 @@ def compute_stats(orders, deliveries):
 
     return {
         'by_slot': by_slot,
+        'foc_delivered_by_slot': foc_delivered_by_slot,
+        'first_actual_delivery_by_day': first_actual_delivery_by_day,
         'foc_distribution': foc_distribution,
         'queue_depth': queue_depth,
         'delivery_map': delivery_map,
@@ -176,7 +189,13 @@ def _section_orders_by_slot(day, day_slots, stats, chart_id):
     slot_range = _slot_range(min(all_slots), max(all_slots))
     labels = _slot_labels(slot_range)
     orders_data = [day_slots.get(s, {}).get('orders', 0) for s in slot_range]
-    foc_data = [day_slots.get(s, {}).get('foc', 0) for s in slot_range]
+    foc_ord_data = [day_slots.get(s, {}).get('foc', 0) for s in slot_range]
+    foc_del_slots = stats['foc_delivered_by_slot'][day]
+    first_delivery = stats['first_actual_delivery_by_day'].get(day)
+    foc_del_data = [
+        foc_del_slots.get(s, 0) if first_delivery is None or s >= first_delivery else None
+        for s in slot_range
+    ]
 
     cid = 'chart-slot-{i}'.format(i=chart_id)
     html = (
@@ -197,11 +216,21 @@ def _section_orders_by_slot(day, day_slots, stats, chart_id):
         '\n            yAxisID: "y",'
         '\n          }},'
         '\n          {{'
-        '\n            label: "Focaccini",'
-        '\n            data: {foc},'
+        '\n            label: "Foc. ordinati",'
+        '\n            data: {foc_ord},'
         '\n            type: "line",'
         '\n            borderColor: "rgba(231, 76, 60, 0.9)",'
-        '\n            backgroundColor: "rgba(231, 76, 60, 0.15)",'
+        '\n            backgroundColor: "rgba(0,0,0,0)",'
+        '\n            yAxisID: "y2",'
+        '\n            tension: 0.3,'
+        '\n            borderDash: [5, 3],'
+        '\n          }},'
+        '\n          {{'
+        '\n            label: "Foc. consegnati (stimati)",'
+        '\n            data: {foc_del},'
+        '\n            type: "line",'
+        '\n            borderColor: "rgba(39, 174, 96, 0.9)",'
+        '\n            backgroundColor: "rgba(39, 174, 96, 0.1)",'
         '\n            yAxisID: "y2",'
         '\n            tension: 0.3,'
         '\n            fill: true,'
@@ -227,7 +256,8 @@ def _section_orders_by_slot(day, day_slots, stats, chart_id):
         cid=json.dumps(cid),
         labels=json.dumps(labels),
         orders=json.dumps(orders_data),
-        foc=json.dumps(foc_data),
+        foc_ord=json.dumps(foc_ord_data),
+        foc_del=json.dumps(foc_del_data),
     )
     return html, js
 
