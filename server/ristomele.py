@@ -213,6 +213,15 @@ def timestamp():
     return flask.jsonify(result='OK',
                          timestamp=time.time())
 
+@ristomele.route('/stats/advanced/', methods=['GET'])
+def stats_advanced():
+    from server import stats as stats_module
+    db_uri = flask.current_app.config['SQLALCHEMY_DATABASE_URI']
+    db_path = db_uri.replace('sqlite:///', '')
+    html = stats_module.generate_html(db_path, cdn=False)
+    return flask.Response(html, content_type='text/html; charset=utf-8')
+
+
 @ristomele.route('/stats/', methods=['GET'])
 def stats():
     from server import model
@@ -254,10 +263,9 @@ def stats():
                                  total_foc=total_foc,
                                  total_money=total_money)
 
-@ristomele.route('/static/bootstrap.min.css', methods=['GET'])
-def send_static():
-    css = config.ROOT.join('server', 'static', 'bootstrap.min.css')
-    return flask.send_file(str(css))
+@ristomele.route('/static/<path:filename>', methods=['GET'])
+def send_static(filename):
+    return flask.send_file(str(STATIC.join(filename)))
 
 
 @ristomele.route('/')
