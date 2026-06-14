@@ -196,11 +196,11 @@ def _x_axis_js(x_min, x_max):
     return (
         'type: "linear", min: {xmin}, max: {xmax},'
         ' title: {{ display: true, text: "Orario" }},'
-        ' ticks: {{ callback: function(v) {{'
+        ' ticks: {{ stepSize: {step}, callback: function(v) {{'
         ' var w=((v%1440)+1440)%1440;'
         ' return String(Math.floor(w/60)).padStart(2,"0")+":"+String(w%60).padStart(2,"0");'
         ' }} }}'
-    ).format(xmin=x_min, xmax=x_max)
+    ).format(xmin=x_min, xmax=x_max, step=BIN_MINUTES)
 
 
 def _section_wait_scatter(day, stats, chart_id, x_min, x_max):
@@ -442,14 +442,15 @@ def generate_html(db_path, cdn=False):
     queue_depth = stats['queue_depth']
 
     for i, day in enumerate(sorted(by_slot.keys(), reverse=True)):
-        # Compute shared x bounds from slot boundaries, using _continuous_x
-        # so that service periods spanning midnight are monotonically increasing.
-        # Subtract half a bin from x_min so bar chart's first bar isn't clipped.
+        # Compute shared x bounds aligned to BIN_MINUTES grid so tick marks
+        # fall on slot boundaries (Chart.js ticks use stepSize=BIN_MINUTES).
         day_slots_keys = sorted(by_slot[day].keys())
         if day_slots_keys:
             half = BIN_MINUTES // 2
-            x_min = _continuous_x(day_slots_keys[0]) - half
-            x_max = _continuous_x(day_slots_keys[-1]) + BIN_MINUTES + half
+            raw_min = _continuous_x(day_slots_keys[0]) - half
+            raw_max = _continuous_x(day_slots_keys[-1]) + BIN_MINUTES + half
+            x_min = (raw_min // BIN_MINUTES) * BIN_MINUTES
+            x_max = ((raw_max + BIN_MINUTES - 1) // BIN_MINUTES) * BIN_MINUTES
         else:
             x_min, x_max = 0, 1440
         html0, js0 = _section_wait_scatter(day, stats, i, x_min, x_max)
