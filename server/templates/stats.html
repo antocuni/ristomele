@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <title>Statistiche – RistoMele</title>
   <link rel="stylesheet" href="/static/bootstrap.min.css">
+  <script src="/static/chart.umd.4.4.4.min.js"></script>
   <style>
     body { background: #f5f5f5; font-size: 15px; }
 
@@ -73,6 +74,7 @@
     .stat-row.money-row .stat-val { color: #27ae60; }
 
     .page-wrap { max-width: 760px; margin: 0 auto; padding: 0 10px 30px; }
+    .wait-chart-wrap { position: relative; height: 200px; margin-bottom: 14px; }
 
     /* ── Screenshot mode ── */
     .screen-header { display: none; }
@@ -198,6 +200,39 @@
     </div>
 
     <div class="day-body">
+      {% set pts = wait_points[date] %}
+      {% if pts|length >= 2 %}
+      <div class="wait-chart-wrap">
+        <canvas id="wait-chart-{{ date }}"></canvas>
+      </div>
+      <script>
+      (function() {
+        var data = {{ json.dumps(pts) }};
+        new Chart(document.getElementById('wait-chart-{{ date }}'), {
+          type: 'scatter',
+          data: { datasets: [{ data: data, backgroundColor: 'rgba(51,122,183,0.7)', pointRadius: 5, pointHoverRadius: 7 }] },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: { callbacks: { label: function(ctx) { return ctx.raw.label; } } }
+            },
+            scales: {
+              x: {
+                title: { display: true, text: 'Orario' },
+                ticks: { callback: function(v) {
+                  var w = ((v%1440)+1440)%1440;
+                  return String(Math.floor(w/60)).padStart(2,'0')+':'+String(w%60).padStart(2,'0');
+                }}
+              },
+              y: { beginAtZero: true, title: { display: true, text: 'Attesa (min)' },
+                   ticks: { callback: function(v) { return v+'m'; } } }
+            }
+          }
+        });
+      })();
+      </script>
+      {% endif %}
       <div class="stats-grid">
 
         <!-- Cassieri -->

@@ -234,7 +234,9 @@ def stats():
     by_cashier = defaultdict(Counter)
     by_item = defaultdict(Counter)
     orders = model.Order.query.all()
+    order_by_id = {}
     for order in orders:
+        order_by_id[order.id] = order
         if order.id < min_order:
             continue
 
@@ -253,15 +255,33 @@ def stats():
             item_counter[item['name']] += item['count']
             if item['name'].startswith('Foc. '):
                 total_foc[dt] += item['count']
+
+    # Build per-day delivery scatter data {day -> list of {x, y, label}}
+    # x = minutes since midnight of order_date, y = waiting minutes
+    wait_points = defaultdict(list)
+    for delivery in model.Delivery.query.all():
+        order = order_by_id.get(delivery.order_id)
+        if order is None or order.id < min_order:
+            continue
+        dt = order.date_dwim
+        minutes_x = order.date.hour * 60 + order.date.minute
+        waiting_min = (delivery.delivery_time - order.date).total_seconds() / 60.0
+        wait_points[dt].append({
+            'x': round(minutes_x, 1),
+            'y': round(waiting_min, 1),
+            'label': '#{} — {}m'.format(order.id, int(waiting_min)),
+        })
     #
     return flask.render_template('stats.html',
                                  min_order=min_order,
                                  sorted=sorted,
+                                 json=json,
                                  by_item=by_item,
                                  by_cashier=by_cashier,
                                  total_orders=total_orders,
                                  total_foc=total_foc,
-                                 total_money=total_money)
+                                 total_money=total_money,
+                                 wait_points=wait_points)
 
 @ristomele.route('/static/<path:filename>', methods=['GET'])
 def send_static(filename):
