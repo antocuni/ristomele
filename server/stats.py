@@ -8,7 +8,7 @@ import argparse
 import json
 import sqlite3
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import date as date_type, datetime, timedelta
 
 CHART_VERSION = '4.4.4'
 CHART_CDN_URL = 'https://cdn.jsdelivr.net/npm/chart.js@{v}/dist/chart.umd.min.js'.format(v=CHART_VERSION)
@@ -28,18 +28,29 @@ def _date_dwim(dt):
 
 
 def _slot(dt):
-    minutes = (dt.hour * 60 + dt.minute) // BIN_MINUTES * BIN_MINUTES
-    return '%02d:%02d' % (minutes // 60, minutes % 60)
+    """Return a datetime truncated to BIN_MINUTES boundary (the real datetime, no offset)."""
+    total = dt.hour * 60 + dt.minute
+    rounded = total // BIN_MINUTES * BIN_MINUTES
+    return dt.replace(hour=rounded // 60, minute=rounded % 60, second=0, microsecond=0)
 
 
 def _slot_range(min_slot, max_slot):
+    """Return sorted list of slot datetimes from min to max."""
     result = []
-    m = int(min_slot[:2]) * 60 + int(min_slot[3:])
-    end = int(max_slot[:2]) * 60 + int(max_slot[3:])
-    while m <= end:
-        result.append('%02d:%02d' % (m // 60, m % 60))
-        m += BIN_MINUTES
+    current = min_slot
+    while current <= max_slot:
+        result.append(current)
+        current = current + timedelta(minutes=BIN_MINUTES)
     return result
+
+
+def _slot_labels(slots):
+    """Format slot datetimes for chart display.
+    If all slots share the same calendar date, use HH:MM; otherwise DD/MM HH:MM."""
+    dates = set(s.date() for s in slots)
+    if len(dates) <= 1:
+        return [s.strftime('%H:%M') for s in slots]
+    return [s.strftime('%d/%m %H:%M') for s in slots]
 
 
 def load_data(db_path):
@@ -60,6 +71,8 @@ def compute_stats(orders, deliveries):
     foc_distribution = defaultdict(lambda: defaultdict(int))
     total_orders = defaultdict(int)
     total_foc = defaultdict(int)
+    # {day -> list of (order_dt, delivery_dt)} — only orders with delivery
+    intervals_by_day = defaultdict(list)
 
     for order in orders:
         if not order['date'] or not order['menu']:
@@ -79,10 +92,27 @@ def compute_stats(orders, deliveries):
         foc_distribution[day][foc] += 1
         total_orders[day] += 1
         total_foc[day] += foc
+        delivery_dt = delivery_map.get(order['id'])
+        if delivery_dt is not None:
+            intervals_by_day[day].append((dt, delivery_dt))
+
+    # queue depth: for each slot boundary, count in-flight orders
+    # {day -> {slot_dt -> depth}}
+    queue_depth = {}
+    for day, intervals in intervals_by_day.items():
+        all_slots = sorted(by_slot[day].keys())
+        if not all_slots:
+            continue
+        slot_range = _slot_range(min(all_slots), max(all_slots))
+        queue_depth[day] = {
+            slot_dt: sum(1 for (o_dt, d_dt) in intervals if o_dt <= slot_dt < d_dt)
+            for slot_dt in slot_range
+        }
 
     return {
         'by_slot': by_slot,
         'foc_distribution': foc_distribution,
+        'queue_depth': queue_depth,
         'delivery_map': delivery_map,
         'total_orders': total_orders,
         'total_foc': total_foc,
@@ -96,12 +126,13 @@ def _day_label(day):
 
 
 def _section_orders_by_slot(day, day_slots, stats, chart_id):
-    all_slots = list(day_slots.keys())
+    all_slots = sorted(day_slots.keys())
     if not all_slots:
         return '', ''
-    labels = _slot_range(min(all_slots), max(all_slots))
-    orders_data = [day_slots.get(s, {}).get('orders', 0) for s in labels]
-    foc_data = [day_slots.get(s, {}).get('foc', 0) for s in labels]
+    slot_range = _slot_range(min(all_slots), max(all_slots))
+    labels = _slot_labels(slot_range)
+    orders_data = [day_slots.get(s, {}).get('orders', 0) for s in slot_range]
+    foc_data = [day_slots.get(s, {}).get('foc', 0) for s in slot_range]
 
     cid = 'chart-slot-{i}'.format(i=chart_id)
     html = (
@@ -201,6 +232,53 @@ def _section_foc_distribution(day, dist, chart_id):
     return html, js
 
 
+def _section_queue_depth(day, depth_by_slot, chart_id):
+    if not depth_by_slot:
+        return '', ''
+    all_slots = sorted(depth_by_slot.keys())
+    slot_range = _slot_range(min(all_slots), max(all_slots))
+    labels = _slot_labels(slot_range)
+    depths = [depth_by_slot.get(s, 0) for s in slot_range]
+    peak = max(depths) if depths else 0
+
+    cid = 'chart-queue-{i}'.format(i=chart_id)
+    html = (
+        u'\n      <h3>Ordini in coda (picco: {peak})</h3>'
+        u'\n      <div class="chart-wrap chart-wrap-sm"><canvas id="{cid}"></canvas></div>'
+    ).format(peak=peak, cid=cid)
+
+    js = (
+        '\n    new Chart(document.getElementById({cid}), {{'
+        '\n      type: "line",'
+        '\n      data: {{'
+        '\n        labels: {labels},'
+        '\n        datasets: [{{'
+        '\n          label: "Ordini in coda",'
+        '\n          data: {depths},'
+        '\n          borderColor: "rgba(230, 126, 34, 0.9)",'
+        '\n          backgroundColor: "rgba(230, 126, 34, 0.15)",'
+        '\n          tension: 0.3,'
+        '\n          fill: true,'
+        '\n        }}]'
+        '\n      }},'
+        '\n      options: {{'
+        '\n        responsive: true,'
+        '\n        maintainAspectRatio: false,'
+        '\n        plugins: {{ legend: {{ display: false }} }},'
+        '\n        scales: {{'
+        '\n          x: {{ title: {{ display: true, text: "Orario" }} }},'
+        '\n          y: {{ beginAtZero: true, title: {{ display: true, text: "Ordini in coda" }} }}'
+        '\n        }}'
+        '\n      }}'
+        '\n    }});'
+    ).format(
+        cid=json.dumps(cid),
+        labels=json.dumps(labels),
+        depths=json.dumps(depths),
+    )
+    return html, js
+
+
 def generate_html(db_path, cdn=False):
     orders, deliveries = load_data(db_path)
     stats = compute_stats(orders, deliveries)
@@ -211,23 +289,27 @@ def generate_html(db_path, cdn=False):
     sections = []
     chart_inits = []
 
+    queue_depth = stats['queue_depth']
+
     for i, day in enumerate(sorted(by_slot.keys(), reverse=True)):
         html1, js1 = _section_orders_by_slot(day, by_slot[day], stats, i)
         html2, js2 = _section_foc_distribution(day, foc_dist[day], i)
+        html3, js3 = _section_queue_depth(day, queue_depth.get(day, {}), i)
         n_orders = stats['total_orders'][day]
         n_foc = stats['total_foc'][day]
         day_block = (
             '\n    <section class="day-section">'
             '\n      <h2>{day} &ndash; {n} ordini, {f} focaccini</h2>'
-            '{slot}{dist}'
+            '{slot}{dist}{queue}'
             '\n    </section>'
         ).format(
             day=_day_label(day), n=n_orders, f=n_foc,
-            slot=html1, dist=html2,
+            slot=html1, dist=html2, queue=html3,
         )
         sections.append(day_block)
         chart_inits.append(js1)
         chart_inits.append(js2)
+        chart_inits.append(js3)
 
     body = ''.join(sections) if sections else '<p style="padding:20px">Nessun dato.</p>'
 
