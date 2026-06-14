@@ -1,0 +1,268 @@
+/* RistoMele — minimal overrides on Bootstrap 3 */
+
+body {
+    padding-top: 50px;
+    padding-bottom: 68px;
+}
+
+/* ── Navbar ───────────────────────────────────────────────────────────────── */
+
+.navbar-inner-row {
+    display: flex;
+    align-items: center;
+    height: 50px;
+    padding: 0 8px;
+    gap: 6px;
+}
+
+#back-btn {
+    font-size: 30px;
+    line-height: 1;
+    padding: 0 10px;
+    cursor: pointer;
+    color: #337ab7;
+    user-select: none;
+}
+
+#screen-title {
+    flex: 1;
+    font-size: 18px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#dev-badge {
+    background: #e67e22;
+    color: #fff;
+    font-size: 11px;
+    padding: 3px 7px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+/* ── Offline bar ──────────────────────────────────────────────────────────── */
+
+#offline-bar {
+    position: fixed;
+    top: 50px;
+    left: 0;
+    right: 0;
+    z-index: 2500;
+    background: #fcf8e3;
+    color: #8a6d3b;
+    border-bottom: 1px solid #faebcc;
+    padding: 8px 15px;
+    text-align: center;
+    font-size: 14px;
+}
+
+body.offline-mode { padding-top: 88px; }
+
+/* ── Bottom bar ───────────────────────────────────────────────────────────── */
+
+.bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    gap: 1px;
+    background: #bbb;
+    z-index: 1000;
+}
+
+.bottom-bar > * {
+    flex: 1;
+    border-radius: 0 !important;
+    border: none !important;
+    padding: 13px 4px;
+    font-size: 14px;
+}
+
+/* ── Main menu ────────────────────────────────────────────────────────────── */
+
+.list-group-item.main-item {
+    padding: 18px 15px;
+    font-size: 17px;
+    color: #337ab7;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0 !important;
+}
+
+.list-group-item.main-item:first-child  { border-radius: 4px 4px 0 0 !important; }
+.list-group-item.main-item:last-child   { border-radius: 0 0 4px 4px !important; }
+
+.list-group-item.main-item:hover { color: #23527c; background: #f5f5f5; }
+
+.main-chevron { color: #ccc; font-size: 20px; line-height: 1; }
+
+/* ── New order ────────────────────────────────────────────────────────────── */
+
+.top-inputs {
+    padding: 8px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #ddd;
+}
+
+.top-inputs .form-control {
+    margin-bottom: 6px;
+    font-size: 16px;
+}
+
+.top-inputs .form-control:last-child { margin-bottom: 0; }
+
+.col-all { grid-column: 1 / -1; }
+
+.item-row {
+    display: flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-bottom: 1px solid #eee;
+    background: #fff;
+    min-height: 48px;
+    gap: 8px;
+}
+
+.item-row.row-active { background: #f5fff8; }
+
+.item-row .count-display {
+    min-width: 38px;
+    pointer-events: none;
+    cursor: default;
+    font-weight: bold;
+    color: #333;
+    background: #fff;
+}
+
+.item-name { flex: 1; font-size: 15px; }
+
+.item-price { font-size: 12px; color: #aaa; flex-shrink: 0; }
+
+.sep-row {
+    background: #f5f5f5;
+    padding: 7px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    border-bottom: 1px solid #e0e0e0;
+    text-transform: uppercase;
+    color: #888;
+    letter-spacing: 0.8px;
+}
+
+/* ── Show order ───────────────────────────────────────────────────────────── */
+
+.show-order { padding: 12px 15px; }
+
+pre.receipt {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 13px;
+    margin: 0;
+    padding: 12px;
+    white-space: pre;
+    overflow-x: auto;
+    border: none;
+    border-radius: 0;
+    background: #fff;
+    line-height: 1.4;
+}
+
+/* ── Order list ───────────────────────────────────────────────────────────── */
+
+.list-group-item.order-item {
+    padding: 12px 15px;
+}
+
+.list-group-item.order-item .badge {
+    background: #337ab7;
+    float: none;
+    margin-right: 8px;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 3px 7px;
+}
+
+/* ── Tables grid ──────────────────────────────────────────────────────────── */
+
+.tables-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 10px;
+}
+
+.table-cell {
+    border: 1px solid #ddd;
+    padding: 10px 4px;
+    text-align: center;
+    cursor: pointer;
+    background: #fff;
+    min-height: 58px;
+    border-radius: 4px;
+    transition: background 0.1s;
+}
+
+.table-cell:hover  { background: #d9edf7; border-color: #bce8f1; }
+.table-cell:active { background: #c4e3f3; }
+
+.table-busy { background: #dff0d8; border-color: #d6e9c6; }
+.table-busy:hover  { background: #c1ddb1; }
+
+.table-num    { color: #337ab7; font-size: 17px; font-weight: bold; }
+.table-waiter { font-size: 12px; color: #555; margin-top: 4px; }
+
+.edit-mode .table-cell:hover  { background: #fcf8e3; border-color: #faebcc; }
+.edit-mode .table-cell:active { background: #f7ecb5; }
+
+/* ── Settings ─────────────────────────────────────────────────────────────── */
+
+.settings-form { padding: 15px; }
+.settings-form .form-group { margin-bottom: 20px; }
+.settings-form label { font-size: 15px; }
+.settings-form .form-control { font-size: 16px; }
+
+/* ── Modal ────────────────────────────────────────────────────────────────── */
+
+#modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+#modal-box {
+    background: #fff;
+    border-radius: 6px;
+    padding: 24px 20px 20px;
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+}
+
+#modal-body h4 {
+    margin-top: 0;
+    color: #a94442;
+}
+
+#modal-body code {
+    display: block;
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+    margin-top: 10px;
+    word-break: break-all;
+}
+
+/* ── Misc ─────────────────────────────────────────────────────────────────── */
+
+.loading   { padding: 40px; text-align: center; color: #aaa; font-size: 15px; }
+.empty-msg { padding: 40px; text-align: center; color: #aaa; font-size: 15px; }

@@ -3,6 +3,8 @@ db.sqlite*
 mobile/play
 mobile/ristomele.ini
 mobile/src.zip
+ssl_cert.pem
+ssl_key.pem
 
 *~
 

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>RistoMele</title>
+  <link rel="stylesheet" href="/static/bootstrap.min.css">
+  <link rel="stylesheet" href="/client/style.css">
+</head>
+<body>
+
+  <nav id="topbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="navbar-inner-row">
+      <span id="back-btn" style="display:none">&#8249;</span>
+      <span id="screen-title" class="navbar-brand-text">RistoMele</span>
+      <span id="dev-badge" style="display:none">DEV</span>
+    </div>
+  </nav>
+
+  <div id="offline-bar" style="display:none">
+    &#9888; Server non raggiungibile — in attesa di connessione&hellip;
+  </div>
+
+<div id="app"></div>
+
+  <div id="modal-overlay" style="display:none" onclick="hideModal()">
+    <div id="modal-box" onclick="event.stopPropagation()">
+      <div id="modal-body"></div>
+      <button class="btn btn-default btn-block" style="margin-top:16px" onclick="hideModal()">Chiudi</button>
+    </div>
+  </div>
+
+  <script src="/client/app.js"></script>
+</body>
+</html>

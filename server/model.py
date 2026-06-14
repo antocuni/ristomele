@@ -207,3 +207,16 @@ class Order(db.Model):
                 continue
             total += item['count'] * item['price']
         return total
+
+
+class Delivery(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
+    delivery_time = db.Column(db.DATETIME, nullable=False)
+
+    def as_dict(self):
+        return dict(
+            id=self.id,
+            order_id=self.order_id,
+            delivery_time=self.delivery_time.strftime('%Y-%m-%d %H:%M:%S'),
+        )

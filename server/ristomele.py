@@ -261,3 +261,83 @@ def stats():
 def send_static():
     css = config.ROOT.join('server', 'static', 'bootstrap.min.css')
     return flask.send_file(str(css))
+
+
+@ristomele.route('/')
+def index():
+    return flask.Response('<meta http-equiv="refresh" content="0;url=/client/">', content_type='text/html')
+
+
+@ristomele.route('/deliveries/', methods=['GET'])
+def list_deliveries():
+    from server import model
+    limit = int(flask.request.args.get('limit', 10))
+    deliveries = (model.Delivery.query
+                  .order_by(model.Delivery.id.desc())
+                  .limit(limit)
+                  .all())
+    result = []
+    for d in deliveries:
+        order = model.Order.query.get(d.order_id)
+        waiting_seconds = (d.delivery_time - order.date).total_seconds() if order else None
+        entry = d.as_dict()
+        entry['waiting_seconds'] = waiting_seconds
+        entry['order_date'] = order.date.strftime('%Y-%m-%d %H:%M:%S') if order else None
+        result.append(entry)
+    return flask.jsonify(result)
+
+
+@ristomele.route('/deliveries/<int:delivery_id>/', methods=['DELETE'])
+def delete_delivery(delivery_id):
+    from server import model
+    delivery = model.Delivery.query.get(delivery_id)
+    if delivery is None:
+        return error('Consegna %s non trovata' % delivery_id)
+    model.db.session.delete(delivery)
+    model.db.session.commit()
+    return flask.jsonify(result='OK')
+
+
+@ristomele.route('/deliveries/', methods=['POST'])
+def register_delivery():
+    from server import model
+    data = flask.request.json
+    if data is None:
+        return error('Expected JSON request', 400)
+    order_id = data.get('order_id')
+    if not order_id:
+        return error('order_id richiesto', 400)
+    myorder = model.Order.query.get(order_id)
+    if myorder is None:
+        return error('Ordine %s non trovato' % order_id)
+    delivery = model.Delivery(
+        order_id=order_id,
+        delivery_time=datetime.now(),
+    )
+    model.db.session.add(delivery)
+    model.db.session.commit()
+    waiting_seconds = (delivery.delivery_time - myorder.date).total_seconds()
+    return flask.jsonify(result='OK', delivery=delivery.as_dict(),
+                         waiting_seconds=waiting_seconds)
+
+
+@ristomele.route('/menu/', methods=['GET'])
+def get_menu():
+    from server import menu as server_menu
+    items = server_menu.get_menu()
+    return flask.jsonify(
+        is_sagra=(config.MODE == 'sagra'),
+        is_croce=(config.MODE == 'croce'),
+        items=items,
+    )
+
+
+@ristomele.route('/client/')
+@ristomele.route('/client/<path:filename>')
+def serve_client(filename='index.html'):
+    client_dir = config.ROOT.join('server', 'static', 'client')
+    resp = flask.send_from_directory(str(client_dir), filename)
+    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    resp.headers['Pragma'] = 'no-cache'
+    resp.headers['Expires'] = '0'
+    return resp

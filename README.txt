@@ -1,3 +1,27 @@
+How to connect to Raspberry Pi and internet at the same time
+=============================================================
+
+The "ristomele" wifi doesn't have internet.
+
+The following instructions are to connect a laptop to both internet and the ristomele
+wifi at the same time:
+
+1. connect the laptop to the ristomele router via ethernet (you probably need an usb/ethernet dongle)
+
+2. connect the laptop to a mobile hotspot
+
+3a. MANUAL MODE: you might need `sudo route del default`: you must ensure that the default gw does
+   through the hotspot and not through ristomele
+
+3b. Network Manager MODE:
+
+    nmcli conneciton show   # find the connection name
+
+    # mark is as "never-default" to disable the default gw
+    nmcli connection modify "ristomele wired" ipv4.never-default yes
+    nmcli connection modify "ristomele wired" ipv6.never-default yes
+    nmcli connection up "ristomele wired"
+
 Overview
 =========
 
@@ -64,9 +88,38 @@ ristomele.log
 spooler.log
 uwsgi.log
 
-The web server runs on port 5000. To check that it works, visit the page
-(using the appropriate IP address, of course):
-   http://192.168.1.6:5000/orders/
+The web server runs on two ports:
+   http://192.168.1.6:5000/   (HTTP, served by uwsgi)
+   https://192.168.1.6/       (HTTPS on port 443, served by stunnel → uwsgi)
+
+Port 443 is the standard HTTPS port, so no port number is needed in the URL.
+The browser will warn about the self-signed certificate on first visit —
+accept it once and the exception is remembered.
+
+stunnel runs as root in order to bind to the privileged port 443, then
+forwards connections to uwsgi on localhost:5000 (which runs as user sta).
+
+HTTPS via stunnel (first-time setup)
+--------------------------------------
+
+stunnel listens on port 443, terminates TLS, and forwards plain HTTP to
+uwsgi on port 5000. Install it and deploy the config:
+
+  $ sudo apt install stunnel4
+  $ sudo cp ~/ristomele/etc/stunnel.conf /etc/stunnel/ristomele.conf
+  $ sudo service stunnel4 restart
+
+(install.sh does this automatically.)
+
+Generate a self-signed certificate once after cloning/pulling:
+
+  $ cd ~/ristomele
+  $ ./generate_cert.sh
+
+This creates ssl_cert.pem and ssl_key.pem. They are not committed to git
+(machine-specific). After generating, restart stunnel:
+
+  $ sudo service stunnel4 restart
 
 lp-thermal
 ===========
