@@ -216,7 +216,6 @@ def timestamp():
 @ristomele.route('/stats/', methods=['GET'])
 def stats():
     from server import model
-    show_money = 'show_money' in flask.request.args
     min_order = flask.request.args.get('min_order', '0')
     min_order = int(min_order)
     #
@@ -249,7 +248,6 @@ def stats():
     return flask.render_template('stats.html',
                                  min_order=min_order,
                                  sorted=sorted,
-                                 show_money=show_money,
                                  by_item=by_item,
                                  by_cashier=by_cashier,
                                  total_orders=total_orders,
