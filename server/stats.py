@@ -16,7 +16,7 @@ CHART_LOCAL_PATH = '/static/chart.umd.{v}.min.js'.format(v=CHART_VERSION)
 
 BIN_MINUTES = 30
 
-DAYS_IT = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica']
+DAYS_IT = [u'Lunedì', u'Martedì', u'Mercoledì', u'Giovedì', u'Venerdì', u'Sabato', u'Domenica']
 
 
 def _parse_dt(s):
@@ -56,6 +56,8 @@ def compute_stats(orders, deliveries):
 
     # {day -> {slot -> {orders, foc}}}
     by_slot = defaultdict(lambda: defaultdict(lambda: {'orders': 0, 'foc': 0}))
+    # {day -> {n_foc -> n_orders}}
+    foc_distribution = defaultdict(lambda: defaultdict(int))
     total_orders = defaultdict(int)
     total_foc = defaultdict(int)
 
@@ -74,11 +76,13 @@ def compute_stats(orders, deliveries):
         )
         by_slot[day][slot]['orders'] += 1
         by_slot[day][slot]['foc'] += foc
+        foc_distribution[day][foc] += 1
         total_orders[day] += 1
         total_foc[day] += foc
 
     return {
         'by_slot': by_slot,
+        'foc_distribution': foc_distribution,
         'delivery_map': delivery_map,
         'total_orders': total_orders,
         'total_foc': total_foc,
@@ -98,17 +102,12 @@ def _section_orders_by_slot(day, day_slots, stats, chart_id):
     labels = _slot_range(min(all_slots), max(all_slots))
     orders_data = [day_slots.get(s, {}).get('orders', 0) for s in labels]
     foc_data = [day_slots.get(s, {}).get('foc', 0) for s in labels]
-    n_orders = stats['total_orders'][day]
-    n_foc = stats['total_foc'][day]
 
     cid = 'chart-slot-{i}'.format(i=chart_id)
     html = (
-        '\n    <section class="day-section">'
-        '\n      <h2>{day} &ndash; {n} ordini, {f} focaccini</h2>'
         '\n      <h3>Ordini e focaccini per fascia oraria (30 min)</h3>'
         '\n      <div class="chart-wrap"><canvas id="{cid}"></canvas></div>'
-        '\n    </section>'
-    ).format(day=_day_label(day), n=n_orders, f=n_foc, cid=cid)
+    ).format(cid=cid)
 
     js = (
         '\n    new Chart(document.getElementById({cid}), {{'
@@ -158,19 +157,77 @@ def _section_orders_by_slot(day, day_slots, stats, chart_id):
     return html, js
 
 
+def _section_foc_distribution(day, dist, chart_id):
+    if not dist:
+        return '', ''
+    max_foc = max(dist.keys())
+    labels = list(range(0, max_foc + 1))
+    counts = [dist.get(n, 0) for n in labels]
+    total = sum(counts)
+    mean = sum(n * c for n, c in zip(labels, counts)) / float(total) if total else 0
+
+    cid = 'chart-dist-{i}'.format(i=chart_id)
+    html = (
+        '\n      <h3>Distribuzione focaccini per ordine (media: {mean:.1f})</h3>'
+        '\n      <div class="chart-wrap chart-wrap-sm"><canvas id="{cid}"></canvas></div>'
+    ).format(mean=mean, cid=cid)
+
+    js = (
+        '\n    new Chart(document.getElementById({cid}), {{'
+        '\n      type: "bar",'
+        '\n      data: {{'
+        '\n        labels: {labels},'
+        '\n        datasets: [{{'
+        '\n          label: "Ordini",'
+        '\n          data: {counts},'
+        '\n          backgroundColor: "rgba(142, 68, 173, 0.7)",'
+        '\n        }}]'
+        '\n      }},'
+        '\n      options: {{'
+        '\n        responsive: true,'
+        '\n        maintainAspectRatio: false,'
+        '\n        plugins: {{ legend: {{ display: false }} }},'
+        '\n        scales: {{'
+        '\n          x: {{ title: {{ display: true, text: "Focaccini per ordine" }} }},'
+        u'\n          y: {{ beginAtZero: true, title: {{ display: true, text: "N° ordini" }} }}'
+        '\n        }}'
+        '\n      }}'
+        '\n    }});'
+    ).format(
+        cid=json.dumps(cid),
+        labels=json.dumps(labels),
+        counts=json.dumps(counts),
+    )
+    return html, js
+
+
 def generate_html(db_path, cdn=False):
     orders, deliveries = load_data(db_path)
     stats = compute_stats(orders, deliveries)
     by_slot = stats['by_slot']
+    foc_dist = stats['foc_distribution']
     chart_src = CHART_CDN_URL if cdn else CHART_LOCAL_PATH
 
     sections = []
     chart_inits = []
 
     for i, day in enumerate(sorted(by_slot.keys(), reverse=True)):
-        html, js = _section_orders_by_slot(day, by_slot[day], stats, i)
-        sections.append(html)
-        chart_inits.append(js)
+        html1, js1 = _section_orders_by_slot(day, by_slot[day], stats, i)
+        html2, js2 = _section_foc_distribution(day, foc_dist[day], i)
+        n_orders = stats['total_orders'][day]
+        n_foc = stats['total_foc'][day]
+        day_block = (
+            '\n    <section class="day-section">'
+            '\n      <h2>{day} &ndash; {n} ordini, {f} focaccini</h2>'
+            '{slot}{dist}'
+            '\n    </section>'
+        ).format(
+            day=_day_label(day), n=n_orders, f=n_foc,
+            slot=html1, dist=html2,
+        )
+        sections.append(day_block)
+        chart_inits.append(js1)
+        chart_inits.append(js2)
 
     body = ''.join(sections) if sections else '<p style="padding:20px">Nessun dato.</p>'
 
@@ -202,6 +259,7 @@ def generate_html(db_path, cdn=False):
       letter-spacing: .5px;
     }}
     .chart-wrap {{ position: relative; height: 300px; }}
+    .chart-wrap-sm {{ position: relative; height: 200px; margin-top: 20px; }}
   </style>
 </head>
 <body>
@@ -237,7 +295,7 @@ def print_summary(db_path):
 # ── Entry point ────────────────────────────────────────────────────────────────
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='RistoMele — statistiche avanzate')
+    parser = argparse.ArgumentParser(description=u'RistoMele — statistiche avanzate')
     parser.add_argument('--db', default='db.sqlite', help='Percorso database SQLite')
     parser.add_argument('--html', help='Salva report HTML in questo file')
     args = parser.parse_args()
