@@ -1,100 +1,210 @@
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="/static/bootstrap.min.css">
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Statistiche – RistoMele</title>
+  <link rel="stylesheet" href="/static/bootstrap.min.css">
+  <style>
+    body { background: #f5f5f5; font-size: 15px; }
 
-    <script>
-      function updateMinOrder() {
-          const newMinOrder = document.getElementById("minOrderInput").value;
-          const url = new URL(window.location.href);
-          url.searchParams.set("min_order", newMinOrder);
-          window.location.href = url.toString();
-      }
-    </script>
-  </head>
+    .topbar {
+      background: #2c3e50;
+      color: #fff;
+      padding: 10px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .topbar h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      flex: 1 0 auto;
+    }
+    .topbar .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .topbar label { margin: 0; color: #ccc; font-size: 13px; }
+    .topbar input[type=number] {
+      width: 80px;
+      padding: 4px 6px;
+      border-radius: 4px;
+      border: none;
+      font-size: 14px;
+    }
+    .topbar .btn-sm { font-size: 13px; padding: 4px 10px; }
 
-  <body>
-    <div class="container">
-      <h1>Statistiche</h1>
+    .day-card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.12);
+      margin: 14px 0;
+      overflow: hidden;
+    }
+    .day-header {
+      background: #2c3e50;
+      color: #fff;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .day-header .date-label { font-size: 18px; font-weight: 700; }
+    .day-header .kpi-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .kpi {
+      background: rgba(255,255,255,.15);
+      border-radius: 6px;
+      padding: 4px 10px;
+      text-align: center;
+      min-width: 70px;
+    }
+    .kpi .kpi-val { font-size: 20px; font-weight: 700; line-height: 1.1; }
+    .kpi .kpi-lbl { font-size: 11px; opacity: .8; text-transform: uppercase; letter-spacing: .04em; }
 
-      {% if show_money %}
-        <a href="/stats/?hide_money">Nascondi €</a>
-      {% endif %}
+    .day-body { padding: 12px 16px; }
 
-      <h3>
-        Ordini a partire da:
-        <input type="number" id="minOrderInput" value="{{ min_order }}" style="width: 70px;">
-        <button onclick="updateMinOrder()">OK</button>
-      </h3>
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+    }
 
-    {% for date, counter in sorted(by_item.items(), reverse=True) %}
-    <div class="row">
-      <div class="col-lg-6">
-      <h2>{{date.strftime("%d/%m/%Y")}}</h2>
+    .stats-section h5 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #888;
+      margin: 0 0 6px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 4px;
+    }
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 3px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+    }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-row .stat-name { color: #333; }
+    .stat-row .stat-val  { font-weight: 600; color: #2c3e50; }
+    .stat-row.total-row .stat-name,
+    .stat-row.total-row .stat-val { font-weight: 700; font-size: 15px; color: #2c3e50; }
+    .stat-row.money-row .stat-val { color: #27ae60; }
 
-      <table class="table">
-        <tr>
-          <td><b>Ordini da fare</b></td>
-          <td>{{total_orders[date]}}</td>
-        </tr>
-        {% if total_foc[date] %}
-        <tr>
-          <td><b>Focaccini da fare</b></td>
-          <td>{{total_foc[date]}}</td>
-        </tr>
-        {% endif %}
-      </table>
-      </div>
-    </div>
+    .page-wrap { max-width: 760px; margin: 0 auto; padding: 0 10px 30px; }
+  </style>
 
-        {% endfor %}
+  <script>
+    function updateMinOrder() {
+      var val = document.getElementById('minOrderInput').value;
+      var url = new URL(window.location.href);
+      url.searchParams.set('min_order', val);
+      window.location.href = url.toString();
+    }
+    document.addEventListener('keydown', function(e) {
+      if ((e.key === 'Enter' || e.keyCode === 13) && document.activeElement.id === 'minOrderInput') updateMinOrder();
+    });
+  </script>
+</head>
+<body>
 
-      <h2>Statistiche complete</h2>
+<div class="topbar">
+  <h1>Statistiche</h1>
+  <div class="filter-group">
+    <label for="minOrderInput">Da ordine</label>
+    <input type="number" id="minOrderInput" value="{{ min_order }}" min="0">
+    <button class="btn btn-default btn-sm" onclick="updateMinOrder()">OK</button>
+  </div>
+  {% if show_money %}
+  <a href="/stats/?{% if min_order %}min_order={{ min_order }}{% endif %}" class="btn btn-warning btn-sm">Nascondi €</a>
+  {% else %}
+  <a href="/stats/?show_money{% if min_order %}&min_order={{ min_order }}{% endif %}" class="btn btn-default btn-sm">Mostra €</a>
+  {% endif %}
+</div>
 
-      {% for date, counter in sorted(by_item.items(), reverse=True) %}
-      <div class="row">
-        <div class="col-lg-6">
-        <h2>{{date.strftime("%d/%m/%Y")}}</h2>
+<div class="page-wrap">
 
-        <table class="table">
-          {% for name, count in by_cashier[date].most_common() %}
-          <tr style="border-bottom: 2px">
-            <td>{{name}}</td>
-            <td>{{count}}</td>
-          </tr>
-          {% endfor %}
-          <tr>
-            <td><b>Ordini</b></td>
-            <td>{{total_orders[date]}}</td>
-          </tr>
-          {% if total_foc[date] %}
-          <tr>
-            <td><b>Totale focaccini</b></td>
-            <td>{{total_foc[date]}}</td>
-          </tr>
-          {% endif %}
-          {% if show_money %}
-          <tr>
-            <td><b>Totale</b></td>
-            <td>{{total_money[date]}} €</td>
-          </tr>
-          {% endif %}
+  {% for date, counter in sorted(by_item.items(), reverse=True) %}
+  <div class="day-card">
 
-          <tr>
-            <td>&nbsp;</td>
-            <td>&nbsp;</td>
-          </tr>
-
-          {% for name, count in counter.most_common() %}
-          <tr>
-            <td>{{name}}</td>
-            <td>{{count}}</td>
-          </tr>
-          {% endfor %}
-        </table>
+    <div class="day-header">
+      <span class="date-label">{{ date.strftime("%d/%m/%Y") }}</span>
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-val">{{ total_orders[date] }}</div>
+          <div class="kpi-lbl">Ordini</div>
         </div>
+        {% if total_foc[date] %}
+        <div class="kpi">
+          <div class="kpi-val">{{ total_foc[date] }}</div>
+          <div class="kpi-lbl">Focaccini</div>
+        </div>
+        {% endif %}
+        {% if show_money %}
+        <div class="kpi">
+          <div class="kpi-val">{{ "{:,.0f}".format(total_money[date]).replace(",", ".") }}</div>
+          <div class="kpi-lbl">Euro</div>
+        </div>
+        {% endif %}
       </div>
-      {% endfor %}
     </div>
-  </body>
+
+    <div class="day-body">
+      <div class="stats-grid">
+
+        <!-- Cassieri -->
+        <div class="stats-section">
+          <h5>Cassieri</h5>
+          {% for name, count in by_cashier[date].most_common() %}
+          <div class="stat-row">
+            <span class="stat-name">{{ name }}</span>
+            <span class="stat-val">{{ count }}</span>
+          </div>
+          {% endfor %}
+          <div class="stat-row total-row">
+            <span class="stat-name">Totale ordini</span>
+            <span class="stat-val">{{ total_orders[date] }}</span>
+          </div>
+          {% if show_money %}
+          <div class="stat-row money-row">
+            <span class="stat-name">Totale incasso</span>
+            <span class="stat-val">{{ "{:,.2f}".format(total_money[date]).replace(",", "X").replace(".", ",").replace("X", ".") }} €</span>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Articoli -->
+        <div class="stats-section">
+          <h5>Articoli</h5>
+          {% for name, count in counter.most_common() %}
+          <div class="stat-row">
+            <span class="stat-name">{{ name }}</span>
+            <span class="stat-val">{{ count }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+  {% endfor %}
+
+</div>
+</body>
 </html>
