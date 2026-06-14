@@ -538,6 +538,10 @@ async function screenMain() {
 
     setContent(
         '<div class="container-fluid" style="padding-top:12px">' +
+            '<div id="clock-warning" style="display:none" class="alert alert-danger">' +
+                '&#9888; L\'ora del server non è corretta. ' +
+                '<a href="#/settings">Vai alle impostazioni</a> per sincronizzarla.' +
+            '</div>' +
             '<div class="list-group">' +
                 newOrderBtn +
                 '<a href="#/orders"      class="list-group-item main-item">Lista ordini <span class="main-chevron">›</span></a>' +
@@ -548,6 +552,19 @@ async function screenMain() {
             '</div>' +
         '</div>'
     );
+
+    api.get('/timestamp/').then(function(ts) {
+        var diffSeconds = Math.abs(ts.timestamp - Date.now() / 1000);
+        if (diffSeconds > 300) {
+            var el = $id('clock-warning');
+            if (el) {
+                var serverTime = new Date(ts.timestamp * 1000).toLocaleString('it-IT');
+                el.innerHTML = '&#9888; L\'ora del server non è corretta: <strong>' + serverTime + '</strong>. ' +
+                    '<a href="#/settings">Vai alle impostazioni</a> per sincronizzarla.';
+                el.style.display = '';
+            }
+        }
+    }).catch(function() {});
 }
 
 async function screenSettings() {
