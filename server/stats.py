@@ -59,6 +59,28 @@ def load_data(db_path):
     return orders, deliveries
 
 
+def _estimate_delivery_times(orders_for_day, delivery_map):
+    """
+    For orders without a delivery record, estimate delivery time as the
+    minimum delivery time of all higher-id orders that have a record.
+    Rationale: if order N was served, all orders < N should have been served too.
+    Out-of-order deliveries are handled by taking the min (optimistic bound).
+    Returns {order_id -> estimated_delivery_dt} for all estimable orders.
+    """
+    sorted_orders = sorted(orders_for_day, key=lambda o: o['id'])
+    result = {}
+    min_future_dt = None
+    for order in reversed(sorted_orders):
+        oid = order['id']
+        if oid in delivery_map:
+            dt = delivery_map[oid]
+            result[oid] = dt
+            min_future_dt = dt if min_future_dt is None else min(min_future_dt, dt)
+        elif min_future_dt is not None:
+            result[oid] = min_future_dt
+    return result
+
+
 def compute_stats(orders, deliveries):
     delivery_map = {d['order_id']: _parse_dt(d['delivery_time']) for d in deliveries}
 
@@ -68,8 +90,8 @@ def compute_stats(orders, deliveries):
     foc_distribution = defaultdict(lambda: defaultdict(int))
     total_orders = defaultdict(int)
     total_foc = defaultdict(int)
-    # {day -> list of (order_dt, delivery_dt)} — only orders with delivery
-    intervals_by_day = defaultdict(list)
+    # {day -> list of order rows} — collected for delivery estimation
+    orders_by_day = defaultdict(list)
 
     for order in orders:
         if not order['date'] or not order['menu']:
@@ -89,22 +111,47 @@ def compute_stats(orders, deliveries):
         foc_distribution[day][foc] += 1
         total_orders[day] += 1
         total_foc[day] += foc
-        delivery_dt = delivery_map.get(order['id'])
-        if delivery_dt is not None:
-            intervals_by_day[day].append((dt, delivery_dt))
+        orders_by_day[day].append(order)
 
-    # queue depth: for each slot boundary, count in-flight orders
-    # {day -> {slot_dt -> depth}}
+    # Build estimated delivery intervals per day using best-effort heuristic.
+    # Also track first *actual* delivery per day to clip the chart start.
+    intervals_by_day = {}
+    first_actual_delivery_by_day = {}
+    for day, day_orders in orders_by_day.items():
+        estimated = _estimate_delivery_times(day_orders, delivery_map)
+        intervals = []
+        for order in day_orders:
+            if not order['date']:
+                continue
+            o_dt = _parse_dt(order['date'])
+            d_dt = estimated.get(order['id'])
+            if d_dt is not None:
+                intervals.append((o_dt, d_dt))
+            if order['id'] in delivery_map:
+                actual = delivery_map[order['id']]
+                prev = first_actual_delivery_by_day.get(day)
+                if prev is None or actual < prev:
+                    first_actual_delivery_by_day[day] = actual
+        intervals_by_day[day] = intervals
+
+    # queue depth: for each slot boundary, count in-flight orders.
+    # Only include slots from the first actual delivery onward (before that
+    # we have no delivery records so the estimate is meaningless).
+    # {day -> {slot_datetime -> depth}}
     queue_depth = {}
     for day, intervals in intervals_by_day.items():
         all_slots = sorted(by_slot[day].keys())
         if not all_slots:
             continue
-        slot_range = _slot_range(min(all_slots), max(all_slots))
-        queue_depth[day] = {
-            slot_dt: sum(1 for (o_dt, d_dt) in intervals if o_dt <= slot_dt < d_dt)
-            for slot_dt in slot_range
-        }
+        first_delivery = first_actual_delivery_by_day.get(day)
+        depth_by_slot = {}
+        for slot_dt in _slot_range(min(all_slots), max(all_slots)):
+            if first_delivery is not None and slot_dt < first_delivery:
+                continue
+            depth_by_slot[slot_dt] = sum(
+                1 for (o_dt, d_dt) in intervals if o_dt <= slot_dt < d_dt
+            )
+        queue_depth[day] = depth_by_slot
 
     return {
         'by_slot': by_slot,
