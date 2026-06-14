@@ -8,6 +8,7 @@
   <style>
     body { background: #f5f5f5; font-size: 15px; }
 
+    /* ── Topbar ── */
     .topbar {
       background: #2c3e50;
       color: #fff;
@@ -20,28 +21,13 @@
       flex-wrap: wrap;
       gap: 8px;
     }
-    .topbar h1 {
-      margin: 0;
-      font-size: 20px;
-      font-weight: 700;
-      color: #fff;
-      flex: 1 0 auto;
-    }
-    .topbar .filter-group {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    .topbar h1 { margin: 0; font-size: 20px; font-weight: 700; color: #fff; flex: 1 0 auto; }
+    .topbar .filter-group { display: flex; align-items: center; gap: 6px; }
     .topbar label { margin: 0; color: #ccc; font-size: 13px; }
-    .topbar input[type=number] {
-      width: 80px;
-      padding: 4px 6px;
-      border-radius: 4px;
-      border: none;
-      font-size: 14px;
-    }
+    .topbar input[type=number] { width: 80px; padding: 4px 6px; border-radius: 4px; border: none; font-size: 14px; }
     .topbar .btn-sm { font-size: 13px; padding: 4px 10px; }
 
+    /* ── Cards ── */
     .day-card {
       background: #fff;
       border-radius: 8px;
@@ -61,45 +47,23 @@
     }
     .day-header .date-label { font-size: 18px; font-weight: 700; }
     .day-header .kpi-row { display: flex; gap: 12px; flex-wrap: wrap; }
-    .kpi {
-      background: rgba(255,255,255,.15);
-      border-radius: 6px;
-      padding: 4px 10px;
-      text-align: center;
-      min-width: 70px;
-    }
+    .kpi { background: rgba(255,255,255,.15); border-radius: 6px; padding: 4px 10px; text-align: center; min-width: 70px; }
     .kpi .kpi-val { font-size: 20px; font-weight: 700; line-height: 1.1; }
     .kpi .kpi-lbl { font-size: 11px; opacity: .8; text-transform: uppercase; letter-spacing: .04em; }
     a.kpi-link { color: inherit; text-decoration: none; display: block; cursor: pointer; }
     a.kpi-link:hover { background: rgba(255,255,255,.25); color: inherit; text-decoration: none; }
 
     .day-body { padding: 12px 16px; }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-    @media (max-width: 480px) {
-      .stats-grid { grid-template-columns: 1fr; }
-    }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } }
 
     .stats-section h5 {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      color: #888;
-      margin: 0 0 6px;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 4px;
+      font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
+      color: #888; margin: 0 0 6px; border-bottom: 1px solid #eee; padding-bottom: 4px;
     }
     .stat-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      padding: 3px 0;
-      border-bottom: 1px solid #f0f0f0;
-      font-size: 14px;
+      display: flex; justify-content: space-between; align-items: baseline;
+      padding: 3px 0; border-bottom: 1px solid #f0f0f0; font-size: 14px;
     }
     .stat-row:last-child { border-bottom: none; }
     .stat-row .stat-name { color: #333; }
@@ -109,6 +73,44 @@
     .stat-row.money-row .stat-val { color: #27ae60; }
 
     .page-wrap { max-width: 760px; margin: 0 auto; padding: 0 10px 30px; }
+
+    /* ── Screenshot mode ── */
+    .screen-header { display: none; }
+    .screen-exit   { display: none; }
+
+    body.screenshot-mode .topbar      { display: none; }
+    body.screenshot-mode .screen-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #2c3e50;
+      color: #fff;
+      padding: 10px 16px;
+      font-size: 17px;
+      font-weight: 700;
+    }
+    body.screenshot-mode .screen-exit {
+      display: inline-block;
+      position: fixed;
+      bottom: 14px;
+      right: 14px;
+      z-index: 200;
+      opacity: .75;
+    }
+    body.screenshot-mode .page-wrap { padding-top: 6px; }
+    /* Make the Euro KPI non-interactive in screenshot mode so it looks clean */
+    body.screenshot-mode a.kpi-link { pointer-events: none; cursor: default; }
+
+    /* ── Print / PDF ── */
+    @media print {
+      body { background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .topbar      { display: none !important; }
+      .screen-header { display: none !important; }
+      .screen-exit { display: none !important; }
+      .page-wrap   { max-width: 100%; padding: 0; }
+      .day-card    { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; margin: 8px 0; }
+      a.kpi-link   { pointer-events: none; cursor: default; }
+    }
   </style>
 
   <script>
@@ -118,8 +120,10 @@
       url.searchParams.set('min_order', val);
       window.location.href = url.toString();
     }
+
     document.addEventListener('keydown', function(e) {
       if ((e.key === 'Enter' || e.keyCode === 13) && document.activeElement.id === 'minOrderInput') updateMinOrder();
+      if (e.key === 'Escape' || e.keyCode === 27) exitScreenshot();
     });
 
     var _moneyShown = false;
@@ -133,6 +137,15 @@
         el.style.display = _moneyShown ? '' : 'none';
       });
     }
+
+    function enterScreenshot() {
+      document.body.classList.add('screenshot-mode');
+      window.scrollTo(0, 0);
+    }
+
+    function exitScreenshot() {
+      document.body.classList.remove('screenshot-mode');
+    }
   </script>
 </head>
 <body>
@@ -144,7 +157,17 @@
     <input type="number" id="minOrderInput" value="{{ min_order }}" min="0">
     <button class="btn btn-default btn-sm" onclick="updateMinOrder()">OK</button>
   </div>
+  <button class="btn btn-default btn-sm" onclick="enterScreenshot()" title="Modalità screenshot">📷</button>
+  <button class="btn btn-default btn-sm" onclick="window.print()" title="Stampa / Salva PDF">🖨️</button>
 </div>
+
+<!-- Shown only in screenshot mode, replaces the topbar -->
+<div class="screen-header">
+  <span>Statistiche RistoMele</span>
+  <small style="opacity:.7;font-weight:400;font-size:13px">{{ sorted(by_item.keys(), reverse=True)|list|first|string if by_item else '' }}</small>
+</div>
+
+<button class="screen-exit btn btn-warning btn-sm" onclick="exitScreenshot()">✕ Esci</button>
 
 <div class="page-wrap">
 
