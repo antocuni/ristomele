@@ -548,7 +548,8 @@ async function screenMain() {
                 '<a href="#/waiting"     class="list-group-item main-item">Tempi di attesa <span class="main-chevron">›</span></a>' +
                 (isRist ? '<a href="#/tables/edit" class="list-group-item main-item">Configura tavoli <span class="main-chevron">›</span></a>' : '') +
                 '<a href="#/settings"    class="list-group-item main-item">Impostazioni <span class="main-chevron">›</span></a>' +
-                '<a href="/stats/" target="_blank" class="list-group-item main-item">Statistiche <span class="main-chevron">›</span></a>' +
+                '<a href="/stats/" class="list-group-item main-item">Statistiche <span class="main-chevron">›</span></a>' +
+                '<a href="/stats/advanced/" class="list-group-item main-item">Statistiche avanzate <span class="main-chevron">›</span></a>' +
             '</div>' +
         '</div>'
     );
