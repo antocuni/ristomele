@@ -50,6 +50,14 @@ def _slot_labels(slots):
     return [s.strftime('%H:%M') for s in slots]
 
 
+def _continuous_x(dt):
+    """Minutes since last service start, handling midnight crossing.
+    Times before the date_dwim 3-hour cutoff (i.e. 00:00-02:59) are mapped
+    to 1440-1619 so the x axis is monotonically increasing across midnight."""
+    m = dt.hour * 60 + dt.minute
+    return m + 1440 if m < 3 * 60 else m
+
+
 def load_data(db_path):
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
@@ -183,7 +191,19 @@ def _day_label(day):
     return '{dow} {date}'.format(dow=DAYS_IT[day.weekday()], date=day.strftime('%d/%m/%Y'))
 
 
-def _section_wait_scatter(day, stats, chart_id):
+def _x_axis_js(x_min, x_max):
+    """Return the JS object literal for the shared linear time x-axis."""
+    return (
+        'type: "linear", min: {xmin}, max: {xmax},'
+        ' title: {{ display: true, text: "Orario" }},'
+        ' ticks: {{ callback: function(v) {{'
+        ' var w=((v%1440)+1440)%1440;'
+        ' return String(Math.floor(w/60)).padStart(2,"0")+":"+String(w%60).padStart(2,"0");'
+        ' }} }}'
+    ).format(xmin=x_min, xmax=x_max)
+
+
+def _section_wait_scatter(day, stats, chart_id, x_min, x_max):
     delivery_map = stats['delivery_map']
     orders_for_day = stats.get('_orders_by_day', {}).get(day, [])
     points = []
@@ -192,7 +212,7 @@ def _section_wait_scatter(day, stats, chart_id):
             continue
         o_dt = _parse_dt(order['date'])
         d_dt = delivery_map[order['id']]
-        x = o_dt.hour * 60 + o_dt.minute
+        x = _continuous_x(o_dt)
         y = round((d_dt - o_dt).total_seconds() / 60.0, 1)
         points.append({'x': x, 'y': y, 'label': '#{0} - {1}m'.format(order['id'], int(y))})
     if len(points) < 2:
@@ -216,33 +236,38 @@ def _section_wait_scatter(day, stats, chart_id):
         '\n          tooltip: {{ callbacks: {{ label: function(ctx) {{ return ctx.raw.label; }} }} }}'
         '\n        }},'
         '\n        scales: {{'
-        '\n          x: {{ title: {{ display: true, text: "Orario" }},'
-        '\n            ticks: {{ callback: function(v) {{'
-        '\n              var w = ((v%1440)+1440)%1440;'
-        '\n              return String(Math.floor(w/60)).padStart(2,"0")+":"+String(w%60).padStart(2,"0");'
-        '\n            }} }} }},'
+        '\n          x: {{ {x_axis} }},'
         '\n          y: {{ beginAtZero: true, title: {{ display: true, text: "Attesa (min)" }},'
-        '\n            ticks: {{ callback: function(v) {{ return v+"m"; }} }} }}'
+        '\n            ticks: {{ callback: function(v) {{ return v+"m"; }} }} }},'
+        '\n          y2: {{ position: "right", display: true,'
+        '\n            ticks: {{ display: false }}, grid: {{ drawOnChartArea: false }},'
+        '\n            afterFit: function(s) {{ s.width = 50; }} }}'
         '\n        }}'
         '\n      }}'
         '\n    }});'
-    ).format(cid=json.dumps(cid), points=json.dumps(points))
+    ).format(cid=json.dumps(cid), points=json.dumps(points), x_axis=_x_axis_js(x_min, x_max))
 
     return html, js
 
 
-def _section_orders_by_slot(day, day_slots, stats, chart_id):
+def _section_orders_by_slot(day, day_slots, stats, chart_id, x_min, x_max):
     all_slots = sorted(day_slots.keys())
     if not all_slots:
         return '', ''
     slot_range = _slot_range(min(all_slots), max(all_slots))
-    labels = _slot_labels(slot_range)
-    orders_data = [day_slots.get(s, {}).get('orders', 0) for s in slot_range]
-    foc_ord_data = [day_slots.get(s, {}).get('foc', 0) for s in slot_range]
     foc_del_slots = stats['foc_delivered_by_slot'][day]
     first_delivery = stats['first_actual_delivery_by_day'].get(day)
+
+    # Use slot centre (start + half bin) as the numeric x value so bars
+    # align with the linear axis shared by the other charts.
+    half = BIN_MINUTES // 2
+    def _xc(s):
+        return _continuous_x(s) + half
+
+    orders_data = [{'x': _xc(s), 'y': day_slots.get(s, {}).get('orders', 0)} for s in slot_range]
+    foc_ord_data = [{'x': _xc(s), 'y': day_slots.get(s, {}).get('foc', 0)} for s in slot_range]
     foc_del_data = [
-        foc_del_slots.get(s, 0) if first_delivery is None or s >= first_delivery else None
+        {'x': _xc(s), 'y': foc_del_slots.get(s, 0) if first_delivery is None or s >= first_delivery else None}
         for s in slot_range
     ]
 
@@ -256,13 +281,13 @@ def _section_orders_by_slot(day, day_slots, stats, chart_id):
         '\n    new Chart(document.getElementById({cid}), {{'
         '\n      type: "bar",'
         '\n      data: {{'
-        '\n        labels: {labels},'
         '\n        datasets: ['
         '\n          {{'
         '\n            label: "Ordini",'
         '\n            data: {orders},'
         '\n            backgroundColor: "rgba(39, 174, 96, 0.7)",'
         '\n            yAxisID: "y",'
+        '\n            barPercentage: 0.95, categoryPercentage: 1.0,'
         '\n          }},'
         '\n          {{'
         '\n            label: "Foc. ordinati",'
@@ -290,22 +315,24 @@ def _section_orders_by_slot(day, day_slots, stats, chart_id):
         '\n        maintainAspectRatio: false,'
         '\n        interaction: {{ mode: "index", intersect: false }},'
         '\n        scales: {{'
+        '\n          x: {{ {x_axis} }},'
         '\n          y: {{ beginAtZero: true, title: {{ display: true, text: "Ordini" }} }},'
         '\n          y2: {{'
         '\n            beginAtZero: true,'
         '\n            position: "right",'
         '\n            title: {{ display: true, text: "Focaccini" }},'
-        '\n            grid: {{ drawOnChartArea: false }}'
+        '\n            grid: {{ drawOnChartArea: false }},'
+        '\n            afterFit: function(s) {{ s.width = 50; }}'
         '\n          }}'
         '\n        }}'
         '\n      }}'
         '\n    }});'
     ).format(
         cid=json.dumps(cid),
-        labels=json.dumps(labels),
         orders=json.dumps(orders_data),
         foc_ord=json.dumps(foc_ord_data),
         foc_del=json.dumps(foc_del_data),
+        x_axis=_x_axis_js(x_min, x_max),
     )
     return html, js
 
@@ -354,14 +381,13 @@ def _section_foc_distribution(day, dist, chart_id):
     return html, js
 
 
-def _section_queue_depth(day, depth_by_slot, chart_id):
+def _section_queue_depth(day, depth_by_slot, chart_id, x_min, x_max):
     if not depth_by_slot:
         return '', ''
     all_slots = sorted(depth_by_slot.keys())
     slot_range = _slot_range(min(all_slots), max(all_slots))
-    labels = _slot_labels(slot_range)
-    depths = [depth_by_slot.get(s, 0) for s in slot_range]
-    peak = max(depths) if depths else 0
+    depths = [{'x': _continuous_x(s), 'y': depth_by_slot.get(s, 0)} for s in slot_range]
+    peak = max(d['y'] for d in depths) if depths else 0
 
     cid = 'chart-queue-{i}'.format(i=chart_id)
     html = (
@@ -373,7 +399,6 @@ def _section_queue_depth(day, depth_by_slot, chart_id):
         '\n    new Chart(document.getElementById({cid}), {{'
         '\n      type: "line",'
         '\n      data: {{'
-        '\n        labels: {labels},'
         '\n        datasets: [{{'
         '\n          label: "Ordini in coda",'
         '\n          data: {depths},'
@@ -388,15 +413,18 @@ def _section_queue_depth(day, depth_by_slot, chart_id):
         '\n        maintainAspectRatio: false,'
         '\n        plugins: {{ legend: {{ display: false }} }},'
         '\n        scales: {{'
-        '\n          x: {{ title: {{ display: true, text: "Orario" }} }},'
-        '\n          y: {{ beginAtZero: true, title: {{ display: true, text: "Ordini in coda" }} }}'
+        '\n          x: {{ {x_axis} }},'
+        '\n          y: {{ beginAtZero: true, title: {{ display: true, text: "Ordini in coda" }} }},'
+        '\n          y2: {{ position: "right", display: true,'
+        '\n            ticks: {{ display: false }}, grid: {{ drawOnChartArea: false }},'
+        '\n            afterFit: function(s) {{ s.width = 50; }} }}'
         '\n        }}'
         '\n      }}'
         '\n    }});'
     ).format(
         cid=json.dumps(cid),
-        labels=json.dumps(labels),
         depths=json.dumps(depths),
+        x_axis=_x_axis_js(x_min, x_max),
     )
     return html, js
 
@@ -414,16 +442,26 @@ def generate_html(db_path, cdn=False):
     queue_depth = stats['queue_depth']
 
     for i, day in enumerate(sorted(by_slot.keys(), reverse=True)):
-        html0, js0 = _section_wait_scatter(day, stats, i)
-        html1, js1 = _section_orders_by_slot(day, by_slot[day], stats, i)
+        # Compute shared x bounds from slot boundaries, using _continuous_x
+        # so that service periods spanning midnight are monotonically increasing.
+        # Subtract half a bin from x_min so bar chart's first bar isn't clipped.
+        day_slots_keys = sorted(by_slot[day].keys())
+        if day_slots_keys:
+            half = BIN_MINUTES // 2
+            x_min = _continuous_x(day_slots_keys[0]) - half
+            x_max = _continuous_x(day_slots_keys[-1]) + BIN_MINUTES + half
+        else:
+            x_min, x_max = 0, 1440
+        html0, js0 = _section_wait_scatter(day, stats, i, x_min, x_max)
+        html1, js1 = _section_orders_by_slot(day, by_slot[day], stats, i, x_min, x_max)
         html2, js2 = _section_foc_distribution(day, foc_dist[day], i)
-        html3, js3 = _section_queue_depth(day, queue_depth.get(day, {}), i)
+        html3, js3 = _section_queue_depth(day, queue_depth.get(day, {}), i, x_min, x_max)
         n_orders = stats['total_orders'][day]
         n_foc = stats['total_foc'][day]
         day_block = (
             '\n    <section class="day-section">'
             '\n      <h2>{day} &ndash; {n} ordini, {f} focaccini</h2>'
-            '{wait}{slot}{dist}{queue}'
+            '{wait}{slot}{queue}{dist}'
             '\n    </section>'
         ).format(
             day=_day_label(day), n=n_orders, f=n_foc,
@@ -432,8 +470,8 @@ def generate_html(db_path, cdn=False):
         sections.append(day_block)
         chart_inits.append(js0)
         chart_inits.append(js1)
-        chart_inits.append(js2)
         chart_inits.append(js3)
+        chart_inits.append(js2)
 
     body = ''.join(sections) if sections else '<p style="padding:20px">Nessun dato.</p>'
 
