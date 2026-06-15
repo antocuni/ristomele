@@ -74,8 +74,8 @@ def run_cherrypy(app):
     cherrypy.engine.block()
 
 def main():
-    app = create_app()
     if not config.DEBUG:
+        app = create_app()
         run_cherrypy(app)
         return
 
@@ -91,7 +91,14 @@ def main():
         action='store_true',
         help='HTTPS without reloader (enables Web Bluetooth in the JS client)',
     )
+    parser.add_argument(
+        'db',
+        nargs='?',
+        default=None,
+        help='path to the SQLite database file (default: db.sqlite)',
+    )
     args = parser.parse_args()
+    app = create_app(dbpath=os.path.abspath(args.db)) if args.db else create_app()
     if args.dev:
         run_flask_dev(app)
     else:
