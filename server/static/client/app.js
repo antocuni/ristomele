@@ -550,6 +550,7 @@ async function screenMain() {
                 '<a href="#/settings"    class="list-group-item main-item">Impostazioni <span class="main-chevron">›</span></a>' +
                 '<a href="/stats/" class="list-group-item main-item">Statistiche <span class="main-chevron">›</span></a>' +
                 '<a href="/stats/advanced/" class="list-group-item main-item">Statistiche avanzate <span class="main-chevron">›</span></a>' +
+                '<a href="/stats/report/" class="list-group-item main-item">Report (stampa/PDF) <span class="main-chevron">›</span></a>' +
             '</div>' +
         '</div>'
     );

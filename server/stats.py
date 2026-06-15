@@ -562,6 +562,41 @@ def generate_html(db_path, cdn=False):
 </html>'''.format(chart_src=chart_src, body=body, js=''.join(chart_inits))
 
 
+def build_chart_sections(db_path, cdn=False):
+    """
+    Return (sections_by_day, all_chart_js, chart_src) for embedding in another page.
+    sections_by_day maps date -> chart HTML string for that day (no day header).
+    """
+    orders, deliveries = load_data(db_path)
+    stats = compute_stats(orders, deliveries)
+    by_slot = stats['by_slot']
+    foc_dist = stats['foc_distribution']
+    queue_depth = stats['queue_depth']
+    chart_src = CHART_CDN_URL if cdn else CHART_LOCAL_PATH
+
+    sections_by_day = {}
+    chart_inits = []
+
+    for i, day in enumerate(sorted(by_slot.keys(), reverse=True)):
+        day_slots_keys = sorted(by_slot[day].keys())
+        if day_slots_keys:
+            half = BIN_MINUTES // 2
+            raw_min = _continuous_x(day_slots_keys[0]) - half
+            raw_max = _continuous_x(day_slots_keys[-1]) + BIN_MINUTES + half
+            x_min = (raw_min // BIN_MINUTES) * BIN_MINUTES
+            x_max = ((raw_max + BIN_MINUTES - 1) // BIN_MINUTES) * BIN_MINUTES
+        else:
+            x_min, x_max = 0, 1440
+        html0, js0 = _section_wait_scatter(day, stats, i, x_min, x_max)
+        html1, js1 = _section_orders_by_slot(day, by_slot[day], stats, i, x_min, x_max)
+        html2, js2 = _section_foc_distribution(day, foc_dist[day], i)
+        html3, js3 = _section_queue_depth(day, queue_depth.get(day, {}), i, x_min, x_max)
+        sections_by_day[day] = html0 + html1 + html3 + html2
+        chart_inits += [js0, js1, js3, js2]
+
+    return sections_by_day, u''.join(chart_inits), chart_src
+
+
 # ── Text summary ───────────────────────────────────────────────────────────────
 
 def print_summary(db_path):

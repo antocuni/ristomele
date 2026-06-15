@@ -213,6 +213,45 @@ def timestamp():
     return flask.jsonify(result='OK',
                          timestamp=time.time())
 
+@ristomele.route('/stats/report/', methods=['GET'])
+def stats_report():
+    from server import model, stats as stats_module
+    db_uri = flask.current_app.config['SQLALCHEMY_DATABASE_URI']
+    db_path = db_uri.replace('sqlite:///', '')
+    #
+    total_money = Counter()
+    total_orders = Counter()
+    total_foc = Counter()
+    by_cashier = defaultdict(Counter)
+    by_item = defaultdict(Counter)
+    for order in model.Order.query.all():
+        dt = order.date_dwim
+        total_orders[dt] += 1
+        total_money[dt] += order.get_total()
+        by_cashier[dt][order.cashier] += 1
+        item_counter = by_item[dt]
+        item_counter['Ordini'] += 1
+        menu = json.loads(order.menu)
+        for item in menu:
+            if item['kind'] != 'item':
+                continue
+            item_counter[item['name']] += item['count']
+            if item['name'].startswith('Foc. '):
+                total_foc[dt] += item['count']
+    #
+    chart_sections, chart_js, chart_src = stats_module.build_chart_sections(db_path, cdn=False)
+    return flask.render_template('report.html',
+                                 sorted=sorted,
+                                 by_item=by_item,
+                                 by_cashier=by_cashier,
+                                 total_orders=total_orders,
+                                 total_foc=total_foc,
+                                 total_money=total_money,
+                                 chart_sections=chart_sections,
+                                 chart_js=chart_js,
+                                 chart_src=chart_src)
+
+
 @ristomele.route('/stats/advanced/', methods=['GET'])
 def stats_advanced():
     from server import stats as stats_module
