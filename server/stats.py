@@ -345,6 +345,11 @@ def _section_orders_by_slot(day, day_slots, stats, chart_id, x_min, x_max):
         '\n        responsive: true,'
         '\n        maintainAspectRatio: false,'
         '\n        interaction: {{ mode: "index", intersect: false }},'
+        '\n        plugins: {{ tooltip: {{ callbacks: {{ title: function(items) {{'
+        '\n          var v=items[0].parsed.x;'
+        '\n          function fmt(m){{var w=((m%1440)+1440)%1440;return String(Math.floor(w/60)).padStart(2,"0")+":"+String(w%60).padStart(2,"0");}}'
+        '\n          return fmt(v-{half})+"-"+fmt(v+{half});'
+        '\n        }} }} }} }},'
         '\n        scales: {{'
         '\n          x: {{ {x_axis} }},'
         '\n          y: {{ beginAtZero: true, title: {{ display: true, text: "Ordini" }} }},'
@@ -364,6 +369,7 @@ def _section_orders_by_slot(day, day_slots, stats, chart_id, x_min, x_max):
         foc_ord=json.dumps(foc_ord_data),
         foc_del=json.dumps(foc_del_data),
         x_axis=_x_axis_js(x_min, x_max),
+        half=half,
     )
     return html, js
 
@@ -442,7 +448,12 @@ def _section_queue_depth(day, depth_by_slot, chart_id, x_min, x_max):
         '\n      options: {{'
         '\n        responsive: true,'
         '\n        maintainAspectRatio: false,'
-        '\n        plugins: {{ legend: {{ display: false }} }},'
+        '\n        plugins: {{ legend: {{ display: false }},'
+        '\n          tooltip: {{ callbacks: {{ title: function(items) {{'
+        '\n            var v=items[0].parsed.x;'
+        '\n            function fmt(m){{var w=((m%1440)+1440)%1440;return String(Math.floor(w/60)).padStart(2,"0")+":"+String(w%60).padStart(2,"0");}}'
+        '\n            return fmt(v)+"-"+fmt(v+{bin_min});'
+        '\n          }} }} }} }},'
         '\n        scales: {{'
         '\n          x: {{ {x_axis} }},'
         '\n          y: {{ beginAtZero: true, title: {{ display: true, text: "Ordini in coda" }} }},'
@@ -456,6 +467,7 @@ def _section_queue_depth(day, depth_by_slot, chart_id, x_min, x_max):
         cid=json.dumps(cid),
         depths=json.dumps(depths),
         x_axis=_x_axis_js(x_min, x_max),
+        bin_min=BIN_MINUTES,
     )
     return html, js
 
