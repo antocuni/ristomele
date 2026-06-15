@@ -219,7 +219,7 @@ def compute_stats(orders, deliveries):
 # ── HTML generation ────────────────────────────────────────────────────────────
 
 def _day_label(day):
-    return '{dow} {date}'.format(dow=DAYS_IT[day.weekday()], date=day.strftime('%d/%m/%Y'))
+    return u'{dow} {date}'.format(dow=DAYS_IT[day.weekday()], date=day.strftime('%d/%m/%Y'))
 
 
 def _x_axis_js(x_min, x_max):
@@ -503,10 +503,10 @@ def generate_html(db_path, cdn=False):
         n_orders = stats['total_orders'][day]
         n_foc = stats['total_foc'][day]
         day_block = (
-            '\n    <section class="day-section">'
-            '\n      <h2>{day} &ndash; {n} ordini, {f} focaccini</h2>'
-            '{wait}{slot}{queue}{dist}'
-            '\n    </section>'
+            u'\n    <section class="day-section">'
+            u'\n      <h2>{day} &ndash; {n} ordini, {f} focaccini</h2>'
+            u'{wait}{slot}{queue}{dist}'
+            u'\n    </section>'
         ).format(
             day=_day_label(day), n=n_orders, f=n_foc,
             wait=html0, slot=html1, dist=html2, queue=html3,
