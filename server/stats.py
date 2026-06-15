@@ -5,6 +5,7 @@ Usage: python -m server.stats [--db PATH] [--html OUTPUT.html]
 """
 from __future__ import print_function
 import argparse
+import bisect
 import json
 import sqlite3
 from collections import defaultdict
@@ -69,23 +70,53 @@ def load_data(db_path):
 
 def _estimate_delivery_times(orders_for_day, delivery_map):
     """
-    For orders without a delivery record, estimate delivery time as the
-    minimum delivery time of all higher-id orders that have a record.
-    Rationale: if order N was served, all orders < N should have been served too.
-    Out-of-order deliveries are handled by taking the min (optimistic bound).
-    Returns {order_id -> estimated_delivery_dt} for all estimable orders.
+    Estimate delivery times for orders without a delivery record.
+    Uses linear interpolation between neighboring known-delivery anchors
+    (keyed on order creation time) so that long gaps in the delivery log
+    are spread smoothly rather than piled up at the next recorded delivery.
+    Orders after the last anchor cannot be estimated and are omitted.
     """
     sorted_orders = sorted(orders_for_day, key=lambda o: o['id'])
+    if not sorted_orders:
+        return {}
+
+    anchor_indices = [i for i, o in enumerate(sorted_orders) if o['id'] in delivery_map]
+    if not anchor_indices:
+        return {}
+
     result = {}
-    min_future_dt = None
-    for order in reversed(sorted_orders):
+    for i, order in enumerate(sorted_orders):
         oid = order['id']
         if oid in delivery_map:
-            dt = delivery_map[oid]
-            result[oid] = dt
-            min_future_dt = dt if min_future_dt is None else min(min_future_dt, dt)
-        elif min_future_dt is not None:
-            result[oid] = min_future_dt
+            result[oid] = delivery_map[oid]
+            continue
+
+        pos = bisect.bisect_left(anchor_indices, i)
+        prev_ai = anchor_indices[pos - 1] if pos > 0 else None
+        next_ai = anchor_indices[pos] if pos < len(anchor_indices) else None
+
+        if next_ai is None:
+            pass  # no future anchor, cannot estimate
+        elif prev_ai is None:
+            # before the first anchor: use that anchor's delivery time
+            result[oid] = delivery_map[sorted_orders[next_ai]['id']]
+        else:
+            prev_o = sorted_orders[prev_ai]
+            next_o = sorted_orders[next_ai]
+            prev_o_dt = _parse_dt(prev_o['date'])
+            next_o_dt = _parse_dt(next_o['date'])
+            prev_d_dt = delivery_map[prev_o['id']]
+            next_d_dt = delivery_map[next_o['id']]
+            o_dt = _parse_dt(order['date'])
+
+            span = (next_o_dt - prev_o_dt).total_seconds()
+            if span <= 0:
+                result[oid] = prev_d_dt
+            else:
+                t = max(0.0, min(1.0, (o_dt - prev_o_dt).total_seconds() / span))
+                result[oid] = prev_d_dt + timedelta(
+                    seconds=t * (next_d_dt - prev_d_dt).total_seconds()
+                )
     return result
 
 
