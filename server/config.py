@@ -5,8 +5,8 @@ DEBUG = True
 ROOT = py.path.local(__file__).join('..', '..')
 
 
-MODE = 'sagra'
-#MODE = 'ristorante'
+#MODE = 'sagra'
+MODE = 'ristorante'
 
 # *** MODE == 'sagra' ***
 #

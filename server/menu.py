@@ -24,8 +24,8 @@ def get_menu():
     # in server/config.py
     #
     #return menu_13_agosto()
-    #return menu_14_agosto()
-    return menu_sagra()
+    return menu_14_15_agosto()
+    #return menu_sagra()
     #return menu_croce()
 
 
@@ -216,29 +216,25 @@ def menu_13_agosto():
     ]
 
 
-def menu_14_agosto():
+def menu_14_15_agosto():
     return [
-        _item('Coperto', 1.5),
+        _item('Coperto', 1),
         _sep('Primi'),
-        _item('Ravioli au Tuccu', 8),
-        _item('Trenette al pesto', 6.5),
+        _item('Ravioli au Tuccu', 9),
+        _item('Trenette al pesto', 7),
         _sep('Secondi'),
-        _item('Salsiccia', 4.5),
-        _item('Salsiccia + patatine', 5.5),
-        _item('Salsiccia + ins peperoni', 5.5),
-        _item('Salsiccia + pomodori', 5.5),
-        _item('Porchetta', 4.5),
-        _item('Porchetta + patatine', 5.5),
-        _item('Porchetta + ins peperoni', 5.5),
-        _item('Porchetta + pomodori', 5.5),
-        _item('Arrosto', 5),
-        _item('Arrosto + patatine', 6),
-        _item('Arrosto + ins peperoni', 6),
-        _item('Arrosto + pomodori', 6),
+        _item('Salsiccia alla piastra', 5),
+        _item('Salsiccia alla piastra + patatine', 6.5),
+        _item('Salsiccia alla piastra + ins peperoni', 6.5),
+        _item('Porchetta alla piastra', 5),
+        _item('Porchetta alla piastra + patatine', 6.5),
+        _item('Porchetta alla piastra + ins peperoni', 6.5),
+        _item('Arrosto di manzo', 7),
+        _item('Arrosto di manzo + patatine', 8.5),
+        _item('Arrosto di manzo + ins peperoni', 8.5),
         _sep('Contorni'),
         _item('Patatine fritte', 3),
         _item('Insalata di peperoni', 3),
-        _item('Pomodori', 2),
         _sep('Dolci'),
         _item('Panna cotta caramello', 3),
         _item('Panna cotta cioccolato', 3),
@@ -247,25 +243,20 @@ def menu_14_agosto():
         _item('Tartufo bianco', 3),
         _item('Tartufo cioccolato', 3),
         _sep('Vino'),
-        _drink('Bicchiere piccolo dolcetto', 1.5),
-        _drink('Bicchiere piccolo bonarda', 1.5),
+        _drink('Bicchiere piccolo rosso', 1.5),
         _drink('Bicchiere piccolo bianco', 1.5),
-        _drink('Bicchiere grande dolcetto', 3),
-        _drink('Bicchiere grande bonarda', 3),
-        _drink('Bicchiere grande bianco', 3),
-        _drink('Bottiglia vino dolcetto', 8),
-        _drink('Bottiglia vino bonarda', 8),
+        _drink('Bottiglia vino rosso', 8),
         _drink('Bottiglia vino bianco', 8),
         _sep('Altre bevande'),
         _drink('Sangria', 5),
-        _drink('Spritz', 5),
         _drink('Birra alla spina PILS', 5),
         _drink('Birra alla spina WEISS', 5),
-        _drink('Coca Cola', 2),
-        _drink('Aranciata', 2),
-        _drink('Gazzosa', 2),
-        _drink('The Limone', 2),
-        _drink('The Pesca', 2),
+        _drink('Coca Cola', 2.5),
+        _drink('Coca ZERO', 2.5),
+        _drink('Aranciata', 2.5),
+        _drink('Gazzosa', 2.5),
+        _drink('The Limone', 2.5),
+        _drink('The Pesca', 2.5),
         _drink('Acqua naturale 0.5L', 1),
         _drink('Acqua frizzante 0.5L', 1),
         _drink('Amaro camatti', 3),
