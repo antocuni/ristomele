@@ -233,6 +233,7 @@ def menu_14_15_agosto():
         _item('Arrosto di manzo + patatine', 8.5),
         _item('Arrosto di manzo + ins peperoni', 8.5),
         _sep('Contorni'),
+        _item('Pane', 0),
         _item('Patatine fritte', 3),
         _item('Insalata di peperoni', 3),
         _sep('Dolci'),
